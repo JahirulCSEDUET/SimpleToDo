@@ -21,18 +21,24 @@ namespace SimpleToDo.Web.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel loginViewModel, string? returnUrl)
+        public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl)
         {
             if (!ModelState.IsValid)
             {
-                return View(loginViewModel);
+                return View(model);
             }
-            var result = await _signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, true, false);
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, false);
             if (result.Succeeded) 
-            {
-                return RedirectToAction(returnUrl);
+            { 
+                if (!string.IsNullOrEmpty(returnUrl) && returnUrl != null)
+                {
+                    return Redirect(returnUrl);
+                }
+                return RedirectToAction("Index", "Home");
             }
-            return RedirectToAction("Index", "Home");
+            ModelState.AddModelError(string.Empty, "Ivalid username or password");
+            return View(model);
         }
+
     }
 }
