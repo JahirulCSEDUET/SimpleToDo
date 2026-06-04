@@ -1,0 +1,53 @@
+﻿@model SimpleToDo.Web.ViewModels.Auth.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">Create Account</h2>
+
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="FullName" class="form-label">Full Name</label>
+                            <input asp-for="FullName" class="form-control" placeholder="Enter your full name" autofocus />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <input asp-for="Password" type="password" class="form-control" placeholder="Create a password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted">Already have an account? <a asp-action="Login">Log in</a></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

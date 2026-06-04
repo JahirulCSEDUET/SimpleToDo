@@ -1,5 +1,10 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SimpleToDo.Application.Interfaces;
+using SimpleToDo.Application.Services;
 using SimpleToDo.Infrastructure.Data;
+using SimpleToDo.Infrastructure.Identity;
+using SimpleToDo.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +15,18 @@ builder.Services.AddDbContext<SimpleToDoDbContext>(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
+builder.Services.AddScoped<IToDoService, ToDoServices>();
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequiredLength = 6;
+    options.Password.RequireDigit = true;
+    options.Password.RequireUppercase = true;
+    options.User.RequireUniqueEmail = true;
+})
+    .AddEntityFrameworkStores<SimpleToDoDbContext>()
+    .AddDefaultTokenProviders();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -23,6 +40,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

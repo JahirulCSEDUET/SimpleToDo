@@ -11,7 +11,7 @@ namespace SimpleToDo.Application.Interfaces
         Task<bool> DeleteAsync(ToDoItem item);
         Task UpdateAsync(ToDoItem item);
         Task<ToDoItem> GetByIdAsync(int id);
-        Task<ToDoItem> GetByUserIdAsync(string userId);
+        Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId);
         Task<IReadOnlyList<ToDoItem>> GetAllASync();
     }
 }

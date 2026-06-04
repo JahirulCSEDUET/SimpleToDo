@@ -10,3 +10,4 @@ namespace SimpleToDo.Infrastructure.Identity
         public string FullName { get; set; }
     }
 }
+   

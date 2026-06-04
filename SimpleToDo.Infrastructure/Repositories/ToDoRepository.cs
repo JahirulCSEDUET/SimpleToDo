@@ -40,9 +40,9 @@ namespace SimpleToDo.Infrastructure.Repositories
             return await _context.ToDoItems.AsNoTracking().FirstOrDefaultAsync(i=> i.Id == id);
         }
 
-        public async Task<ToDoItem> GetByUserIdAsync(string userId)
+        public async Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId)
         {
-            return await _context.ToDoItems.AsNoTracking().FirstOrDefaultAsync(i => i.UserId == userId);
+            return await _context.ToDoItems.AsNoTracking().Where(i => i.UserId == userId).ToListAsync();
         }
 
         public async Task UpdateAsync(ToDoItem item)

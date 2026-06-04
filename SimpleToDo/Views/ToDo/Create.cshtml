@@ -1,0 +1,41 @@
+﻿@model SimpleToDo.Web.ViewModels.ToDo.ToDoItemCreateViewModel
+
+@{
+    ViewData["Title"] = "Create Task";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">Add New Task</h2>
+
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Title Input -->
+                        <div class="form-group mb-4">
+                            <label asp-for="Title" class="form-label fw-bold">Task Title</label>
+                            <input asp-for="Title" class="form-control form-control-lg" placeholder="What do you need to do?" autofocus autocomplete="off" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+                            <button type="submit" class="btn btn-primary px-4">Save Task</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        // Included in case you add [Required] or [StringLength] to your ViewModel later!
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -5,13 +5,13 @@ using System.Text;
 
 namespace SimpleToDo.Application.Interfaces
 {
-    public interface IToDOService
+    public interface IToDoService
     {
         Task<ToDoItem> AddAsync(ToDoItem item);
         Task<bool> DeleteAsync(ToDoItem item);
-        Task UpdateAsync(ToDoItem item);
+        Task UpdateStatus(int id, string status);
         Task<ToDoItem> GetByIdAsync(int id);
-        Task<ToDoItem> GetByUserIdAsync(string userId);
+        Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId);
         Task<IReadOnlyList<ToDoItem>> GetAllASync();
     }
 }

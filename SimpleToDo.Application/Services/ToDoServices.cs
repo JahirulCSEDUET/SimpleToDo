@@ -1,12 +1,13 @@
 ﻿using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Domain.Entities;
+using SimpleToDo.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace SimpleToDo.Application.Services
 {
-    public class ToDoServices : IToDOService
+    public class ToDoServices : IToDoService
     {
         private readonly IToDoRepository _toDoRepository;
 
@@ -36,14 +37,23 @@ namespace SimpleToDo.Application.Services
             return await _toDoRepository.GetByIdAsync(id);
         }
 
-        public async Task<ToDoItem> GetByUserIdAsync(string userId)
+        public async Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId)
         {
             return await _toDoRepository.GetByUserIdAsync(userId);
         }
 
-        public async Task UpdateAsync(ToDoItem item)
+        public async Task UpdateStatus(int id, string status)
         {
-            await _toDoRepository.UpdateAsync(item);
+            var todo = await _toDoRepository.GetByIdAsync(id);
+            if (status == Status.Processing.ToString())
+            {
+                todo.Status = Status.Processing;
+            }
+            else if (status == Status.Completed.ToString())
+            {
+                todo.Status = Status.Completed;
+            }
+            await _toDoRepository.UpdateAsync(todo);
         }
     }
 }
