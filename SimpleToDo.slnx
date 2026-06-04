@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="SimpleToDo.Application/SimpleToDo.Application.csproj" />
+  <Project Path="SimpleToDo.Domain/SimpleToDo.Domain.csproj" />
+  <Project Path="SimpleToDo.Infrastructure/SimpleToDo.Infrastructure.csproj" />
+  <Project Path="SimpleToDo/SimpleToDo.Web.csproj" />
+</Solution>
