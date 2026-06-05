@@ -25,7 +25,7 @@ namespace SimpleToDo.Web.Controllers
             {
                 Challenge();
             }
-            var todos = await _todoService.GetByUserIdAsync(userId);
+            var todos = await _todoService.GetByUserIdAsync(userId, false);
             var todoList = todos.Select(t => new ToDoItemListViewModel
             {
                 Id = t.Id,
@@ -54,7 +54,8 @@ namespace SimpleToDo.Web.Controllers
             {
                 Status = Status.Pending,
                 Title = item.Title,
-                UserId = userId
+                UserId = userId,
+                IsArchived =false,
             };
             await _todoService.AddAsync(todo);
             return RedirectToAction(nameof(Index));
@@ -67,12 +68,12 @@ namespace SimpleToDo.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
             await _todoService.UpdateStatus(id, status);
-            return RedirectToAction(nameof(Index));
+            return Ok();
         }
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Archived(int id)
         {
-            bool result = await _todoService.DeleteAsync(id);
+            bool result = await _todoService.ArchiveAsync(id);
             if(!result)
             {
                 return NotFound();

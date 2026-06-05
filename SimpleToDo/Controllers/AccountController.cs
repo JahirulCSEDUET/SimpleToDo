@@ -36,7 +36,7 @@ namespace SimpleToDo.Web.Controllers
                 }
                 return RedirectToAction("Index", "ToDo");
             }
-            ModelState.AddModelError(string.Empty, "Ivalid username or password");
+            ModelState.AddModelError(string.Empty, "Invalid username or password");
             return View(model);
         }
         public IActionResult Register() 
