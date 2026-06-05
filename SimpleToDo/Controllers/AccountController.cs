@@ -72,6 +72,11 @@ namespace SimpleToDo.Web.Controllers
             }
             return RedirectToAction("Index", "ToDo");
         }
-
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction(nameof(Login));
+        }
     }
 }

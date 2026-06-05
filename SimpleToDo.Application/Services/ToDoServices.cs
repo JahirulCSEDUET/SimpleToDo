@@ -1,4 +1,4 @@
-﻿using SimpleToDo.Application.Interfaces;
+﻿using SimpleToDo.Domain.Interfaces;
 using SimpleToDo.Domain.Entities;
 using SimpleToDo.Domain.Enums;
 using System;
@@ -22,8 +22,13 @@ namespace SimpleToDo.Application.Services
             return item;
         }
 
-        public async Task<bool> DeleteAsync(ToDoItem item)
+        public async Task<bool> DeleteAsync(int id)
         {
+            var item = await _toDoRepository.GetByIdAsync(id);
+            if(item==null)
+            {
+                return false;
+            }
             return await _toDoRepository.DeleteAsync(item);
         }
 

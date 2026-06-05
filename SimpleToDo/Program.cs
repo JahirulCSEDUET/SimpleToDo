@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SimpleToDo.Application.Interfaces;
+using SimpleToDo.Domain.Interfaces;
 using SimpleToDo.Application.Services;
 using SimpleToDo.Infrastructure.Data;
 using SimpleToDo.Infrastructure.Identity;
@@ -47,7 +47,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=ToDO}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 

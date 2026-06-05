@@ -39,7 +39,7 @@
                             {
                                 <form asp-action="UpdateStatus" asp-controller="ToDo" method="post" class="m-0">
                                     <input type="hidden" name="id" value="@item.Id" />
-                                    <input type="hidden" name="newStatus" value="Processing" />
+                                    <input type="hidden" name="status" value="Processing" />
                                     <button type="submit" class="btn btn-primary btn-sm">Process it</button>
                                 </form>
                             }
@@ -47,9 +47,13 @@
                             {
                                 <form asp-action="UpdateStatus" asp-controller="ToDo" method="post" class="m-0">
                                     <input type="hidden" name="id" value="@item.Id" />
-                                    <input type="hidden" name="newStatus" value="Complete" />
-                                    <button type="submit" class="btn btn-success btn-sm">Complete it</button>
+                                    <input type="hidden" name="status" value="Completed" />
+                                    <button type="submit" class="btn btn-success btn-sm">Mark As Complete</button>
                                 </form>
+                            }
+                            else if(item.Status.ToString() == "Completed")
+                            {
+                                <button type="button" class="btn btn-success btn-sm">Completed</button>
                             }
 
                             <!-- Delete Button (Always Visible) -->

@@ -3,13 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SimpleToDo.Application.Interfaces
+namespace SimpleToDo.Domain.Interfaces
 {
-    public interface IToDoRepository
+    public interface IToDoService
     {
         Task<ToDoItem> AddAsync(ToDoItem item);
-        Task<bool> DeleteAsync(ToDoItem item);
-        Task UpdateAsync(ToDoItem item);
+        Task<bool> DeleteAsync(int id);
+        Task UpdateStatus(int id, string status);
         Task<ToDoItem> GetByIdAsync(int id);
         Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId);
         Task<IReadOnlyList<ToDoItem>> GetAllASync();

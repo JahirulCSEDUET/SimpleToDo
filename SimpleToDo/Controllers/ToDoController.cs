@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SimpleToDo.Application.Interfaces;
+using SimpleToDo.Domain.Interfaces;
 using SimpleToDo.Domain.Entities;
 using SimpleToDo.Domain.Enums;
-using SimpleToDo.Web.ViewModels.Auth;
 using SimpleToDo.Web.ViewModels.ToDo;
 using System.Security.Claims;
 
@@ -65,10 +64,20 @@ namespace SimpleToDo.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View();
+                return RedirectToAction(nameof(Index));
             }
             await _todoService.UpdateStatus(id, status);
-            return View();
+            return RedirectToAction(nameof(Index));
+        }
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            bool result = await _todoService.DeleteAsync(id);
+            if(!result)
+            {
+                return NotFound();
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }
