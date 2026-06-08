@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SimpleToDo.Domain.Interfaces;
+using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Domain.Entities;
 using SimpleToDo.Domain.Enums;
 using SimpleToDo.Web.ViewModels.ToDo;

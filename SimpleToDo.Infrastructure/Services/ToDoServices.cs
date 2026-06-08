@@ -1,11 +1,11 @@
-﻿using SimpleToDo.Domain.Interfaces;
-using SimpleToDo.Domain.Entities;
+﻿using SimpleToDo.Domain.Entities;
 using SimpleToDo.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SimpleToDo.Application.Interfaces;
 
-namespace SimpleToDo.Application.Services
+namespace SimpleToDo.Infrastructure.Services
 {
     public class ToDoServices : IToDoService
     {

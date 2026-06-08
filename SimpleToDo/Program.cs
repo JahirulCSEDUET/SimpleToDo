@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SimpleToDo.Domain.Interfaces;
-using SimpleToDo.Application.Services;
+using SimpleToDo.Application.Interfaces;
+using SimpleToDo.Infrastructure.Services;
 using SimpleToDo.Infrastructure.Data;
 using SimpleToDo.Infrastructure.Identity;
 using SimpleToDo.Infrastructure.Repositories;
