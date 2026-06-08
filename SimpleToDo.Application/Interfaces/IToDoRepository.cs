@@ -7,11 +7,11 @@ namespace SimpleToDo.Application.Interfaces
 {
     public interface IToDoRepository
     {
-        Task<ToDoItem> AddAsync(ToDoItem item);
-        Task<bool> DeleteAsync(ToDoItem item);
-        Task UpdateAsync(ToDoItem item);
-        Task<ToDoItem> GetByIdAsync(int id);
-        Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId, bool isArchived);
-        Task<IReadOnlyList<ToDoItem>> GetAllASync();
+        Task<Todo> AddAsync(Todo item);
+        Task<bool> DeleteAsync(Todo item);
+        System.Threading.Tasks.Task UpdateAsync(Todo item);
+        Task<Todo> GetByIdAsync(int id);
+        Task<IReadOnlyList<Todo>> GetByUserIdAsync(string userId, bool isArchived);
+        Task<IReadOnlyList<Todo>> GetAllASync();
     }
 }

@@ -17,37 +17,37 @@ namespace SimpleToDo.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<ToDoItem> AddAsync(ToDoItem item)
+        public async Task<Todo> AddAsync(Todo item)
         {
-            await _context.ToDoItems.AddAsync(item);
+            await _context.Todos.AddAsync(item);
             await _context.SaveChangesAsync();
             return item;
         }
 
-        public async Task<bool> DeleteAsync(ToDoItem item)
+        public async Task<bool> DeleteAsync(Domain.Entities.Todo item)
         {
-            _context.ToDoItems.Remove(item);
+            _context.Todos.Remove(item);
             return await _context.SaveChangesAsync()>0;
         }
 
-        public async Task<IReadOnlyList<ToDoItem>> GetAllASync()
+        public async Task<IReadOnlyList<Todo>> GetAllASync()
         {
-            return await _context.ToDoItems.AsNoTracking().ToListAsync();
+            return await _context.Todos.AsNoTracking().ToListAsync();
         }
 
-        public async Task<ToDoItem> GetByIdAsync(int id)
+        public async Task<Todo> GetByIdAsync(int id)
         {
-            return await _context.ToDoItems.AsNoTracking().FirstOrDefaultAsync(i=> i.Id == id);
+            return await _context.Todos.AsNoTracking().FirstOrDefaultAsync(i=> i.Id == id);
         }
 
-        public async Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId, bool isArchived)
+        public async Task<IReadOnlyList<Todo>> GetByUserIdAsync(string userId, bool isArchived)
         {
-            return await _context.ToDoItems.AsNoTracking().Where(i => i.UserId == userId && i.IsArchived== isArchived).ToListAsync();
+            return await _context.Todos.AsNoTracking().Where(i => i.UserId == userId && i.IsArchived== isArchived).ToListAsync();
         }
 
-        public async Task UpdateAsync(ToDoItem item)
+        public async  Task UpdateAsync(Domain.Entities.Todo item)
         {
-            _context.ToDoItems.Update(item);
+            _context.Todos.Update(item);
             await _context.SaveChangesAsync();
         }
     }

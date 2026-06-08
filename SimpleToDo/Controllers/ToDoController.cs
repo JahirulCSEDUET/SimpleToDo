@@ -50,7 +50,7 @@ namespace SimpleToDo.Web.Controllers
             {
                 Challenge();
             }
-            var todo = new ToDoItem
+            var todo = new Todo
             {
                 Status = Status.Pending,
                 Title = item.Title,

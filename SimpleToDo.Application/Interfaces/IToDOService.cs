@@ -7,12 +7,12 @@ namespace SimpleToDo.Application.Interfaces
 {
     public interface IToDoService
     {
-        Task<ToDoItem> AddAsync(ToDoItem item);
+        Task<Todo> AddAsync(Todo item);
         Task<bool> DeleteAsync(int id);
         Task<bool> ArchiveUnarchivedAsync(int id);
         Task UpdateStatus(int id, string status);
-        Task<ToDoItem> GetByIdAsync(int id);
-        Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId, bool isArchived);
-        Task<IReadOnlyList<ToDoItem>> GetAllASync();
+        Task<Todo> GetByIdAsync(int id);
+        Task<IReadOnlyList<Todo>> GetByUserIdAsync(string userId, bool isArchived);
+        Task<IReadOnlyList<Todo>> GetAllASync();
     }
 }

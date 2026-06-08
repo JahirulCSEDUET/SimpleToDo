@@ -16,7 +16,7 @@ namespace SimpleToDo.Infrastructure.Services
             _toDoRepository = toDoRepository;
         }
 
-        public async Task<ToDoItem> AddAsync(ToDoItem item)
+        public async Task<Todo> AddAsync(Todo item)
         {
             await _toDoRepository.AddAsync(item);
             return item;
@@ -32,17 +32,17 @@ namespace SimpleToDo.Infrastructure.Services
             return await _toDoRepository.DeleteAsync(item);
         }
 
-        public async Task<IReadOnlyList<ToDoItem>> GetAllASync()
+        public async Task<IReadOnlyList<Todo>> GetAllASync()
         {
             return await _toDoRepository.GetAllASync();
         }
 
-        public async Task<ToDoItem> GetByIdAsync(int id)
+        public async Task<Todo> GetByIdAsync(int id)
         {
             return await _toDoRepository.GetByIdAsync(id);
         }
 
-        public async Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId, bool isArchived)
+        public async Task<IReadOnlyList<Todo>> GetByUserIdAsync(string userId, bool isArchived)
         {
             return await _toDoRepository.GetByUserIdAsync(userId, isArchived);
         }
