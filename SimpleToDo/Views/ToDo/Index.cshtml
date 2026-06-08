@@ -83,16 +83,15 @@
             const columns = ['Pending', 'Processing', 'Completed'];
 
             columns.forEach(colId => {
-
                 const el = document.getElementById(colId);
                 if (el) {
                     new Sortable(el, {
-                        group: 'todo-board', 
+                        group: 'todo-board',
                         animation: 150,
                         ghostClass: 'sortable-ghost',
                         
                         onEnd: function (evt) {
-                            if (evt.from === evt.to) return; 
+                            if (evt.from === evt.to) return;
                             const itemEl = evt.item;
                             const taskId = itemEl.getAttribute('data-id');
                             const newStatus = evt.to.getAttribute('data-status');
@@ -103,7 +102,6 @@
                 }
             });
 
-        
             function updateTaskStatus(taskId, newStatus, oldColumn, itemElement) {
                 
                 let formData = new FormData();
@@ -115,14 +113,30 @@
                     body: formData
                 })
                 .then(response => {
-                    if (!response.ok && !response.redirected) {
+                    // Check if the backend update succeeded
+                    if (response.ok || response.redirected) {
+                        
+                        // NEW CODE: Find the form inside the dragged card
+                        const archiveForm = itemElement.querySelector('.archive-form');
+                        
+                        if (archiveForm) {
+                            if (newStatus === 'Completed') {
+                                archiveForm.classList.remove('d-none'); // Show button
+                            } 
+                            else {
+                                archiveForm.classList.add('d-none'); // Hide button if dragged out
+                            }
+                        }
+
+                    } 
+                    else {
                         alert('Error updating status.');
                         oldColumn.appendChild(itemElement);
                     }
                 })
                 .catch(error => {
-                console.error('Error:', error);        
-                oldColumn.appendChild(itemElement);
+                    console.error('Error:', error);
+                    oldColumn.appendChild(itemElement);
                 });
             }
         });
