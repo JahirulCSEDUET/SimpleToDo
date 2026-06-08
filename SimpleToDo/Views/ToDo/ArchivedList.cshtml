@@ -1,0 +1,68 @@
+﻿@model IReadOnlyList<ToDoItemListViewModel>
+
+@{
+    ViewData["Title"] = "Archived Tasks";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-archive text-secondary me-2"></i>Archived Tasks</h2>
+        <a asp-action="Index" class="btn btn-outline-primary" title="Go back to the main task board">
+            <i class="bi bi-arrow-left-circle me-1"></i> Back to Board
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-secondary text-center shadow-sm">
+            <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+            You don't have any archived tasks right now.
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Task Title</th>
+                            <th class="text-end pe-4" style="width: 250px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-medium text-muted">
+                                    <del>@item.Title</del>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        
+                                        <!-- 1. Unarchive Action -->
+                                        <form asp-action="ArchivedUnArchived" asp-controller="ToDo" method="post" class="m-0">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-success" title="Restore this task back to the board">
+                                                <i class="bi bi-arrow-counterclockwise me-1"></i> Unarchive
+                                            </button>
+                                        </form>
+
+                                        <!-- 2. Delete Action -->
+                                        <form asp-action="Delete" asp-controller="ToDo" method="post" class="m-0" onsubmit="return confirm('Are you sure you want to permanently delete this task? This cannot be undone.');">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Permanently delete this task">
+                                                <i class="bi bi-trash me-1"></i> Delete
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

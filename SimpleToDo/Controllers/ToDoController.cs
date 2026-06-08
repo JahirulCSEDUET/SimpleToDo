@@ -71,14 +71,40 @@ namespace SimpleToDo.Web.Controllers
             return Ok();
         }
         [HttpPost]
-        public async Task<IActionResult> Archived(int id)
+        public async Task<IActionResult> ArchivedUnArchived(int id)
         {
-            bool result = await _todoService.ArchiveAsync(id);
+            bool result = await _todoService.ArchiveUnarchivedAsync(id);
             if(!result)
             {
                 return NotFound();
             }
             return RedirectToAction(nameof(Index));
+        }
+        public async Task<IActionResult> ArchivedList()
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                Challenge();
+            }
+            var todos = await _todoService.GetByUserIdAsync(userId, true);
+            var todoList = todos.Select(t => new ToDoItemListViewModel
+            {
+                Id = t.Id,
+                Status = t.Status,
+                Title = t.Title
+            }).ToList();
+            return View(todoList);
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            bool result = await _todoService.DeleteAsync(id);
+            return RedirectToAction(nameof(ArchivedList));
         }
     }
 }

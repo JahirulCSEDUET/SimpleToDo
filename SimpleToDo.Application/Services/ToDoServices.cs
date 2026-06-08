@@ -60,10 +60,17 @@ namespace SimpleToDo.Application.Services
             }
             await _toDoRepository.UpdateAsync(todo);
         }
-        public async Task<bool> ArchiveAsync(int id)
+        public async Task<bool> ArchiveUnarchivedAsync(int id)
         {
             var todo = await _toDoRepository.GetByIdAsync(id);
-            todo.IsArchived = true;
+            if(todo.IsArchived == true)
+            {
+                todo.IsArchived = false;
+            }
+            else
+            {
+                todo.IsArchived = true;
+            }
             await _toDoRepository.UpdateAsync(todo);
             return true;
         }

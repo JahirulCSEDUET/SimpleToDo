@@ -9,7 +9,7 @@ namespace SimpleToDo.Domain.Interfaces
     {
         Task<ToDoItem> AddAsync(ToDoItem item);
         Task<bool> DeleteAsync(int id);
-        Task<bool> ArchiveAsync(int id);
+        Task<bool> ArchiveUnarchivedAsync(int id);
         Task UpdateStatus(int id, string status);
         Task<ToDoItem> GetByIdAsync(int id);
         Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId, bool isArchived);

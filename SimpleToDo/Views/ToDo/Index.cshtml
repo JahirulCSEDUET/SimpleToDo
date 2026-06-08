@@ -1,4 +1,4 @@
-﻿@model IReadOnlyList<SimpleToDo.Web.ViewModels.ToDo.ToDoItemListViewModel>
+﻿@model IReadOnlyList<ToDoItemListViewModel>
 
 @{
     ViewData["Title"] = "My To-Do List";
@@ -30,14 +30,26 @@
 
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>My Tasks Board</h2>
-        <a asp-action="Create" class="btn btn-primary">Add New Task</a>
+        
+        <!-- Title on the LEFT -->
+        <h2 class="mb-0">My Tasks Board</h2>
+
+        <!-- Buttons grouped together on the RIGHT -->
+        <div class="d-flex gap-2">
+            <a asp-action="Create" class="btn btn-primary" title="Create a new task">
+                <i class="bi bi-plus-circle"></i> <!-- Added text back if you want it -->
+            </a>
+            <a asp-action="ArchivedList" class="btn btn-secondary" title="Archived List">
+                <i class="bi bi-archive"></i>
+            </a>
+        </div>
+
     </div>
 
     @if (!Model.Any())
     {
         <div class="alert alert-info text-center">
-            You don't have any tasks right now. Click "Add New Task" to get started!
+            You don't have any tasks right now. Click <a asp-action="Create" >"Add New Task"</a> to get started!
         </div>
     }
     else
