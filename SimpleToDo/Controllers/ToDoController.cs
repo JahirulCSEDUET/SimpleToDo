@@ -12,10 +12,12 @@ namespace SimpleToDo.Web.Controllers
     public class ToDoController : Controller
     {
         private readonly IToDoService _todoService;
+        private readonly IUserService _userService;
 
-        public ToDoController(IToDoService todoService)
+        public ToDoController(IToDoService todoService, IUserService userService)
         {
             _todoService = todoService;
+            _userService = userService;
         }
 
         public async Task<IActionResult> Index()
@@ -25,7 +27,8 @@ namespace SimpleToDo.Web.Controllers
             {
                 Challenge();
             }
-            var todos = await _todoService.GetByUserIdAsync(userId, false);
+            var user = _userService.GetByUserId(userId);
+            var todos = await _todoService.GetByUserIdAsync(user.Id, false);
             var todoList = todos.Select(t => new ToDoItemListViewModel
             {
                 Id = t.Id,
@@ -50,12 +53,14 @@ namespace SimpleToDo.Web.Controllers
             {
                 Challenge();
             }
+            var user = _userService.GetByUserId(userId);
             var todo = new Todo
             {
                 Status = Status.Pending,
                 Title = item.Title,
-                UserId = userId,
-                IsArchived =false,
+                UserId = user.Id,
+                CreatedBy = user.Id,
+                IsArchived = false,
             };
             await _todoService.AddAsync(todo);
             return RedirectToAction(nameof(Index));
@@ -87,7 +92,8 @@ namespace SimpleToDo.Web.Controllers
             {
                 Challenge();
             }
-            var todos = await _todoService.GetByUserIdAsync(userId, true);
+            var user = _userService.GetByUserId(userId);
+            var todos = await _todoService.GetByUserIdAsync(user.Id, true);
             var todoList = todos.Select(t => new ToDoItemListViewModel
             {
                 Id = t.Id,

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleToDo.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SimpleToDo.Infrastructure.Data;
 namespace SimpleToDo.Infrastructure.Migrations
 {
     [DbContext(typeof(SimpleToDoDbContext))]
-    partial class SimpleToDoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260609074108_Feature_Project")]
+    partial class Feature_Project
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

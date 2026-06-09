@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SimpleToDo.Application.Interfaces;
+﻿using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Domain.Entities;
 using SimpleToDo.Domain.Interfaces;
 using SimpleToDo.Infrastructure.Data;
@@ -9,9 +8,9 @@ using System.Text;
 
 namespace SimpleToDo.Infrastructure.Repositories
 {
-    public class ToDoRepository :Repository<Todo>, IToDoRepository
+    public class UserRepository : Repository<User>, IUserRepository
     {
-        public ToDoRepository(SimpleToDoDbContext context):base(context)
+        public UserRepository(SimpleToDoDbContext context) : base(context)
         {
         }
     }

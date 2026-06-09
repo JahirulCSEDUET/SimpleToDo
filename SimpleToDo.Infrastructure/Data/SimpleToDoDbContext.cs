@@ -12,7 +12,7 @@ namespace SimpleToDo.Infrastructure.Data
     {
         public SimpleToDoDbContext(DbContextOptions<SimpleToDoDbContext> options) : base(options) { }
         public DbSet<Todo> Todos { get; set; }
-        public DbSet<Member> Members { get; set; }
+        public DbSet<User> Members { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectMember> ProjectMembers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,9 +25,9 @@ namespace SimpleToDo.Infrastructure.Data
                 .HasForeignKey(p => p.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<ProjectMember>()
-                .HasOne(pm => pm.Member)
+                .HasOne(pm => pm.User)
                 .WithMany(m => m.ProjectMembers)
-                .HasForeignKey(pm => pm.MemberId)
+                .HasForeignKey(pm => pm.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

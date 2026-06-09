@@ -1,0 +1,68 @@
+﻿@using SimpleToDo.Domain.Entities
+@model IReadOnlyList<Project>
+
+@{
+    ViewData["Title"] = "My Projects";
+
+    var ownProjects = Model.Where(p => p.ProjectMembers.Any(m => m.Role.ToString() == "Admin")).ToList();
+    var contributions = Model.Where(p => p.ProjectMembers.Any(m => m.Role.ToString() == "Contributor")).ToList();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Projects Dashboard</h2>
+    <a asp-action="Create" class="btn btn-primary">Create New Project</a>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">Own Projects</h4>
+            </div>
+            <div class="card-body">
+                @if (ownProjects.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var project in ownProjects)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>@project.Name</span>
+                                <a asp-action="Details" asp-route-id="@project.Id" class="btn btn-sm btn-outline-primary">View</a>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">You don't have any projects as an Admin yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h4 class="card-title mb-0">Contributions</h4>
+            </div>
+            <div class="card-body">
+                @if (contributions.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var project in contributions)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>@project.Name</span>
+                                <a asp-action="Details" asp-route-id="@project.Id" class="btn btn-sm btn-outline-info">View</a>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">You are not contributing to any projects yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

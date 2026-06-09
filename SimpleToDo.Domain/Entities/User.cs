@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SimpleToDo.Domain.Entities
 {
-    public class Member
+    public class User
     {
         public int Id { get; set; }
         public string UserId { get; set; }

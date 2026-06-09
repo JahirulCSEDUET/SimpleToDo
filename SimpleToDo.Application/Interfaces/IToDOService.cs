@@ -12,7 +12,7 @@ namespace SimpleToDo.Application.Interfaces
         Task<bool> ArchiveUnarchivedAsync(int id);
         Task UpdateStatus(int id, string status);
         Task<Todo> GetByIdAsync(int id);
-        Task<IReadOnlyList<Todo>> GetByUserIdAsync(string userId, bool isArchived);
-        Task<IReadOnlyList<Todo>> GetAllASync();
+        Task<IReadOnlyList<Todo>> GetByUserIdAsync(int userId, bool isArchived);
+        Task<IReadOnlyList<Todo>> GetAllAsync();
     }
 }

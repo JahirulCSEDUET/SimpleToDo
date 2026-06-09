@@ -24,6 +24,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="ToDo" asp-action="Index">Home</a>
                         </li>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                                <li>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Project" asp-action="Index">Projects</a>
+                                </li>
+                            }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
@@ -35,7 +41,6 @@
                                 <span class="nav-link text-dark fw-bold">Welcome @User.Identity.Name!</span>
                             </li>
                             <li class="nav-item">
-                                <!-- Using a form for logout is a security best practice to prevent CSRF -->
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="form-inline m-0">
                                     <button type="submit" class="nav-link btn btn-link text-dark border-0">Logout</button>
                                 </form>
@@ -44,10 +49,10 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Login</a>
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Register</a>
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Register</a>
                             </li>
                         }
                     </ul>
