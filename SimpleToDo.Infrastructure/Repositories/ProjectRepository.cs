@@ -16,25 +16,17 @@ namespace SimpleToDo.Infrastructure.Repositories
         {
             _context = context;
         }
-        public async Task<Project> GetByIdWithMembersAsync(int projectId)
+        public async Task<Project> GetByIdWithMemberAndTodoAsync(int projectId)
         {
             return await _context.Projects
                 .Include(p => p.ProjectMembers)
+                    .ThenInclude(pm => pm.User)
+                .Include(p=> p.Todos)
                     .ThenInclude(pm => pm.User)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == projectId);
                 
         }
-
-        public async Task<Project> GetByIdWithTodoAsync(int projectId)
-        {
-            return await _context.Projects
-                .Include(p => p.Todos)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Id == projectId);
-
-        }
-
         public async Task<IReadOnlyList<Project>> GetByMemberIdAsync(int userId)
         {
             return await _context.Projects

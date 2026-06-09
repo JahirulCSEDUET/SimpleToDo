@@ -12,8 +12,8 @@ namespace SimpleToDo.Domain.Entities
         public Status Status { get; set; }
         public bool IsArchived { get; set; } 
         public int CreatedBy { get; set; }
-        public int UserId { get; set; }
-        public User User { get; set; }
+        public int? UserId { get; set; }
+        public User? User { get; set; }
         public int? ProjectId { get; set; }
         public Project Project { get; set; }
     }

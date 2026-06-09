@@ -13,7 +13,6 @@ namespace SimpleToDo.Application.Interfaces
         Task<IReadOnlyList<Project>> GetAllAsync();
         Task<IReadOnlyList<Project>> GetByMemberIdAsync(int userId);
         Task<Project> GetByIdAsync(int id);        
-        Task<Project> GetByIdWithMembersAsync(int projectId);
-        Task<Project> GetByIdWithTodoAsync(int projectId);
+        Task<Project> GetByIdWithMemberAndTodoAsync(int projectId);
     }
 }

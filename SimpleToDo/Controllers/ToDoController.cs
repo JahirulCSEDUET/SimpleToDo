@@ -27,7 +27,11 @@ namespace SimpleToDo.Web.Controllers
             {
                 Challenge();
             }
-            var user = _userService.GetByUserId(userId);
+            var user =_userService.GetByUserId(userId);
+            if (user == null)
+            {
+                Challenge();
+            }
             var todos = await _todoService.GetByUserIdAsync(user.Id, false);
             var todoList = todos.Select(t => new ToDoItemListViewModel
             {
@@ -64,6 +68,30 @@ namespace SimpleToDo.Web.Controllers
             };
             await _todoService.AddAsync(todo);
             return RedirectToAction(nameof(Index));
+        }
+        [HttpPost]
+        public async Task<IActionResult> QuickCreate(int projectId, string title)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Details","Project");
+            }
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                Challenge();
+            }
+            var user = _userService.GetByUserId(userId);
+            var todo = new Todo
+            {
+                Status = Status.Pending,
+                Title = title,
+                ProjectId = projectId,
+                CreatedBy = user.Id,
+                IsArchived = false,
+            };
+            await _todoService.AddAsync(todo);
+            return RedirectToAction("Details","Project", new { id = projectId });
         }
         [HttpPost]
         public async Task<IActionResult> UpdateStatus(int id, string status)
