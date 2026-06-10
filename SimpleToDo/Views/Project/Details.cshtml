@@ -1,282 +1,294 @@
 ﻿@model SimpleToDo.Web.ViewModels.Project.ProjectDetailsViewModel
 
 @{
-    ViewData["Title"] = "Project Details - " + Model.Name;
+    ViewData["Title"] = "Project Workspace - " + Model.Name;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-    <div>
-        <span class="text-muted text-uppercase small fw-bold tracking-wide">Project Workspace</span>
-        <h2 class="mb-0 fw-bold text-dark">@Model.Name</h2>
-    </div>
-    <div>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-sm">
-            &larr; Back to Projects
-        </a>
-    </div>
-</div>
+<style>
+    /* Premium Board Framework Layout styles */
+    .kanban-lane {
+        min-height: 450px;
+        background-color: rgba(248, 249, 250, 0.75);
+        border: 1px dashed #e3e6f0;
+        border-radius: 14px;
+        padding: 12px;
+        transition: background-color 0.2s ease;
+    }
 
-<div class="card shadow-sm border-0 rounded-4">
-    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
-        <ul class="nav nav-pills fs-6 fw-semibold" id="projectTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active px-4 rounded-pill" id="todos-tab" data-bs-toggle="tab" data-bs-target="#todos-pane" type="button" role="tab" aria-controls="todos-pane" aria-selected="true">
-                    Todos
-                    <span class="badge bg-secondary ms-2 rounded-pill">@Model.TodoList.Count</span>
-                </button>
-            </li>
-            <li class="nav-item ms-2" role="presentation">
-                <button class="nav-link px-4 rounded-pill" id="members-tab" data-bs-toggle="tab" data-bs-target="#members-pane" type="button" role="tab" aria-controls="members-pane" aria-selected="false">
-                    Team Members
-                    <span class="badge bg-secondary ms-2 rounded-pill">@Model.ProjectMemberList.Count</span>
-                </button>
-            </li>
-        </ul>
+    .sortable-ghost {
+        opacity: 0.35;
+        transform: scale(0.97);
+        filter: saturate(0.5);
+    }
+
+    .project-task-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .project-task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.06) !important;
+        }
+
+    .avatar-circle {
+        width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .transition-all {
+        transition: all 0.2s ease-in-out;
+    }
+</style>
+
+<div class="container-fluid px-0 mt-2">
+
+    <!-- Workspace Top Header Bar -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill px-2.5 small">Project Workspace</span>
+                <span class="text-muted small">&bull; Role: <strong>@Model.DetailsViewerRole</strong></span>
+            </div>
+            <h2 class="mb-0 fw-bold text-dark tracking-tight"><i class="bi bi-folder2-open text-primary me-2"></i>@Model.Name</h2>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-light border rounded-pill px-3 text-secondary d-flex align-items-center gap-2 btn-sm py-2 shadow-sm transition-all" title="Return to Projects Dashboard">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
     </div>
 
-    <div class="card-body p-0">
-        <div class="tab-content" id="projectTabsContent">
-            
-            <div class="tab-pane fade show active" id="todos-pane" role="tabpanel" aria-labelledby="todos-tab">
-                @if (Model.DetailsViewerRole == "Admin")
-                {
-                    <div class="bg-light p-3 border-bottom border-top">
-                        <form asp-controller="Todo" asp-action="QuickCreate" method="post" class="d-flex align-items-center gap-2 m-0 px-2">
+    <!-- Main Asymmetric Multi-Column Workspace Framework (Ratio Split) -->
+    <div class="row g-4">
+
+        <!-- LEFT SIDEBAR PART: TODOS & ACTIVE WORKFLOW (Ratio 5 Columns Equivalent) -->
+        <div class="col-xl-9 col-lg-8">
+
+            <!-- Context Block: Notification Alerts Pipeline -->
+            @if (TempData["TodoError"] != null)
+            {
+                <div class="alert alert-danger rounded-3 p-3 mb-3 d-flex align-items-center gap-2 small border-0 shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill fs-6 text-danger"></i> @TempData["TodoError"]
+                </div>
+            }
+            @if (TempData["TodoSuccess"] != null)
+            {
+                <div class="alert alert-success rounded-3 p-3 mb-3 d-flex align-items-center gap-2 small border-0 shadow-sm">
+                    <i class="bi bi-check-circle-fill fs-6 text-success"></i> @TempData["TodoSuccess"]
+                </div>
+            }
+
+            <!-- Quick Task Creator Entry Line -->
+            @if (Model.DetailsViewerRole == "Admin")
+            {
+                <div class="card border border-light-subtle rounded-4 shadow-sm bg-white mb-4">
+                    <div class="card-body p-3">
+                        <form asp-controller="Todo" asp-action="QuickCreate" method="post" class="d-flex align-items-center gap-2 m-0">
                             <input type="hidden" name="projectId" value="@Model.Id" />
-                            <input type="text" name="title" class="form-control rounded-pill border-secondary-subtle px-4 shadow-sm" placeholder="What needs to be done? Type here..." required autocomplete="off" />
-                        
-                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm text-nowrap">
-                                + Add Task
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0 text-muted ps-3"><i class="bi bi-plus-circle"></i></span>
+                                <input type="text" name="title" class="form-control border-start-0 px-2 py-2 shadow-none" placeholder="Add a new task objective to this project workspace..." required autocomplete="off" />
+                            </div>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm text-nowrap py-2 btn-sm">
+                                Create Task
                             </button>
                         </form>
+                    </div>
+                </div>
+            }
 
-                        @if (TempData["TodoError"] != null)
+            <!-- Dynamic Interactive Kanban Board Matrix Container -->
+            <div class="row g-3">
+
+                <!-- COLUMN PHASE 1: PENDING -->
+                <div class="col-md-4">
+                    <div class="p-1 d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="d-inline-block bg-danger rounded-circle" style="width: 8px; height: 8px;"></span>
+                            <span class="fw-bold text-dark small text-uppercase tracking-wider">Todo</span>
+                        </div>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">
+                            @Model.TodoList.Count(t => t.Status.ToString() == "Pending")
+                        </span>
+                    </div>
+
+                    <div class="kanban-lane" id="lane-Pending" data-status="Pending">
+                        @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Pending"))
                         {
-                            <div class="text-danger small mt-2 px-3 fw-medium d-flex align-items-center gap-1">
-                                <span class="fs-6">⚠️</span> @TempData["TodoError"]
-                            </div>
+                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMemberList }, { "DetailsViewerRole", Model.DetailsViewerRole }, { "ProjectId", Model.Id } })
                         }
-                        @if (TempData["TodoSuccess"] != null)
+                    </div>
+                </div>
+
+                <!-- COLUMN PHASE 2: PROCESSING -->
+                <div class="col-md-4">
+                    <div class="p-1 d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="d-inline-block bg-primary rounded-circle" style="width: 8px; height: 8px;"></span>
+                            <span class="fw-bold text-dark small text-uppercase tracking-wider">In Progress</span>
+                        </div>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">
+                            @Model.TodoList.Count(t => t.Status.ToString() == "Processing")
+                        </span>
+                    </div>
+
+                    <div class="kanban-lane" id="lane-Processing" data-status="Processing" style="background-color: rgba(13, 110, 253, 0.02); border-color: rgba(13, 110, 253, 0.12)">
+                        @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Processing"))
                         {
-                            <div class="text-success small mt-2 px-3 fw-medium d-flex align-items-center gap-1">
-                                <span class="fs-6">✅</span> @TempData["TodoSuccess"]
-                            </div>
+                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMemberList }, { "DetailsViewerRole", Model.DetailsViewerRole }, { "ProjectId", Model.Id } })
                         }
                     </div>
-                }
-                
+                </div>
 
-                @if (Model.TodoList.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light text-muted small text-uppercase">
-                                <tr>
-                                    <th class="ps-4 w-50 border-0 pt-3 pb-3">Task Title</th>
-                                    <th class="border-0 pt-3 pb-3">Creator</th>
-                                    <th class="pe-4 text-end border-0 pt-3 pb-3">Assignment</th>
-                                    <th class="pe-4 text-end border-0 pt-3 pb-3">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var todo in Model.TodoList)
-                                {
-                                    <tr>
-                                        <td class="ps-4 fw-medium text-dark py-3">@todo.Title</td>
-                                        <td class="text-muted py-3">@todo.CreatorName</td>
-                                        <td class="pe-4 text-end py-3">
-                                            @if (Model.DetailsViewerRole == "Admin")
-                                            {
-                                                @if (todo.UserId == null || todo.UserId.ToString() == "0")
-                                                {
-                                                    <form asp-controller="Todo" asp-action="QuickAssign" method="post" class="d-inline-flex align-items-center gap-2 m-0">
-                                                        <input type="hidden" name="todoId" value="@todo.Id" />
-                                                        <input type="hidden" name="projectId" value="@Model.Id" />
-                                                        
-                                                        <select name="userId" class="form-select form-select-sm rounded-pill w-auto border-secondary-subtle shadow-sm" required>
-                                                            <option value="">Select member...</option>
-                                                            @foreach (var member in Model.ProjectMemberList)
-                                                            {
-                                                                <option value="@member.UserId">@member.UserName</option>
-                                                            }
-                                                        </select>
-                                                    
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-semibold shadow-sm">
-                                                            Assign
-                                                        </button>
-                                                    </form>
-                                                }
-                                                else
-                                                {
-                                                    <div class="d-inline-flex align-items-center bg-success bg-opacity-10 rounded-pill px-3 py-1 border border-success-subtle">
-                                                        <span class="text-success fw-semibold small">@todo.UserName</span>
-                                                    </div>
-                                                }
-                                            }
-                                            
-                                            else if (todo.UserId == null || todo.UserId.ToString() == "0")
-                                            {
-                                                <div class="d-inline-flex align-items-center bg-success bg-opacity-10 rounded-pill px-3 py-1 border border-success-subtle">
-                                                    <span class="text-danger fw-semibold small">Doesn't Assign yet</span>
-                                                </div>
-                                                
-                                            }
-                                            else
-                                            {
-                                                <div class="d-inline-flex align-items-center bg-success bg-opacity-10 rounded-pill px-3 py-1 border border-success-subtle">
-                                                    <span class="text-success fw-semibold small">@todo.UserName</span>
-                                                </div>
-                                            }
-
-                                            
-                                            @if (TempData["AssignMemberError"] != null)
-                                            {
-                                                <div class="text-danger small mt-2 px-3 fw-medium d-flex align-items-center gap-1">
-                                                    <span class="fs-6">⚠️</span> @TempData["AssignMemberError"]
-                                                </div>
-                                            }
-                                            @if (TempData["AssignMemberSuccess"] != null)
-                                            {
-                                                <div class="text-success small mt-2 px-3 fw-medium d-flex align-items-center gap-1">
-                                                    <span class="fs-6">✅</span> @TempData["AssignMemberSuccess"]
-                                                </div>
-                                            }
-                                        </td>
-                                        <td class="py-3">
-                                            @switch (todo.Status.ToString())
-                                            {
-                                                case "Pending":
-                                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
-                                                        <i class="bi bi-clock-history"></i> Starting Soon
-                                                    </span>
-                                                    break;
-
-                                                case "Processing": 
-                                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
-                                                        <i class="bi bi-play-circle"></i> In Progress
-                                                    </span>
-                                                    break;
-
-                                                case "Completed":
-                                                    <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
-                                                        <i class="bi bi-check-circle-fill"></i> Completed
-                                                    </span>
-                                                    break;
-
-                                                default:
-                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary-subtle rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
-                                                        <i class="bi bi-question-circle"></i> Unknown
-                                                    </span>
-                                                    break;
-                                            }
-                                        </td>                                        
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                <div class="col-md-4">
+                    <div class="p-1 d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="d-inline-block bg-success rounded-circle" style="width: 8px; height: 8px;"></span>
+                            <span class="fw-bold text-dark small text-uppercase tracking-wider">Completed</span>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
+                            @Model.TodoList.Count(t => t.Status.ToString() == "Completed")
+                        </span>
                     </div>
-                }
-                else
-                {
-                    <div class="text-center py-5">
-                        <div class="text-muted mb-3" style="font-size: 3rem;">📋</div>
-                        <h5 class="fw-bold text-dark">No tasks yet</h5>
-                        <p class="text-muted">Use the input field above to add the first task to this project.</p>
+
+                    <div class="kanban-lane" id="lane-Completed" data-status="Completed">
+                        @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Completed"))
+                        {
+                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMemberList }, { "DetailsViewerRole", Model.DetailsViewerRole }, { "ProjectId", Model.Id } })
+                        }
                     </div>
-                }
+                </div>
+
             </div>
 
-            <div class="tab-pane fade" id="members-pane" role="tabpanel" aria-labelledby="members-tab">
+        </div>
+
+        <!-- RIGHT SIDEBAR PART: TEAM MEMBERS & ROSTER LIST MANAGEMENT (Ratio 1 Column Equivalent) -->
+        <div class="col-xl-3 col-lg-4">
+
+            <!-- Context Block: Member Management Alerts Pipeline -->
+            @if (TempData["MemberError"] != null || TempData["AssignMemberError"] != null)
+            {
+                <div class="alert alert-danger rounded-3 p-3 mb-3 small border-0 shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i> @(TempData["MemberError"] ?? TempData["AssignMemberError"])
+                </div>
+            }
+            @if (TempData["MemberSuccess"] != null || TempData["AssignMemberSuccess"] != null)
+            {
+                <div class="alert alert-success rounded-3 p-3 mb-3 small border-0 shadow-sm">
+                    <i class="bi bi-check-circle-fill text-success me-1"></i> @(TempData["MemberSuccess"] ?? TempData["AssignMemberSuccess"])
+                </div>
+            }
+
+            <!-- Card Sidebar Roster Panel Wrapper -->
+            <div class="card border border-light-subtle rounded-4 shadow-sm bg-white">
+                <div class="card-header bg-white border-bottom border-light py-3 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-dark small text-uppercase tracking-wider"><i class="bi bi-people me-2 text-secondary"></i>Team Roster</h5>
+                        <span class="badge bg-light text-secondary border rounded-pill px-2">@Model.ProjectMemberList.Count</span>
+                    </div>
+                </div>
+
                 @if (Model.DetailsViewerRole == "Admin")
                 {
-                    <div class="bg-light p-3 border-bottom border-top">
-                        <form asp-controller="Project" asp-action="QuickAddMember" method="post" class="d-flex align-items-center gap-2 m-0 px-2">
+                    <!-- Admin Control: Add Team Member Inline Field Form -->
+                    <div class="p-3 bg-light bg-opacity-50 border-bottom border-light">
+                        <form asp-controller="Project" asp-action="QuickAddMember" method="post" class="d-flex flex-column gap-2 m-0">
                             <input type="hidden" name="projectId" value="@Model.Id" />
-                        
-                            <input type="email" name="email" class="form-control rounded-pill border-secondary-subtle px-4 shadow-sm" placeholder="Enter user's email address..." required autocomplete="off" />
-                        
-                            <select name="role" class="form-select rounded-pill w-auto border-secondary-subtle shadow-sm">
-                                <option value="Contributor">Contributor</option>
-                                <option value="Admin">Admin</option>
-                            </select>
-
-                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm text-nowrap">
-                                + Add Member
-                            </button>
+                            <input type="email" name="email" class="form-control form-control-sm rounded-pill border-secondary-subtle shadow-none px-3" placeholder="Invitee email address..." required />
+                            <div class="d-flex gap-2">
+                                <select name="role" class="form-select form-select-sm rounded-pill border-secondary-subtle shadow-none">
+                                    <option value="Contributor">Contributor</option>
+                                    <option value="Admin">Admin</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill text-nowrap px-3 fw-semibold">
+                                    Invite
+                                </button>
+                            </div>
                         </form>
-
-                        @if (TempData["MemberError"] != null)
-                        {
-                            <div class="text-danger small mt-2 px-3 fw-medium d-flex align-items-center gap-1">
-                                <span class="fs-6">⚠️</span> @TempData["MemberError"]
-                            </div>
-                        }
-                        @if (TempData["MemberSuccess"] != null)
-                        {
-                            <div class="text-success small mt-2 px-3 fw-medium d-flex align-items-center gap-1">
-                                <span class="fs-6">✅</span> @TempData["MemberSuccess"]
-                            </div>
-                        }
                     </div>
-                }            
-                @if (Model.ProjectMemberList.Any())
-                {
-                    <ul class="list-group list-group-flush rounded-bottom-4">
+                }
+
+                <!-- Scrollable Team Member Row Frame -->
+                <div class="card-body p-0 max-vh-50 overflow-auto">
+                    <div class="list-group list-group-flush">
                         @foreach (var member in Model.ProjectMemberList)
                         {
-                            <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4 border-top">
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm" style="width: 40px; height: 40px; font-weight: 600;">
+                            <div class="list-group-item px-3 py-2.5 d-flex align-items-center justify-content-between border-bottom-0">
+                                <div class="d-flex align-items-center text-truncate">
+                                    <div class="avatar-circle bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center shadow-none me-2.5 border border-white shrink-0">
                                         @(string.IsNullOrEmpty(member.UserName) ? "?" : member.UserName.Substring(0, 1).ToUpper())
                                     </div>
-                                    <div>
-                                        <div class="fw-bold text-dark">@member.UserName</div>
+                                    <div class="text-truncate">
+                                        <div class="fw-semibold text-dark text-truncate small" title="@member.UserName">@member.UserName</div>
+                                        @* <span class="text-muted-opacity font-xs d-block" style="font-size: 0.72rem; margin-top:-2px;">ID: @member.UserId</span> *@
                                     </div>
                                 </div>
-                                
-                                <div>
-                                    <span class="badge @(member.Role.ToString() == "Admin" ? "bg-dark" : "bg-info text-dark") rounded-pill px-3 py-2 fw-medium shadow-sm">
-                                        @member.Role
-                                    </span>
-                                </div>
-                            </li>
+                                <span class="badge @(member.Role.ToString() == "Admin" ? "bg-dark text-white" : "bg-light text-secondary border") rounded-pill px-2 py-1 font-xs" style="font-size:0.7rem;">
+                                    @member.Role
+                                </span>
+                            </div>
                         }
-                    </ul>
-                }
-                else
-                {
-                    <div class="text-center py-5">
-                        <div class="text-muted mb-3" style="font-size: 3rem;">👥</div>
-                        <h5 class="fw-bold text-dark">No team members</h5>
-                        <p class="text-muted">Use the input field above to invite people to this project.</p>
                     </div>
-                }
+                </div>
             </div>
 
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
 @section Scripts {
-    @* Auto-switch tabs based on which action the user just took *@
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Check if there are member-related alerts
-            @if (TempData["MemberError"] != null || TempData["MemberSuccess"] != null)
-            {
-                    <text>
-                        var membersTab = new bootstrap.Tab(document.querySelector('#members-tab'));
-                        membersTab.show();
-                    </text>
-            }
-            // Check if there are todo-related alerts
-            else if (TempData["TodoError"] != null || TempData["TodoSuccess"] != null)
-            {
-                    <text>
-                        var todosTab = new bootstrap.Tab(document.querySelector('#todos-tab'));
-                        todosTab.show();
-                    </text>
-            }
+        document.addEventListener('DOMContentLoaded', function () {
+        const lanes = ['Pending', 'Processing', 'Completed'];
+
+        lanes.forEach(status => {
+        const laneEl = document.getElementById(`lane-${status}`);
+        if (laneEl) {
+        new Sortable(laneEl, {
+        group: 'project-kanban-board',
+        animation: 180,
+        ghostClass: 'sortable-ghost',
+        fallbackTolerance: 3,
+
+        onEnd: function (evt) {
+        if (evt.from === evt.to) return;
+
+        const cardElement = evt.item;
+        const taskId = cardElement.getAttribute('data-task-id');
+        const targetStatus = evt.to.getAttribute('data-status');
+        const originalLane = evt.from;
+
+        executeDragStatusUpdate(taskId, targetStatus, originalLane, cardElement);
+        }
+        });
+        }
+        });
+
+        function executeDragStatusUpdate(taskId, newStatus, fallbackLane, cardElement) {
+        let formData = new FormData();
+        formData.append('id', taskId);
+        formData.append('status', newStatus);
+
+        fetch('/ToDo/UpdateStatus', {
+        method: 'POST',
+        body: formData
+        })
+        .then(response => {
+        if (!response.ok && !response.redirected) {
+        alert('Error updating core pipeline status state.');
+        fallbackLane.appendChild(cardElement);
+        }
+        })
+        .catch(error => {
+        console.error('Core Pipeline Async Catch Exception Context:', error);
+        fallbackLane.appendChild(cardElement);
+        });
+        }
         });
     </script>
 }

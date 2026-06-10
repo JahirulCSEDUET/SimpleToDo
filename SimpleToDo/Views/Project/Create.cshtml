@@ -1,30 +1,93 @@
 ﻿@model SimpleToDo.Web.ViewModels.Project.ProjectCreateViewModel
 
 @{
-    ViewData["Title"] = "Create Project";
+    ViewData["Title"] = "Create Project Workspace";
 }
 
-<h2>Create Project</h2>
-<hr />
+<div class="container">
+    <div class="d-flex align-items-center gap-3 mb-5 pb-3 border-bottom mt-4">
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary rounded-circle d-inline-flex align-items-center justify-content-center p-0 shadow-sm transition-all" style="width: 34px; height: 34px; min-width: 34px;" title="Back to Dashboard">
+            <i class="bi bi-arrow-left fs-5"></i>
+        </a>
+        <div>
+            <h2 class="mb-0 fw-bold text-dark tracking-tight fs-3">Create Workspace</h2>
+            <p class="text-muted mb-0 small d-none d-sm-block">Set up a centralized area for your team tasks and targets.</p>
+        </div>
+    </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            
-            <div class="form-group mb-3">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" placeholder="Enter project name" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+    <div class="row">
+        <div class="col-xl-6 col-lg-8 mx-auto">
+
+            <div class="card border border-light-subtle shadow-sm rounded-4 overflow-hidden bg-white mb-4">
+                <div class="bg-primary" style="height: 4px; width: 100%;"></div>
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-flex justify-content-center align-items-center shadow-sm" style="width: 48px; height: 48px;">
+                            <i class="bi bi-folder-plus fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">Project Parameters</h5>
+                            <small class="text-muted">Fill out the workspace specifications below.</small>
+                        </div>
+                    </div>
+
+                    <form asp-action="Create" method="post" class="needs-validation">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 py-2 px-3 small border-0 mb-4 shadow-sm" role="alert"></div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Name" class="form-label fw-semibold text-dark small mb-2">Workspace Name</label>
+                            <div class="input-group project-input-group rounded-3 overflow-hidden">
+                                <span class="input-group-text bg-light border-end-0 text-muted px-3"><i class="bi bi-pencil-square"></i></span>
+                                <input asp-for="Name" class="form-control border-start-0 py-2.5 ps-2 shadow-none" placeholder="Enter workspace name" autocomplete="off" required />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small mt-1.5 d-block fw-medium"></span>
+                            <div class="form-text text-muted-xs mt-2">
+                                <i class="bi bi-info-circle me-1"></i> Use a clear, identifiable name your teammates will recognize instantly.
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-top border-light d-flex align-items-center justify-content-end gap-2.5">
+                            <a asp-action="Index" class="btn btn-light border rounded-pill px-4 text-secondary btn-sm py-2 fw-medium transition-all">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm btn-sm py-2 transition-all">
+                                Initialize Project &rarr;
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            
-            <div class="form-group">
-                <input type="submit" value="Create Project" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
-            </div>
-        </form>
+
+        </div>
     </div>
 </div>
+
+<style>
+    .project-input-group {
+        border: 1px solid #dee2e6;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .project-input-group:focus-within {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+        .project-input-group .form-control {
+            border: none !important;
+        }
+
+    .text-muted-xs {
+        font-size: 0.75rem;
+        color: #8c98a5;
+    }
+
+    .transition-all {
+        transition: all 0.2s ease-in-out;
+    }
+</style>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
