@@ -59,6 +59,10 @@ namespace SimpleToDo.Application.Services
             {
                 todo.Status = Status.Completed;
             }
+            else if(status == Status.Pending.ToString())
+            {
+                todo.Status = Status.Pending;
+            }
             _unitOfWork.Todo.Update(todo);
             await _unitOfWork.SaveAsync();
         }

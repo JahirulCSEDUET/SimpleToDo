@@ -7,7 +7,6 @@
 }
 
 <style>
-    /* Premium Spacing & Typography Polish */
     .task-card-premium {
         border: 1px solid rgba(0, 0, 0, 0.08) !important;
         border-radius: 12px !important;
@@ -24,7 +23,6 @@
         color: #8c98a5;
         letter-spacing: 0.2px;
     }
-    /* Compact custom input group styling */
     .assignment-input-group {
         border: 1px solid #dee2e6;
         background-color: #fff;
@@ -64,7 +62,7 @@
     }
 </style>
 
-<div class="card mb-3 shadow-sm task-card-premium bg-white project-task-card" data-task-id="@Model.Id" style="cursor: grab;">
+<div class="card mb-3 shadow-sm task-card-premium bg-white project-task-card" data-task-id="@Model.Id" data-user-id ="@Model.UserId" style="cursor: grab;">
     <div class="card-body p-3.5">
 
         <div class="mb-3">
@@ -89,7 +87,7 @@
                         <div class="input-group assignment-input-group rounded-pill overflow-hidden ps-2 pe-0 d-flex align-items-center">
                             <span class="text-muted ps-1 d-flex align-items-center" style="font-size: 0.8rem;"><i class="bi bi-person-plus"></i></span>
                             <select name="userId" class="form-select select-xs flex-grow-1 shadow-none" required>
-                                <option value="">Unassigned...</option>
+                                <option value="">Unassigned</option>
                                 @if (memberList != null)
                                 {
                                     foreach (var member in memberList)

@@ -86,6 +86,10 @@ namespace SimpleToDo.Web.Controllers
                 Challenge();
             }
             var user = _userService.GetByUserId(userId);
+            if (user == null)
+            {
+                Challenge();
+            }
             var todo = new Todo
             {
                 Status = Status.Pending,
@@ -99,14 +103,37 @@ namespace SimpleToDo.Web.Controllers
             return RedirectToAction("Details","Project", new { id = projectId });
         }
         [HttpPost]
-        public async Task<IActionResult> UpdateStatus(int id, string status)
+        public async Task<IActionResult> UpdateStatus(int id, string status,int? userId=null)
         {
             if (!ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                return BadRequest(new { message = "Invalid data model state discovered." });
+            }
+            var todo = await _todoService.GetByIdAsync(id); 
+            if(todo == null)
+            {
+                return NotFound(new { message = "The requested task could not be found." });
+            }
+            if (!userId.HasValue || userId==0)
+            {
+                return BadRequest(new { message = "Status update failed: To-do is unassigned." });
+            }
+            string userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                Challenge();
+            }
+            var user = _userService.GetByUserId(userID);
+            if (user == null)
+            {
+                Challenge();
+            }
+            if(user.Id != userId)
+            {
+                return BadRequest(new { message = "Status update failed: You are not assigned to this to-do." });
             }
             await _todoService.UpdateStatus(id, status);
-            return Ok();
+            return Ok(new { success = true, message = "Status updated successfully." });
         }
         [HttpPost]
         public async Task<IActionResult> ArchivedUnArchived(int id)

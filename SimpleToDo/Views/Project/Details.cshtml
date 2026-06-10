@@ -44,7 +44,6 @@
 
 <div class="container-fluid px-0 mt-2">
 
-    <!-- Workspace Top Header Bar -->
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom">
         <div>
             <div class="d-flex align-items-center gap-2 mb-1">
@@ -60,13 +59,11 @@
         </div>
     </div>
 
-    <!-- Main Asymmetric Multi-Column Workspace Framework (Ratio Split) -->
     <div class="row g-4">
 
-        <!-- LEFT SIDEBAR PART: TODOS & ACTIVE WORKFLOW (Ratio 5 Columns Equivalent) -->
         <div class="col-xl-9 col-lg-8">
-
-            <!-- Context Block: Notification Alerts Pipeline -->
+            <div id="kanban-live-alert" class="position-fixed top-0 start-50 translate-middle-x mt-4 d-none" style="z-index: 1080; min-width: 320px; max-width: 450px;">
+            </div>
             @if (TempData["TodoError"] != null)
             {
                 <div class="alert alert-danger rounded-3 p-3 mb-3 d-flex align-items-center gap-2 small border-0 shadow-sm">
@@ -80,7 +77,6 @@
                 </div>
             }
 
-            <!-- Quick Task Creator Entry Line -->
             @if (Model.DetailsViewerRole == "Admin")
             {
                 <div class="card border border-light-subtle rounded-4 shadow-sm bg-white mb-4">
@@ -99,10 +95,8 @@
                 </div>
             }
 
-            <!-- Dynamic Interactive Kanban Board Matrix Container -->
             <div class="row g-3">
 
-                <!-- COLUMN PHASE 1: PENDING -->
                 <div class="col-md-4">
                     <div class="p-1 d-flex align-items-center justify-content-between mb-2">
                         <div class="d-flex align-items-center gap-2">
@@ -117,12 +111,21 @@
                     <div class="kanban-lane" id="lane-Pending" data-status="Pending">
                         @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Pending"))
                         {
-                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMemberList }, { "DetailsViewerRole", Model.DetailsViewerRole }, { "ProjectId", Model.Id } })
+                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { 
+                                { 
+                                    "ProjectMemberList", Model.ProjectMemberList 
+                                }, 
+                                { 
+                                    "DetailsViewerRole", Model.DetailsViewerRole 
+                                }, 
+                                { 
+                                    "ProjectId", Model.Id 
+                                } 
+                            })
                         }
                     </div>
                 </div>
 
-                <!-- COLUMN PHASE 2: PROCESSING -->
                 <div class="col-md-4">
                     <div class="p-1 d-flex align-items-center justify-content-between mb-2">
                         <div class="d-flex align-items-center gap-2">
@@ -165,10 +168,10 @@
 
         </div>
 
-        <!-- RIGHT SIDEBAR PART: TEAM MEMBERS & ROSTER LIST MANAGEMENT (Ratio 1 Column Equivalent) -->
+        
         <div class="col-xl-3 col-lg-4">
 
-            <!-- Context Block: Member Management Alerts Pipeline -->
+            
             @if (TempData["MemberError"] != null || TempData["AssignMemberError"] != null)
             {
                 <div class="alert alert-danger rounded-3 p-3 mb-3 small border-0 shadow-sm">
@@ -182,7 +185,7 @@
                 </div>
             }
 
-            <!-- Card Sidebar Roster Panel Wrapper -->
+            
             <div class="card border border-light-subtle rounded-4 shadow-sm bg-white">
                 <div class="card-header bg-white border-bottom border-light py-3 px-4">
                     <div class="d-flex justify-content-between align-items-center">
@@ -193,7 +196,7 @@
 
                 @if (Model.DetailsViewerRole == "Admin")
                 {
-                    <!-- Admin Control: Add Team Member Inline Field Form -->
+                    
                     <div class="p-3 bg-light bg-opacity-50 border-bottom border-light">
                         <form asp-controller="Project" asp-action="QuickAddMember" method="post" class="d-flex flex-column gap-2 m-0">
                             <input type="hidden" name="projectId" value="@Model.Id" />
@@ -201,17 +204,16 @@
                             <div class="d-flex gap-2">
                                 <select name="role" class="form-select form-select-sm rounded-pill border-secondary-subtle shadow-none">
                                     <option value="Contributor">Contributor</option>
-                                    <option value="Admin">Admin</option>
                                 </select>
                                 <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill text-nowrap px-3 fw-semibold">
-                                    Invite
+                                    Add
                                 </button>
                             </div>
                         </form>
                     </div>
                 }
 
-                <!-- Scrollable Team Member Row Frame -->
+                
                 <div class="card-body p-0 max-vh-50 overflow-auto">
                     <div class="list-group list-group-flush">
                         @foreach (var member in Model.ProjectMemberList)
@@ -223,7 +225,6 @@
                                     </div>
                                     <div class="text-truncate">
                                         <div class="fw-semibold text-dark text-truncate small" title="@member.UserName">@member.UserName</div>
-                                        @* <span class="text-muted-opacity font-xs d-block" style="font-size: 0.72rem; margin-top:-2px;">ID: @member.UserId</span> *@
                                     </div>
                                 </div>
                                 <span class="badge @(member.Role.ToString() == "Admin" ? "bg-dark text-white" : "bg-light text-secondary border") rounded-pill px-2 py-1 font-xs" style="font-size:0.7rem;">
@@ -244,50 +245,77 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-        const lanes = ['Pending', 'Processing', 'Completed'];
+            const lanes = ['Pending', 'Processing', 'Completed'];
 
-        lanes.forEach(status => {
-        const laneEl = document.getElementById(`lane-${status}`);
-        if (laneEl) {
-        new Sortable(laneEl, {
-        group: 'project-kanban-board',
-        animation: 180,
-        ghostClass: 'sortable-ghost',
-        fallbackTolerance: 3,
+            lanes.forEach(status => {
+                const laneEl = document.getElementById(`lane-${status}`);
+                if (laneEl) {
+                    new Sortable(laneEl, {
+                        group: 'project-kanban-board',
+                        animation: 180,
+                        ghostClass: 'sortable-ghost',
+                        fallbackTolerance: 3,
 
-        onEnd: function (evt) {
-        if (evt.from === evt.to) return;
+                        onEnd: function (evt) {
+                            if (evt.from === evt.to) return;
 
-        const cardElement = evt.item;
-        const taskId = cardElement.getAttribute('data-task-id');
-        const targetStatus = evt.to.getAttribute('data-status');
-        const originalLane = evt.from;
+                            const cardElement = evt.item;
+                            const taskId = cardElement.getAttribute('data-task-id');
+                            const targetStatus = evt.to.getAttribute('data-status');
+                            const todoUserId = cardElement.getAttribute('data-user-id');
+                            const originalLane = evt.from;
 
-        executeDragStatusUpdate(taskId, targetStatus, originalLane, cardElement);
-        }
-        });
-        }
-        });
+                            executeDragStatusUpdate(taskId, targetStatus, todoUserId, originalLane, cardElement);
+                        }
+                    });
+                }
+            });
 
-        function executeDragStatusUpdate(taskId, newStatus, fallbackLane, cardElement) {
-        let formData = new FormData();
-        formData.append('id', taskId);
-        formData.append('status', newStatus);
+        function executeDragStatusUpdate(taskId, newStatus,todoUserId, fallbackLane, cardElement) {
+                let formData = new FormData();
+                formData.append('id', taskId);
+                formData.append('status', newStatus);
+                formData.append('userId', todoUserId);
 
-        fetch('/ToDo/UpdateStatus', {
-        method: 'POST',
-        body: formData
-        })
-        .then(response => {
-        if (!response.ok && !response.redirected) {
-        alert('Error updating core pipeline status state.');
-        fallbackLane.appendChild(cardElement);
-        }
-        })
-        .catch(error => {
-        console.error('Core Pipeline Async Catch Exception Context:', error);
-        fallbackLane.appendChild(cardElement);
-        });
+                fetch('/ToDo/UpdateStatus', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(async response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'An unexpected pipeline error occurred.');
+                })
+                .then(data => {
+                    showLiveAlert(data.message || 'Task status updated!', 'success');
+                })
+                .catch(error => {
+                    showLiveAlert(error.message, 'danger');
+                    fallbackLane.appendChild(cardElement);
+                });
+            }
+
+        function showLiveAlert(message, type) {
+            const container = document.getElementById('kanban-live-alert');
+            if (!container) return;
+
+            const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+    
+            container.innerHTML = `
+                <div class="alert alert-${type} shadow-lg border-0 rounded-4 p-3 d-flex align-items-center gap-2 animate-fade-in">
+                <i class="bi ${icon} fs-5 text-${type}"></i>
+                <div class="fw-medium text-dark small flex-grow-1">${message}</div>
+                <button type="button" class="btn-close small shadow-none ms-2" onclick="this.parentElement.parentElement.classList.add('d-none')" aria-label="Close"></button>
+                </div>
+            `;
+
+            container.classList.remove('d-none');
+
+            setTimeout(() => {
+                container.classList.add('d-none');
+            }, 3500);
         }
         });
     </script>

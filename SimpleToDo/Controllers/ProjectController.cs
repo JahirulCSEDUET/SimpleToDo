@@ -122,6 +122,7 @@ namespace SimpleToDo.Web.Controllers
                     UserName =t.User?.FullName??"Not Asigned.",
                     CreatedBy = t.CreatorId,
                     CreatorName = t.CreatorName,
+                    ProjectId = t.ProjectId,
                     Status =t.Status,
                     Title = t.Title
                 }).ToList()

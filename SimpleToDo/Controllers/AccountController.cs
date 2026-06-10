@@ -38,7 +38,7 @@ namespace SimpleToDo.Web.Controllers
                 {
                     return Redirect(returnUrl);
                 }
-                return RedirectToAction("Index", "ToDo");
+                return RedirectToAction("Index", "Project");
             }
             ModelState.AddModelError(string.Empty, "Invalid username or password");
             return View(model);
@@ -81,7 +81,7 @@ namespace SimpleToDo.Web.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "ToDo");
+            return RedirectToAction("Index", "Project");
         }
         [HttpPost]
         public async Task<IActionResult> Logout()
