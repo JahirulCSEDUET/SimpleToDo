@@ -10,11 +10,22 @@
             
             <form asp-action="ArchivedUnArchived" asp-controller="ToDo" method="post" class="m-0 archive-form @(Model.Status.ToString() == "Completed" ? "" : "d-none")" >
                 <input type="hidden" name="id" value="@Model.Id" />
+                
                 <button type="submit" class="btn btn-outline-danger btn-sm border-0">
                     <i class="bi bi-trash"></i> Archive
                 </button>
             </form>
 
         </div>
+        @if (Model.ProjectId.HasValue && Model.ProjectId!=0)
+        {
+            <div>
+                <span class="mb-1 text-muted">Project Name: @Model.ProjectName</span>
+                
+            </div>
+            <div>
+                <span class="mb-1 text-muted">Creator Name: @Model.CreatorName</span>
+            </div>
+        }
     </div>
 </div>

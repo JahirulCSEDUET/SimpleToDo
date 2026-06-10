@@ -24,6 +24,11 @@ namespace SimpleToDo.Application.Services
             return user;
         }
 
+        public User GetByEmail(string email)
+        {
+            return _unitOfWork.User.Query().FirstOrDefault(i => i.Email == email);
+        }
+
         public async Task<User> GetByIdAsync(int id)
         {
             return await _unitOfWork.User.GetByIdAsync(id);

@@ -6,6 +6,7 @@ namespace SimpleToDo.Web.ViewModels.Project
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<ProjectMember> ProjectMembers { get; set; } = new List<ProjectMember>();
+        public int CurrentUserId { get; set; }
+        public ICollection<ProjectMemberListViewModel> ProjectMembers { get; set; } = new List<ProjectMemberListViewModel>();
     }
 }

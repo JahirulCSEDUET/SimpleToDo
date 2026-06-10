@@ -28,6 +28,7 @@ builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 
 builder.Services.AddScoped<IProjectMemberRepository, ProjectMemberRepository>();
+builder.Services.AddScoped<IProjectMemberService, ProjectMemberService>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

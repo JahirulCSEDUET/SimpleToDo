@@ -8,5 +8,6 @@ namespace SimpleToDo.Application.Interfaces
     public interface IProjectMemberService
     {
         Task<ProjectMember> AddAsync(ProjectMember projectMember);
+        ProjectMember GetProjectMemberById(int  memberId, int projectId);
     }
 }

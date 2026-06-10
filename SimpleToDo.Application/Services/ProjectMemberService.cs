@@ -22,5 +22,11 @@ namespace SimpleToDo.Application.Services
             await _unitOfWork.SaveAsync();
             return projectMember;
         }
+
+        public ProjectMember GetProjectMemberById(int memberId, int projectId)
+        {
+            var query = _unitOfWork.ProjectMember.Query().FirstOrDefault(pm=> pm.UserId == memberId && pm.ProjectId == projectId);
+            return query;
+        }
     }
 }

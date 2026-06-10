@@ -10,13 +10,13 @@
         <h2 class="mb-0 fw-bold text-dark">@Model.Name</h2>
     </div>
     <div>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-sm">
             &larr; Back to Projects
         </a>
     </div>
 </div>
 
-<div class="card shadow-sm border-0 rounded-3">
+<div class="card shadow-sm border-0 rounded-4">
     <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
         <ul class="nav nav-pills fs-6 fw-semibold" id="projectTabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -38,17 +38,33 @@
         <div class="tab-content" id="projectTabsContent">
             
             <div class="tab-pane fade show active" id="todos-pane" role="tabpanel" aria-labelledby="todos-tab">
-                
-                <div class="bg-light p-3 border-bottom border-top">
-                    <form asp-controller="Todo" asp-action="QuickCreate" method="post" class="d-flex align-items-center gap-2 m-0 px-2">
-                        <input type="hidden" name="projectId" value="@Model.Id" />
-                        <input type="text" name="title" class="form-control rounded-pill border-secondary-subtle px-4" placeholder="What needs to be done? Type here..." required autocomplete="off" />
+                @if (Model.DetailsViewerRole == "Admin")
+                {
+                    <div class="bg-light p-3 border-bottom border-top">
+                        <form asp-controller="Todo" asp-action="QuickCreate" method="post" class="d-flex align-items-center gap-2 m-0 px-2">
+                            <input type="hidden" name="projectId" value="@Model.Id" />
+                            <input type="text" name="title" class="form-control rounded-pill border-secondary-subtle px-4 shadow-sm" placeholder="What needs to be done? Type here..." required autocomplete="off" />
                         
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm text-nowrap">
-                            + Add Task
-                        </button>
-                    </form>
-                </div>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm text-nowrap">
+                                + Add Task
+                            </button>
+                        </form>
+
+                        @if (TempData["TodoError"] != null)
+                        {
+                            <div class="text-danger small mt-2 px-3 fw-medium d-flex align-items-center gap-1">
+                                <span class="fs-6">⚠️</span> @TempData["TodoError"]
+                            </div>
+                        }
+                        @if (TempData["TodoSuccess"] != null)
+                        {
+                            <div class="text-success small mt-2 px-3 fw-medium d-flex align-items-center gap-1">
+                                <span class="fs-6">✅</span> @TempData["TodoSuccess"]
+                            </div>
+                        }
+                    </div>
+                }
+                
 
                 @if (Model.TodoList.Any())
                 {
@@ -56,9 +72,10 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light text-muted small text-uppercase">
                                 <tr>
-                                    <th class="ps-4 w-50 border-0 pt-3 pb-3">Task Description</th>
-                                    <th class="border-0 pt-3 pb-3">Created By</th>
+                                    <th class="ps-4 w-50 border-0 pt-3 pb-3">Task Title</th>
+                                    <th class="border-0 pt-3 pb-3">Creator</th>
                                     <th class="pe-4 text-end border-0 pt-3 pb-3">Assignment</th>
+                                    <th class="pe-4 text-end border-0 pt-3 pb-3">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -66,21 +83,93 @@
                                 {
                                     <tr>
                                         <td class="ps-4 fw-medium text-dark py-3">@todo.Title</td>
-                                        <td class="text-muted py-3">@todo.CreatedBy</td>
+                                        <td class="text-muted py-3">@todo.CreatorName</td>
                                         <td class="pe-4 text-end py-3">
-                                            @if (todo.UserId==null)
+                                            @if (Model.DetailsViewerRole == "Admin")
                                             {
-                                                <a asp-controller="Todo" asp-action="Assign" asp-route-id="@todo.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                                                    + Assign
-                                                </a>
+                                                @if (todo.UserId == null || todo.UserId.ToString() == "0")
+                                                {
+                                                    <form asp-controller="Todo" asp-action="QuickAssign" method="post" class="d-inline-flex align-items-center gap-2 m-0">
+                                                        <input type="hidden" name="todoId" value="@todo.Id" />
+                                                        <input type="hidden" name="projectId" value="@Model.Id" />
+                                                        
+                                                        <select name="userId" class="form-select form-select-sm rounded-pill w-auto border-secondary-subtle shadow-sm" required>
+                                                            <option value="">Select member...</option>
+                                                            @foreach (var member in Model.ProjectMemberList)
+                                                            {
+                                                                <option value="@member.UserId">@member.UserName</option>
+                                                            }
+                                                        </select>
+                                                    
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-semibold shadow-sm">
+                                                            Assign
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <div class="d-inline-flex align-items-center bg-success bg-opacity-10 rounded-pill px-3 py-1 border border-success-subtle">
+                                                        <span class="text-success fw-semibold small">@todo.UserName</span>
+                                                    </div>
+                                                }
+                                            }
+                                            
+                                            else if (todo.UserId == null || todo.UserId.ToString() == "0")
+                                            {
+                                                <div class="d-inline-flex align-items-center bg-success bg-opacity-10 rounded-pill px-3 py-1 border border-success-subtle">
+                                                    <span class="text-danger fw-semibold small">Doesn't Assign yet</span>
+                                                </div>
+                                                
                                             }
                                             else
                                             {
-                                                <div class="d-inline-flex align-items-center bg-light rounded-pill px-3 py-1 border border-success-subtle">
+                                                <div class="d-inline-flex align-items-center bg-success bg-opacity-10 rounded-pill px-3 py-1 border border-success-subtle">
                                                     <span class="text-success fw-semibold small">@todo.UserName</span>
                                                 </div>
                                             }
+
+                                            
+                                            @if (TempData["AssignMemberError"] != null)
+                                            {
+                                                <div class="text-danger small mt-2 px-3 fw-medium d-flex align-items-center gap-1">
+                                                    <span class="fs-6">⚠️</span> @TempData["AssignMemberError"]
+                                                </div>
+                                            }
+                                            @if (TempData["AssignMemberSuccess"] != null)
+                                            {
+                                                <div class="text-success small mt-2 px-3 fw-medium d-flex align-items-center gap-1">
+                                                    <span class="fs-6">✅</span> @TempData["AssignMemberSuccess"]
+                                                </div>
+                                            }
                                         </td>
+                                        <td class="py-3">
+                                            @switch (todo.Status.ToString())
+                                            {
+                                                case "Pending":
+                                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
+                                                        <i class="bi bi-clock-history"></i> Starting Soon
+                                                    </span>
+                                                    break;
+
+                                                case "Processing": 
+                                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
+                                                        <i class="bi bi-play-circle"></i> In Progress
+                                                    </span>
+                                                    break;
+
+                                                case "Completed":
+                                                    <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
+                                                        <i class="bi bi-check-circle-fill"></i> Completed
+                                                    </span>
+                                                    break;
+
+                                                default:
+                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary-subtle rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
+                                                        <i class="bi bi-question-circle"></i> Unknown
+                                                    </span>
+                                                    break;
+                                            }
+                                        </td>                                        
                                     </tr>
                                 }
                             </tbody>
@@ -98,21 +187,46 @@
             </div>
 
             <div class="tab-pane fade" id="members-pane" role="tabpanel" aria-labelledby="members-tab">
-                
-                <div class="d-flex justify-content-end p-3 bg-light border-bottom border-top">
-                    <a asp-action="AddMember" asp-route-projectId="@Model.Id" class="btn btn-sm btn-primary rounded-pill px-4 fw-semibold shadow-sm">
-                        + Add Member
-                    </a>
-                </div>
+                @if (Model.DetailsViewerRole == "Admin")
+                {
+                    <div class="bg-light p-3 border-bottom border-top">
+                        <form asp-controller="Project" asp-action="QuickAddMember" method="post" class="d-flex align-items-center gap-2 m-0 px-2">
+                            <input type="hidden" name="projectId" value="@Model.Id" />
+                        
+                            <input type="email" name="email" class="form-control rounded-pill border-secondary-subtle px-4 shadow-sm" placeholder="Enter user's email address..." required autocomplete="off" />
+                        
+                            <select name="role" class="form-select rounded-pill w-auto border-secondary-subtle shadow-sm">
+                                <option value="Contributor">Contributor</option>
+                                <option value="Admin">Admin</option>
+                            </select>
 
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm text-nowrap">
+                                + Add Member
+                            </button>
+                        </form>
+
+                        @if (TempData["MemberError"] != null)
+                        {
+                            <div class="text-danger small mt-2 px-3 fw-medium d-flex align-items-center gap-1">
+                                <span class="fs-6">⚠️</span> @TempData["MemberError"]
+                            </div>
+                        }
+                        @if (TempData["MemberSuccess"] != null)
+                        {
+                            <div class="text-success small mt-2 px-3 fw-medium d-flex align-items-center gap-1">
+                                <span class="fs-6">✅</span> @TempData["MemberSuccess"]
+                            </div>
+                        }
+                    </div>
+                }            
                 @if (Model.ProjectMemberList.Any())
                 {
-                    <ul class="list-group list-group-flush rounded-bottom">
+                    <ul class="list-group list-group-flush rounded-bottom-4">
                         @foreach (var member in Model.ProjectMemberList)
                         {
-                            <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4">
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4 border-top">
                                 <div class="d-flex align-items-center">
-                                    <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px; font-weight: 600;">
+                                    <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm" style="width: 40px; height: 40px; font-weight: 600;">
                                         @(string.IsNullOrEmpty(member.UserName) ? "?" : member.UserName.Substring(0, 1).ToUpper())
                                     </div>
                                     <div>
@@ -121,7 +235,7 @@
                                 </div>
                                 
                                 <div>
-                                    <span class="badge @(member.Role.ToString() == "Admin" ? "bg-dark" : "bg-info text-dark") rounded-pill px-3 py-2 fw-medium">
+                                    <span class="badge @(member.Role.ToString() == "Admin" ? "bg-dark" : "bg-info text-dark") rounded-pill px-3 py-2 fw-medium shadow-sm">
                                         @member.Role
                                     </span>
                                 </div>
@@ -134,7 +248,7 @@
                     <div class="text-center py-5">
                         <div class="text-muted mb-3" style="font-size: 3rem;">👥</div>
                         <h5 class="fw-bold text-dark">No team members</h5>
-                        <p class="text-muted">Invite people to collaborate on this project.</p>
+                        <p class="text-muted">Use the input field above to invite people to this project.</p>
                     </div>
                 }
             </div>
@@ -142,3 +256,27 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @* Auto-switch tabs based on which action the user just took *@
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Check if there are member-related alerts
+            @if (TempData["MemberError"] != null || TempData["MemberSuccess"] != null)
+            {
+                    <text>
+                        var membersTab = new bootstrap.Tab(document.querySelector('#members-tab'));
+                        membersTab.show();
+                    </text>
+            }
+            // Check if there are todo-related alerts
+            else if (TempData["TodoError"] != null || TempData["TodoSuccess"] != null)
+            {
+                    <text>
+                        var todosTab = new bootstrap.Tab(document.querySelector('#todos-tab'));
+                        todosTab.show();
+                    </text>
+            }
+        });
+    </script>
+}

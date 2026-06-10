@@ -32,12 +32,15 @@ namespace SimpleToDo.Web.Controllers
             {
                 Challenge();
             }
-            var todos = await _todoService.GetByUserIdAsync(user.Id, false);
+            var todos = await _todoService.GetByUserIdWithProjectAsync(user.Id, false);
             var todoList = todos.Select(t => new ToDoItemListViewModel
             {
                 Id = t.Id,
                 Status = t.Status,
-                Title = t.Title
+                Title = t.Title,
+                ProjectId = t.ProjectId?? 0,
+                ProjectName = t.Project?.Name??"N/A",
+                CreatorName =t.CreatorName
             }).ToList();
             return View(todoList);
         }
@@ -63,7 +66,8 @@ namespace SimpleToDo.Web.Controllers
                 Status = Status.Pending,
                 Title = item.Title,
                 UserId = user.Id,
-                CreatedBy = user.Id,
+                CreatorId = user.Id,
+                CreatorName =user.FullName,
                 IsArchived = false,
             };
             await _todoService.AddAsync(todo);
@@ -87,7 +91,8 @@ namespace SimpleToDo.Web.Controllers
                 Status = Status.Pending,
                 Title = title,
                 ProjectId = projectId,
-                CreatedBy = user.Id,
+                CreatorId = user.Id,
+                CreatorName=user.FullName,
                 IsArchived = false,
             };
             await _todoService.AddAsync(todo);
@@ -139,6 +144,28 @@ namespace SimpleToDo.Web.Controllers
             }
             bool result = await _todoService.DeleteAsync(id);
             return RedirectToAction(nameof(ArchivedList));
+        }
+        [HttpPost]
+        public async Task<IActionResult> QuickAssign(int userId, int projectId, int todoId)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["AssignMemberError"] = $"Assigmn member unsuccessfull.";
+                return RedirectToAction("Details", "Project", new { id = projectId });
+            }
+            var user = await _userService.GetByIdAsync(userId);
+            if (user == null) 
+            {
+                TempData["AssignMemberError"] = $"Invalid member.";
+            }
+            var todo = await _todoService.GetByIdAsync(todoId);
+            if (user == null)
+            {
+                TempData["AssignMemberError"] = $"Invalid todo.";
+            }
+            todo.UserId = userId;
+            await _todoService.UpdateAsync(todo);
+            return RedirectToAction("Details", "Project", new { Id = projectId });
         }
     }
 }

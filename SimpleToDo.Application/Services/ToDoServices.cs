@@ -44,7 +44,8 @@ namespace SimpleToDo.Application.Services
 
         public async Task<IReadOnlyList<Todo>> GetByUserIdAsync(int userId, bool isArchived)
         {
-            return _unitOfWork.Todo.Query().Where(t=>t.UserId==userId && t.IsArchived==isArchived).ToList();
+            return _unitOfWork.Todo.Query()
+                .Where(t=>t.UserId==userId && t.IsArchived==isArchived).ToList();
         }
 
         public async Task UpdateStatus(int id, string status)
@@ -74,6 +75,17 @@ namespace SimpleToDo.Application.Services
             }
             _unitOfWork.Todo.Update(todo);
             return await _unitOfWork.SaveAsync()>0;
+        }
+
+        public async Task UpdateAsync(Todo item)
+        {
+            _unitOfWork.Todo.Update(item);
+            await _unitOfWork.SaveAsync();
+        }
+
+        public async Task<IReadOnlyList<Todo>> GetByUserIdWithProjectAsync(int userId, bool isArchived)
+        {
+            return await _unitOfWork.Todo.GetByUserIdWithProjectAsync(userId, isArchived);
         }
     }
 }

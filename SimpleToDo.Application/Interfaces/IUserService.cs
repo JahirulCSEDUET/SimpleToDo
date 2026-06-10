@@ -10,5 +10,6 @@ namespace SimpleToDo.Application.Interfaces
         Task<User> AddAsync(User user);
         Task<User> GetByIdAsync(int id);
         User GetByUserId(string userId);
+        User GetByEmail(string email);
     }
 }
