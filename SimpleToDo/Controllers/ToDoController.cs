@@ -14,12 +14,13 @@ namespace SimpleToDo.Web.Controllers
     {
         private readonly IToDoService _todoService;
         private readonly IUserService _userService;
-        private readonly IFileService _fileService;
+        private readonly INotificationService _notificationService;
 
-        public ToDoController(IToDoService todoService, IUserService userService)
+        public ToDoController(IToDoService todoService, IUserService userService, INotificationService notificationService)
         {
             _todoService = todoService;
             _userService = userService;
+            _notificationService = notificationService;
         }
 
         public async Task<IActionResult> Index()
@@ -200,7 +201,17 @@ namespace SimpleToDo.Web.Controllers
                 TempData["AssignMemberError"] = $"Invalid todo.";
             }
             todo.UserId = userId;
+            
             await _todoService.UpdateAsync(todo);
+            var notification = new Notification
+            {
+                Title = "New Task Assigned",
+                Message = $"{user.FullName} assigned you to the task: {todo.Title} in workspace {todo.Project.Name}.",
+                RedirectLink = RedirectLink.Todo,
+                UserId = userId,
+                IsRead = false
+            };
+            await _notificationService.AddAsync(notification);
             return RedirectToAction("Details", "Project", new { Id = projectId });
         }
         public async Task<IActionResult> Details(int id)

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleToDo.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SimpleToDo.Infrastructure.Data;
 namespace SimpleToDo.Infrastructure.Migrations
 {
     [DbContext(typeof(SimpleToDoDbContext))]
-    partial class SimpleToDoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260611181332_AddNotifications")]
+    partial class AddNotifications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,15 +166,9 @@ namespace SimpleToDo.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RedirectLink")
-                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
