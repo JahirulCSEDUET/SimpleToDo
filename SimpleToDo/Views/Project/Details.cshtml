@@ -94,7 +94,30 @@
                     </div>
                 </div>
             }
-
+            <div class="card border border-light-subtle rounded-4 shadow-sm bg-white mb-4">
+                <div class="card-body p-3 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="bg-light text-secondary rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 36px; height: 36px;">
+                            <i class="bi bi-funnel text-secondary"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0 small text-uppercase tracking-wider">Filter Board</h6>
+                            <small class="text-muted">Isolate assignments selectively using team profile metrics.</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2" style="min-width: 250px;">
+                        <span class="text-muted small text-nowrap"><i class="bi bi-filter-left me-1"></i>Assignee:</span>
+                        <select id="member-board-filter" class="form-select form-select-sm rounded-pill border-secondary-subtle shadow-none ps-3 pe-5 py-1.5" style="font-size: 0.8rem; font-weight: 500;">
+                            <option value="all">⚡ All Team Members</option>
+                            <option value="0">⚠️ Unassigned Tasks</option>
+                            @foreach (var member in Model.ProjectMemberList)
+                            {
+                                <option value="@member.UserId">👤 @member.UserName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
             <div class="row g-3">
 
                 <div class="col-md-4">
@@ -270,53 +293,91 @@
                     });
                 }
             });
+            const boardFilter = document.getElementById('member-board-filter');
+            if (boardFilter) {
+                boardFilter.addEventListener('change', function () {
+                    const selectedValue = this.value;
+                    const allCards = document.querySelectorAll('.project-task-card');
 
-        function executeDragStatusUpdate(taskId, newStatus,todoUserId, fallbackLane, cardElement) {
-                let formData = new FormData();
-                formData.append('id', taskId);
-                formData.append('status', newStatus);
-                formData.append('userId', todoUserId);
+                    allCards.forEach(card => {
+                        const cardUserId = card.getAttribute('data-user-id');
 
-                fetch('/ToDo/UpdateStatus', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(async response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || 'An unexpected pipeline error occurred.');
-                })
-                .then(data => {
-                    showLiveAlert(data.message || 'Task status updated!', 'success');
-                })
-                .catch(error => {
-                    showLiveAlert(error.message, 'danger');
-                    fallbackLane.appendChild(cardElement);
+                        if (selectedValue === 'all') {
+                            card.classList.remove('d-none');
+                        }
+                        else if (selectedValue === '0') {
+                            if (!cardUserId || cardUserId === '0' || cardUserId.trim() === '') {
+                                card.classList.remove('d-none');
+                            } 
+                            else {
+                                card.classList.add('d-none');
+                            }
+                        }
+                        else {
+                            if (cardUserId === selectedValue) {
+                                card.classList.remove('d-none');
+                            } 
+                            else {
+                                card.classList.add('d-none');
+                            }
+                        }
+                    });
                 });
             }
+            function executeDragStatusUpdate(taskId, newStatus,todoUserId, fallbackLane, cardElement) {
+                    let formData = new FormData();
+                    formData.append('id', taskId);
+                    formData.append('status', newStatus);
+                    formData.append('userId', todoUserId);
 
-        function showLiveAlert(message, type) {
-            const container = document.getElementById('kanban-live-alert');
-            if (!container) return;
+                    fetch('/ToDo/UpdateStatus', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(async response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.message || 'An unexpected pipeline error occurred.');
+                    })
+                    .then(data => {
+                        showLiveAlert(data.message || 'Task status updated!', 'success');
+                        cardElement.classList.remove('card-status-todo', 'card-status-progress', 'card-status-done');
+                        if (newStatus === 'Pending') {
+                            cardElement.classList.add('card-status-todo');
+                        } else if (newStatus === 'Processing') {
+                            cardElement.classList.add('card-status-progress');
+                        } else if (newStatus === 'Completed') {
+                            cardElement.classList.add('card-status-done');
+                        }
+                    })
+                    .catch(error => {
+                        showLiveAlert(error.message, 'danger');
+                        fallbackLane.appendChild(cardElement);
+                    });
+                }
 
-            const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+            function showLiveAlert(message, type) {
+                const container = document.getElementById('kanban-live-alert');
+                if (!container) return;
+
+                const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
     
-            container.innerHTML = `
-                <div class="alert alert-${type} shadow-lg border-0 rounded-4 p-3 d-flex align-items-center gap-2 animate-fade-in">
-                <i class="bi ${icon} fs-5 text-${type}"></i>
-                <div class="fw-medium text-dark small flex-grow-1">${message}</div>
-                <button type="button" class="btn-close small shadow-none ms-2" onclick="this.parentElement.parentElement.classList.add('d-none')" aria-label="Close"></button>
-                </div>
-            `;
+                container.innerHTML = `
+                    <div class="alert alert-${type} shadow-lg border-0 rounded-4 p-3 d-flex align-items-center gap-2 animate-fade-in">
+                    <i class="bi ${icon} fs-5 text-${type}"></i>
+                    <div class="fw-medium text-dark small flex-grow-1">${message}</div>
+                    <button type="button" class="btn-close small shadow-none ms-2" onclick="this.parentElement.parentElement.classList.add('d-none')" aria-label="Close"></button>
+                    </div>
+                `;
 
-            container.classList.remove('d-none');
+                container.classList.remove('d-none');
 
-            setTimeout(() => {
-                container.classList.add('d-none');
-            }, 3500);
-        }
+                setTimeout(() => {
+                    container.classList.add('d-none');
+                }, 3500);
+            }
         });
     </script>
 }

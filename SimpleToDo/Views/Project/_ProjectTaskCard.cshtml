@@ -4,25 +4,67 @@
     var memberList = ViewData["ProjectMemberList"] as List<ProjectMemberListViewModel>;
     var viewerRole = ViewData["DetailsViewerRole"]?.ToString();
     var projectId = ViewData["ProjectId"];
+
+    
+    var statusStr = Model.Status.ToString();
+    var statusBorderClass = statusStr == "Pending" ? "card-status-todo"
+                          : statusStr == "Processing" ? "card-status-progress"
+                          : "card-status-done";
 }
 
 <style>
+    
     .task-card-premium {
         border: 1px solid rgba(0, 0, 0, 0.08) !important;
         border-radius: 12px !important;
-        transition: all 0.2s ease-in-out;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.22s ease-in-out;
     }
 
-        .task-card-premium:hover {
-            border-color: rgba(13, 110, 253, 0.25) !important;
-            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.05) !important;
+    
+    .card-status-todo {
+        border-top: 4px solid #ea868f !important; 
+    }
+
+        .card-status-todo:hover {
+            border-top-color: #dc3545 !important;
+            border-inline-color: rgba(220, 53, 69, 0.2) !important;
+            border-bottom-color: rgba(220, 53, 69, 0.2) !important;
+            box-shadow: 0 6px 14px rgba(220, 53, 69, 0.06) !important;
         }
 
+    
+    .card-status-progress {
+        border-top: 4px solid #86b7fe !important; 
+    }
+
+        .card-status-progress:hover {
+            border-top-color: #0d6efd !important;
+            border-inline-color: rgba(13, 110, 253, 0.2) !important;
+            border-bottom-color: rgba(13, 110, 253, 0.2) !important;
+            box-shadow: 0 6px 14px rgba(13, 110, 253, 0.07) !important;
+        }
+
+    
+    .card-status-done {
+        border-top: 4px solid #75b798 !important; 
+    }
+
+        .card-status-done:hover {
+            border-top-color: #198754 !important;
+            border-inline-color: rgba(25, 135, 84, 0.2) !important;
+            border-bottom-color: rgba(25, 135, 84, 0.2) !important;
+            box-shadow: 0 6px 14px rgba(25, 135, 84, 0.06) !important;
+        }
+
+    
     .text-muted-xs {
         font-size: 0.75rem;
         color: #8c98a5;
         letter-spacing: 0.2px;
     }
+
     .assignment-input-group {
         border: 1px solid #dee2e6;
         background-color: #fff;
@@ -62,9 +104,12 @@
     }
 </style>
 
-<div class="card mb-3 shadow-sm task-card-premium bg-white project-task-card" data-task-id="@Model.Id" data-user-id ="@Model.UserId" style="cursor: grab;">
-    <div class="card-body p-3.5">
+<div class="card mb-3 shadow-sm task-card-premium bg-white project-task-card @statusBorderClass"
+     data-task-id="@Model.Id"
+     data-user-id="@(Model.UserId != null && Model.UserId != 0 ? Model.UserId.ToString() : "0")"
+     style="cursor: grab;">
 
+    <div class="card-body p-3.5">
         <div class="mb-3">
             <h6 class="mb-1.5 fw-bold text-dark lh-base text-wrap" style="letter-spacing: -0.1px;" title="@Model.Title">
                 @Model.Title
@@ -127,6 +172,5 @@
                 }
             }
         </div>
-
     </div>
 </div>
