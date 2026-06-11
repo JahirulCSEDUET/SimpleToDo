@@ -12,9 +12,9 @@ namespace SimpleToDo.Web.Controllers
     [Authorize]
     public class ToDoController : Controller
     {
-        private readonly IWebHostEnvironment _env;
         private readonly IToDoService _todoService;
         private readonly IUserService _userService;
+        private readonly IFileService _fileService;
 
         public ToDoController(IToDoService todoService, IUserService userService)
         {
@@ -71,11 +71,14 @@ namespace SimpleToDo.Web.Controllers
             {
                 Status = Status.Pending,
                 Title = item.Title,
+                Description = item.Description,
                 UserId = user.Id,
                 CreatorId = user.Id,
                 CreatorName =user.FullName,
                 IsArchived = false,
+                CreatedDate = DateTime.Now
             };
+            
             await _todoService.AddAsync(todo);
             return RedirectToAction(nameof(Index));
         }
