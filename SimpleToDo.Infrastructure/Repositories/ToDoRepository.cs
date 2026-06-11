@@ -17,6 +17,16 @@ namespace SimpleToDo.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<Todo> GetByIdAsync(int id)
+        {
+            return await _context.Todos
+                .Include(t=>t.User)
+                .Include(t=>t.Queries)
+                    .ThenInclude(q=> q.User)
+                .Include(t=>t.Project)
+                .FirstOrDefaultAsync(t => t.Id == id);
+        }
+
         public async Task<IReadOnlyList<Todo>> GetByUserIdWithProjectAsync(int userId, bool isArchived)
         {
             return await _context.Todos

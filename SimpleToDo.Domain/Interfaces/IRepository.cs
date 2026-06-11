@@ -5,10 +5,8 @@ namespace SimpleToDo.Domain.Interfaces
     {
         Task<T> AddAsync(T item);
         void Delete(T item);
-        Task<T> GetByIdAsync(int id);
         void Update(T item);
         IQueryable<T> Query();
-        Task<IReadOnlyList<T>> GetAllAsync();
         
     }
 }

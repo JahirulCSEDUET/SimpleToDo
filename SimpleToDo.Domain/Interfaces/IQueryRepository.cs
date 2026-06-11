@@ -5,8 +5,8 @@ using System.Text;
 
 namespace SimpleToDo.Domain.Interfaces
 {
-    public interface IUserRepository :IRepository<User>
+    public interface IQueryRepository:IRepository<Query>
     {
-        Task<User> GetByIdAsync(int id);
-    }
+        Task<IReadOnlyList<Query>> GetByUserIdAsync(int userId); 
+    } 
 }

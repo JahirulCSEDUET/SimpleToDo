@@ -32,19 +32,10 @@ namespace SimpleToDo.Infrastructure.Repositories
             return  _dbSet.AsQueryable();
         }
 
-        public async Task<T> GetByIdAsync(int id)
-        {
-            return await _dbSet.FindAsync(id);
-        }
-
         public void Update(T item)
         {
             _dbSet.Update(item);
         }
 
-        public async Task<IReadOnlyList<T>> GetAllAsync()
-        {
-            return await _dbSet.AsNoTracking().ToListAsync();
-        }
     }
 }

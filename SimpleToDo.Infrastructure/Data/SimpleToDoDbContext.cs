@@ -15,6 +15,7 @@ namespace SimpleToDo.Infrastructure.Data
         public DbSet<User> Members { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectMember> ProjectMembers { get; set; }
+        public DbSet<Query> Queries { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Domain.Entities;
 using SimpleToDo.Domain.Enums;
+using SimpleToDo.Web.ViewModels.Queries;
 using SimpleToDo.Web.ViewModels.ToDo;
 using System.Security.Claims;
 
@@ -11,6 +12,7 @@ namespace SimpleToDo.Web.Controllers
     [Authorize]
     public class ToDoController : Controller
     {
+        private readonly IWebHostEnvironment _env;
         private readonly IToDoService _todoService;
         private readonly IUserService _userService;
 
@@ -61,6 +63,10 @@ namespace SimpleToDo.Web.Controllers
                 Challenge();
             }
             var user = _userService.GetByUserId(userId);
+            if (user == null)
+            {
+                Challenge();
+            }
             var todo = new Todo
             {
                 Status = Status.Pending,
@@ -193,6 +199,44 @@ namespace SimpleToDo.Web.Controllers
             todo.UserId = userId;
             await _todoService.UpdateAsync(todo);
             return RedirectToAction("Details", "Project", new { Id = projectId });
+        }
+        public async Task<IActionResult> Details(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                Challenge();
+            }
+            var user = _userService.GetByUserId(userId);
+            if (user == null)
+            {
+                Challenge();
+            }
+            var todo = await _todoService.GetByIdAsync(id);
+            var todovm = new ToDoItemDetailsViewModel
+            {
+                Id = todo.Id,
+                Title = todo.Title,
+                Status = todo.Status,
+                CreatorId = todo.CreatorId,
+                CreatorName = todo.CreatorName,
+                UserId = todo.UserId.Value,
+                UserName = todo.User.FullName,
+                ProjectId = todo.ProjectId.Value,
+                ProjectName = todo.Project.Name,
+                QueryList = todo.Queries.Select(q => new QueryListViewModel
+                {
+                    Id = q.Id,
+                    Body = q.Body,
+                    UserId = q.UserId,
+                    UserName = q.User.FullName
+                }).ToList()
+            };
+            return View(todovm);
         }
     }
 }

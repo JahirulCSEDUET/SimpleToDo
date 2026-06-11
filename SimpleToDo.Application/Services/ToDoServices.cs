@@ -32,10 +32,7 @@ namespace SimpleToDo.Application.Services
             return await _unitOfWork.SaveAsync()>0;
         }
 
-        public async Task<IReadOnlyList<Todo>> GetAllAsync()
-        {
-            return await _unitOfWork.Todo.GetAllAsync();
-        }
+        
 
         public async Task<Todo> GetByIdAsync(int id)
         {

@@ -14,7 +14,6 @@ namespace SimpleToDo.Application.Interfaces
         Task UpdateAsync(Todo item); 
         Task<Todo> GetByIdAsync(int id);
         Task<IReadOnlyList<Todo>> GetByUserIdAsync(int userId, bool isArchived);
-        Task<IReadOnlyList<Todo>> GetAllAsync();
         Task<IReadOnlyList<Todo>> GetByUserIdWithProjectAsync(int userId, bool isArchived);
     }
 }

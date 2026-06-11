@@ -5,7 +5,6 @@
     var viewerRole = ViewData["DetailsViewerRole"]?.ToString();
     var projectId = ViewData["ProjectId"];
 
-    
     var statusStr = Model.Status.ToString();
     var statusBorderClass = statusStr == "Pending" ? "card-status-todo"
                           : statusStr == "Processing" ? "card-status-progress"
@@ -13,7 +12,6 @@
 }
 
 <style>
-    
     .task-card-premium {
         border: 1px solid rgba(0, 0, 0, 0.08) !important;
         border-radius: 12px !important;
@@ -22,9 +20,8 @@
         transition: all 0.22s ease-in-out;
     }
 
-    
     .card-status-todo {
-        border-top: 4px solid #ea868f !important; 
+        border-top: 4px solid #ea868f !important;
     }
 
         .card-status-todo:hover {
@@ -34,9 +31,8 @@
             box-shadow: 0 6px 14px rgba(220, 53, 69, 0.06) !important;
         }
 
-    
     .card-status-progress {
-        border-top: 4px solid #86b7fe !important; 
+        border-top: 4px solid #86b7fe !important;
     }
 
         .card-status-progress:hover {
@@ -46,9 +42,8 @@
             box-shadow: 0 6px 14px rgba(13, 110, 253, 0.07) !important;
         }
 
-    
     .card-status-done {
-        border-top: 4px solid #75b798 !important; 
+        border-top: 4px solid #75b798 !important;
     }
 
         .card-status-done:hover {
@@ -58,7 +53,6 @@
             box-shadow: 0 6px 14px rgba(25, 135, 84, 0.06) !important;
         }
 
-    
     .text-muted-xs {
         font-size: 0.75rem;
         color: #8c98a5;
@@ -102,6 +96,18 @@
         font-size: 0.78rem;
         font-weight: 500;
     }
+
+    .btn-query-premium {
+        font-size: 0.72rem !important;
+        padding: 0.22rem 0.65rem !important;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        transition: all 0.15s ease-in-out;
+    }
+
+        .btn-query-premium:hover {
+            transform: translateY(-1px);
+        }
 </style>
 
 <div class="card mb-3 shadow-sm task-card-premium bg-white project-task-card @statusBorderClass"
@@ -149,9 +155,15 @@
                 }
                 else
                 {
-                    <div class="d-inline-flex align-items-center rounded-pill px-3 py-1 user-pill-premium max-w-100 shadow-none">
-                        <i class="bi bi-person-fill-check me-1.5"></i>
-                        <span class="text-truncate">@Model.UserName</span>
+                    <div class="d-flex align-items-center justify-content-between w-100 gap-2">
+                        <div class="d-inline-flex align-items-center gap-2 rounded-pill ps-2.5 pe-3 py-1 user-pill-premium text-truncate shadow-none" style="max-width: 65%;">
+                            <i class="bi bi-person-fill-check shrink-0"></i>
+                            <span class="text-truncate">@Model.UserName</span>
+                        </div>
+
+                        <a asp-controller="Todo" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-query-premium rounded-pill d-inline-flex align-items-center gap-1 shadow-sm text-decoration-none shrink-0" title="View Task Details">
+                            <span>Query</span><i class="bi bi-arrow-right-short"></i>
+                        </a>
                     </div>
                 }
             }
@@ -165,9 +177,15 @@
                 }
                 else
                 {
-                    <div class="d-inline-flex align-items-center bg-light border text-secondary rounded-pill px-3 py-1 font-xs text-truncate max-w-100" style="font-size: 0.78rem; font-weight: 500;">
-                        <i class="bi bi-person-circle text-secondary text-opacity-75 me-1.5"></i>
-                        <span class="text-truncate">@Model.UserName</span>
+                    <div class="d-flex align-items-center justify-content-between w-100 gap-2">
+                        <div class="d-inline-flex align-items-center gap-2 bg-light border text-secondary rounded-pill ps-2.5 pe-3 py-1 font-xs text-truncate" style="font-size: 0.78rem; font-weight: 500; max-width: 65%;">
+                            <i class="bi bi-person-circle text-secondary text-opacity-75 shrink-0"></i>
+                            <span class="text-truncate">@Model.UserName</span>
+                        </div>
+
+                        <a asp-controller="Todo" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary btn-query-premium rounded-pill d-inline-flex align-items-center gap-1 shadow-sm text-decoration-none shrink-0" title="View Task Details">
+                            <span>Query</span><i class="bi bi-arrow-right-short"></i>
+                        </a>
                     </div>
                 }
             }
