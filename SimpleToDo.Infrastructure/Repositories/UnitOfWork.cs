@@ -7,7 +7,7 @@ namespace SimpleToDo.Infrastructure.Repositories
     public class UnitOfWork : IUnitOfWork
     {
         private readonly SimpleToDoDbContext _context;
-        public UnitOfWork(SimpleToDoDbContext context, IToDoRepository todo, IProjectMemberRepository projectMember, IProjectRepository project, IUserRepository user, IQueryRepository query)
+        public UnitOfWork(SimpleToDoDbContext context, IToDoRepository todo, IProjectMemberRepository projectMember, IProjectRepository project, IUserRepository user, IQueryRepository query, INotificationRepository notification)
         {
             _context = context;
             Todo = todo;
@@ -15,6 +15,7 @@ namespace SimpleToDo.Infrastructure.Repositories
             Project = project;
             User = user;
             Query = query;
+            Notification = notification;
         }
 
         public IToDoRepository Todo { get;}
@@ -25,6 +26,7 @@ namespace SimpleToDo.Infrastructure.Repositories
 
         public IProjectMemberRepository ProjectMember { get; }
         public IQueryRepository Query { get; }
+        public INotificationRepository Notification { get; }
 
         public async Task<int> SaveAsync()
         {

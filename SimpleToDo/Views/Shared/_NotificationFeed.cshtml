@@ -1,0 +1,65 @@
+﻿@using SimpleToDo.Web.Views.Shared
+@model IReadOnlyList<NotificationListViewModel>
+
+<div id="notification-meta-bridge"
+     data-unread-count="@ViewBag.UnreadCount"
+     class="d-none"></div>
+
+<style>
+    .btn-redirect-shortcut {
+        color: #0d6efd;
+        transition: transform 0.15s ease, color 0.15s ease;
+        padding: 0;
+    }
+
+        .btn-redirect-shortcut:hover {
+            color: #0b5ed7;
+            transform: scale(1.18);
+        }
+
+    .shrink-0 {
+        flex-shrink: 0;
+    }
+</style>
+
+@if (!Model.Any())
+{
+    <div class="p-4 text-center text-muted small">
+        <i class="bi bi-bell-slash mb-2 d-block fs-3 text-opacity-25"></i>
+        No notifications yet.
+    </div>
+}
+else
+{
+    @foreach (var item in Model)
+    {
+        <div id="noti-item-@item.Id" class="p-3 fb-notification-item d-flex align-items-center justify-content-between gap-3 @(item.IsRead ? "bg-white" : "bg-primary-subtle bg-opacity-25")">
+
+            <div class="text-truncate flex-grow-1">
+                <div class="text-dark small lh-sm text-wrap @(item.IsRead ? "fw-normal" : "fw-semibold")">
+                    @item.Message
+                </div>
+                <div class="text-muted-xs mt-1">
+                    <i class="bi bi-clock me-1"></i>@item.TimeAgo m ago
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-2.5 shrink-0">
+                @if (!item.IsRead)
+                {
+                    <div class="fb-unread-dot"></div>
+                }
+
+                <a asp-controller="@item.RedirectLink"
+                   asp-action="Details"
+                   asp-route-id="@item.RedirectId"
+                   data-id="@item.Id"
+                   class="btn border-0 btn-redirect-shortcut d-flex align-items-center justify-content-center"
+                   title="Navigate to Details">
+                    <i class="bi bi-arrow-right-short fs-4"></i>
+                </a>
+            </div>
+
+        </div>
+    }
+}

@@ -6,6 +6,7 @@ namespace SimpleToDo.Domain.Interfaces
         Task<T> AddAsync(T item);
         void Delete(T item);
         void Update(T item);
+        void UpdateRange(ICollection<T> items);
         IQueryable<T> Query();
         
     }

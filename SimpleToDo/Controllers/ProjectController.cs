@@ -15,11 +15,13 @@ namespace SimpleToDo.Web.Controllers
         private readonly IProjectService _projectService;
         private readonly IUserService _userService;
         private readonly IProjectMemberService _projectMemberService;
-        public ProjectController(IProjectService projectService, IUserService userService, IProjectMemberService projectMemberService)
+        private readonly INotificationService _notificationService;
+        public ProjectController(IProjectService projectService, IUserService userService, IProjectMemberService projectMemberService, INotificationService notificationService)
         {
             _projectService = projectService;
             _userService = userService;
             _projectMemberService = projectMemberService;
+            _notificationService = notificationService;
         }
 
         public async Task<IActionResult> Index()
@@ -155,7 +157,33 @@ namespace SimpleToDo.Web.Controllers
                 UserId = user.Id,
                 Role = Role.Contributor
             };
+
+            string loginUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (loginUserId == null)
+            {
+                Challenge();
+            }
+            var loginUser = _userService.GetByUserId(loginUserId);
+            if (loginUser == null)
+            {
+                Challenge();
+            }
+
+
+            var project = await _projectService.GetByIdAsync(projectId);
+            
             await _projectMemberService.AddAsync(projectMember);
+            var notification = new Notification
+            {
+                Title = "Added to Workspace",
+                Message = $"{loginUser.FullName} added you in workspace {project.Name}.",
+                RedirectLink = RedirectLink.Project,
+                UserId = user.Id,
+                IsRead = false,
+                CreatedTime = DateTime.Now,
+                RedirectId = projectId
+            };
+            await _notificationService.AddAsync(notification);
             return RedirectToAction("Details","Project", new {Id=projectId});
         }
     }

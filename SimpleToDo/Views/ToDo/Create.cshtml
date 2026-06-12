@@ -1,32 +1,123 @@
 ﻿@model SimpleToDo.Web.ViewModels.ToDo.ToDoItemCreateViewModel
 
 @{
-    ViewData["Title"] = "Create Task";
+    ViewData["Title"] = "Create Task - " + Model.ProjectName;
 }
 
-<div class="container mt-5">
+<style>
+    /* Premium AuraSpace Layout Configuration Framework */
+    .task-create-card {
+        border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        border-radius: 16px !important;
+    }
+
+    .form-control-premium {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .form-control-premium:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+    /* Interactive Premium File Upload Zone */
+    .upload-zone-wrapper {
+        border: 2px dashed #dee2e6;
+        border-radius: 12px;
+        background-color: #f8f9fa;
+        transition: all 0.2s ease-in-out;
+        position: relative;
+    }
+
+        .upload-zone-wrapper:hover {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.02);
+        }
+
+    .ext-badge {
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.25rem 0.6rem;
+        letter-spacing: 0.3px;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+        <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="btn btn-sm btn-outline-secondary rounded-circle d-inline-flex align-items-center justify-content-center p-0 shadow-sm" style="width: 34px; height: 34px; min-width: 34px;" title="Back to Project Workspace">
+            <i class="bi bi-arrow-left fs-5"></i>
+        </a>
+        <div>
+            <span class="text-muted small text-uppercase tracking-wider fw-semibold" style="font-size: 0.72rem;">
+                <i class="bi bi-folder2-open text-primary me-1"></i> Target Project Workspace
+            </span>
+            <h3 class="mb-0 fw-bold text-dark tracking-tight">@Model.ProjectName</h3>
+        </div>
+    </div>
+
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-body p-4">
-                    <h2 class="text-center mb-4">Add New Task</h2>
+        <div class="col-xl-7 col-lg-9">
+            <div class="card shadow-sm bg-white task-create-card border-0">
+                <div class="card-body p-4 p-md-5">
 
-                    <form asp-action="Create" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" class="m-0">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 fw-medium"></div>
 
-                        <!-- Title Input -->
-                        <div class="form-group mb-4">
-                            <label asp-for="Title" class="form-label fw-bold">Task Title</label>
-                            <input asp-for="Title" class="form-control form-control-lg" placeholder="What do you need to do?" autofocus autocomplete="off" />
-                            <span asp-validation-for="Title" class="text-danger"></span>
+                        <input type="hidden" asp-for="ProjectId" />
+                        <input type="hidden" asp-for="ProjectName" />
+
+                        <div class="mb-2 text-muted-xs text-uppercase fw-bold tracking-wider mb-3" style="font-size: 0.75rem; color: #8c98a5;">
+                            <i class="bi bi-layers-half me-1"></i> Task Definition Entry
                         </div>
 
-                        <!-- Action Buttons -->
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
-                            <button type="submit" class="btn btn-primary px-4">Save Task</button>
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label text-dark fw-bold small text-uppercase tracking-wider" style="font-size: 0.78rem;">Task Title</label>
+                            <input asp-for="Title" class="form-control form-control-premium" placeholder="What core objective needs to be done?" autofocus autocomplete="off" />
+                            <span asp-validation-for="Title" class="text-danger small d-block mt-1 fw-medium"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label text-dark fw-bold small text-uppercase tracking-wider" style="font-size: 0.78rem;">Scope Description</label>
+                            <textarea asp-for="Description" class="form-control form-control-premium" rows="4" placeholder="Detail the operational steps, execution dependencies, or technical block parameters..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small d-block mt-1 fw-medium"></span>
+                        </div>
+
+                        <div class="mb-5">
+                            <label asp-for="File" class="form-label text-dark fw-bold small text-uppercase tracking-wider" style="font-size: 0.78rem;">
+                                Supported Attachments <span class="text-muted fw-normal text-lowercase">(Optional)</span>
+                            </label>
+
+                            <div class="upload-zone-wrapper p-4 text-center">
+                                <i class="bi bi-file-earmark-arrow-up text-primary fs-1 mb-2 d-inline-block"></i>
+                                <h6 class="text-dark fw-bold mb-1 small">Select dynamic tracking assets to upload</h6>
+                                <p class="text-muted small mb-3" style="font-size: 0.78rem;">Files are securely attached to the data pipeline context logs.</p>
+
+                                <div class="col-sm-8 mx-auto mb-3">
+                                    <input asp-for="File" class="form-control form-control-sm shadow-none" type="file" accept=".jpg,.jpeg,.png,.pdf,.zip" />
+                                </div>
+
+                                <div class="d-flex justify-content-center flex-wrap gap-2">
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill ext-badge">.JPG / .JPEG</span>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill ext-badge">.PNG</span>
+                                    <span class="badge bg-warning bg-opacity-10 text-warning-emphasis border border-warning-subtle rounded-pill ext-badge">.PDF</span>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary-subtle rounded-pill ext-badge">.ZIP</span>
+                                </div>
+                            </div>
+                            <span asp-validation-for="File" class="text-danger small d-block mt-1 fw-medium"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top border-light-subtle">
+                            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="btn btn-outline-secondary rounded-pill px-4 btn-sm py-2 fw-semibold text-decoration-none transition-all">Cancel</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 btn-sm py-2 fw-semibold shadow-sm transition-all">
+                                Save Task <i class="bi bi-plus-circle ms-1.5 small"></i>
+                            </button>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -35,7 +126,6 @@
 
 @section Scripts {
     @{
-        // Included in case you add [Required] or [StringLength] to your ViewModel later!
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
