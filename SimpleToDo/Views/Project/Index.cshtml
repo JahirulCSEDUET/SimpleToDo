@@ -1,0 +1,189 @@
+﻿@using SimpleToDo.Web.ViewModels.Project
+
+@model IReadOnlyList<ProjectListViewModel>
+
+@{
+    ViewData["Title"] = "Workspace";
+
+    var ownProjects = Model.Where(p => p.ProjectMembers
+        .Any(m => m.UserId == p.CurrentUserId && m.Role.ToString() == "Admin"))
+        .ToList();
+
+    var contributions = Model.Where(p => p.ProjectMembers
+        .Any(m => m.UserId == p.CurrentUserId && m.Role.ToString() == "Contributor"))
+        .ToList();
+}
+
+<!-- Dashboard Header -->
+<div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom">
+    <div>
+        <h2 class="mb-1 fw-bold text-dark tracking-tight">Your workspaces</h2>
+        <p class="text-muted mb-0 small">Manage your personal workspaces and team collaborations</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm d-flex align-items-center gap-2 transition-all">
+        <span class="fs-5 lh-1">+</span> New workspace
+    </a>
+</div>
+
+<div class="d-flex flex-column gap-5">
+
+    <!-- SECTION 1: MY PROJECTS (UPPER) -->
+    <section>
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                <span>👑</span>
+            </div>
+            <h4 class="mb-0 fw-bold text-dark">My Projects</h4>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 ms-2">@ownProjects.Count</span>
+        </div>
+
+        @if (ownProjects.Any())
+        {
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                @foreach (var project in ownProjects)
+                {
+                    <div class="col">
+                        <div class="card h-100 border border-light-subtle shadow-sm rounded-4 hover-shadow transition-all position-relative overflow-hidden">
+                            <!-- Top subtle highlight border -->
+                            <div class="position-absolute top-0 start-0 end-0 bg-primary" style="height: 4px;"></div>
+
+                            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-flex justify-content-center align-items-center fw-bold text-uppercase fs-5 shadow-sm" style="width: 48px; height: 48px; min-width: 48px;">
+                                            @project.Name.Substring(0, 1)
+                                        </div>
+                                        <div class="text-truncate">
+                                            <h5 class="card-title mb-1 fw-bold text-dark text-truncate" title="@project.Name">@project.Name</h5>
+                                            <span class="badge bg-light text-primary border border-primary-subtle rounded-pill px-2 py-1 fs-xs fw-semibold">Admin</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted small card-text text-secondary mb-4 line-clamp-2">
+                                        Manage workspace parameters, tasks, and team configurations.
+                                    </p>
+                                </div>
+
+                                <div class="pt-3 border-top border-light d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small d-flex align-items-center gap-1">
+                                        👥 @project.ProjectMembers.Count Members
+                                    </span>
+                                    <a asp-action="Details" asp-route-id="@project.Id" class="btn btn-sm btn-link text-primary fw-semibold p-0 text-decoration-none stretched-link">
+                                        Open Workspace &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <!-- Empty State for My Projects -->
+            <div class="card border border-dashed rounded-4 p-5 text-center bg-light bg-opacity-20">
+                <div class="bg-light text-secondary rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 64px; height: 64px;">
+                    <span class="fs-3">📁</span>
+                </div>
+                <h5 class="fw-bold text-dark">No projects created yet</h5>
+                <p class="text-muted small mb-4 mx-auto" style="max-width: 320px;">Get started by building your first managed project workspace right now.</p>
+                <a asp-action="Create" class="btn btn-sm btn-primary rounded-pill px-4 shadow-sm">Create a Project</a>
+            </div>
+        }
+    </section>
+
+    <!-- SECTION 2: MY CONTRIBUTIONS (LOWER) -->
+    <section>
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="bg-info bg-opacity-10 text-info rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                <span>🤝</span>
+            </div>
+            <h4 class="mb-0 fw-bold text-dark">Contributions</h4>
+            <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 ms-2">@contributions.Count</span>
+        </div>
+
+        @if (contributions.Any())
+        {
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                @foreach (var project in contributions)
+                {
+                    <div class="col">
+                        <div class="card h-100 border border-light-subtle shadow-sm rounded-4 hover-shadow transition-all position-relative overflow-hidden">
+                            <!-- Top subtle highlight border -->
+                            <div class="position-absolute top-0 start-0 end-0 bg-info" style="height: 4px;"></div>
+
+                            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div class="bg-info bg-opacity-10 text-info rounded-3 d-flex justify-content-center align-items-center fw-bold text-uppercase fs-5 shadow-sm" style="width: 48px; height: 48px; min-width: 48px;">
+                                            @project.Name.Substring(0, 1)
+                                        </div>
+                                        <div class="text-truncate">
+                                            <h5 class="card-title mb-1 fw-bold text-dark text-truncate" title="@project.Name">@project.Name</h5>
+                                            <span class="badge bg-light text-info border border-info-subtle rounded-pill px-2 py-1 fs-xs fw-semibold">Contributor</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted small card-text text-secondary mb-4 line-clamp-2">
+                                        Collaborate on active milestones, update tasks, and check updates.
+                                    </p>
+                                </div>
+
+                                <div class="pt-3 border-top border-light d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small d-flex align-items-center gap-1">
+                                        👥 @project.ProjectMembers.Count Members
+                                    </span>
+                                    <a asp-action="Details" asp-route-id="@project.Id" class="btn btn-sm btn-link text-info fw-semibold p-0 text-decoration-none stretched-link">
+                                        Open Workspace &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <!-- Empty State for Contributions -->
+            <div class="card border border-dashed rounded-4 p-5 text-center bg-light bg-opacity-20">
+                <div class="bg-light text-secondary rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 64px; height: 64px;">
+                    <span class="fs-3">🌱</span>
+                </div>
+                <h5 class="fw-bold text-dark">No shared workspaces</h5>
+                <p class="text-muted small mb-0 mx-auto" style="max-width: 320px;">When other team administrators add you to their projects, they'll show up here.</p>
+            </div>
+        }
+    </section>
+
+</div>
+
+<!-- Small CSS injection for premium UX behaviors -->
+<style>
+    .hover-shadow {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+        .hover-shadow:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.08) !important;
+        }
+
+    .transition-all {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .border-dashed {
+        border-style: dashed !important;
+        border-width: 2px !important;
+    }
+
+    .fs-xs {
+        font-size: 0.75rem;
+    }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>

@@ -1,0 +1,176 @@
+﻿@model ToDoItemListViewModel
+
+@{
+    var memberList = ViewData["ProjectMemberList"] as List<ProjectMemberListViewModel>;
+    var viewerRole = ViewData["DetailsViewerRole"]?.ToString();
+    var projectId = ViewData["ProjectId"];
+
+    
+    var statusStr = Model.Status.ToString();
+    var statusBorderClass = statusStr == "Pending" ? "card-status-todo"
+                          : statusStr == "Processing" ? "card-status-progress"
+                          : "card-status-done";
+}
+
+<style>
+    
+    .task-card-premium {
+        border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        border-radius: 12px !important;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.22s ease-in-out;
+    }
+
+    
+    .card-status-todo {
+        border-top: 4px solid #ea868f !important; 
+    }
+
+        .card-status-todo:hover {
+            border-top-color: #dc3545 !important;
+            border-inline-color: rgba(220, 53, 69, 0.2) !important;
+            border-bottom-color: rgba(220, 53, 69, 0.2) !important;
+            box-shadow: 0 6px 14px rgba(220, 53, 69, 0.06) !important;
+        }
+
+    
+    .card-status-progress {
+        border-top: 4px solid #86b7fe !important; 
+    }
+
+        .card-status-progress:hover {
+            border-top-color: #0d6efd !important;
+            border-inline-color: rgba(13, 110, 253, 0.2) !important;
+            border-bottom-color: rgba(13, 110, 253, 0.2) !important;
+            box-shadow: 0 6px 14px rgba(13, 110, 253, 0.07) !important;
+        }
+
+    
+    .card-status-done {
+        border-top: 4px solid #75b798 !important; 
+    }
+
+        .card-status-done:hover {
+            border-top-color: #198754 !important;
+            border-inline-color: rgba(25, 135, 84, 0.2) !important;
+            border-bottom-color: rgba(25, 135, 84, 0.2) !important;
+            box-shadow: 0 6px 14px rgba(25, 135, 84, 0.06) !important;
+        }
+
+    
+    .text-muted-xs {
+        font-size: 0.75rem;
+        color: #8c98a5;
+        letter-spacing: 0.2px;
+    }
+
+    .assignment-input-group {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        transition: border-color 0.15s ease-in-out;
+    }
+
+        .assignment-input-group:focus-within {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+    .select-xs {
+        font-size: 0.78rem !important;
+        padding-top: 0.25rem !important;
+        padding-bottom: 0.25rem !important;
+        border: none !important;
+        background-color: transparent !important;
+    }
+
+        .select-xs:focus {
+            box-shadow: none !important;
+        }
+
+    .btn-go-xs {
+        font-size: 0.75rem !important;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem !important;
+        margin: 2px;
+    }
+
+    .user-pill-premium {
+        background-color: #f0f5ff;
+        color: #0d6efd;
+        border: 1px solid #d3e2ff;
+        font-size: 0.78rem;
+        font-weight: 500;
+    }
+</style>
+
+<div class="card mb-3 shadow-sm task-card-premium bg-white project-task-card @statusBorderClass"
+     data-task-id="@Model.Id"
+     data-user-id="@(Model.UserId != null && Model.UserId != 0 ? Model.UserId.ToString() : "0")"
+     style="cursor: grab;">
+
+    <div class="card-body p-3.5">
+        <div class="mb-3">
+            <h6 class="mb-1.5 fw-bold text-dark lh-base text-wrap" style="letter-spacing: -0.1px;" title="@Model.Title">
+                @Model.Title
+            </h6>
+            <div class="d-flex align-items-center gap-1 text-muted-xs">
+                <i class="bi bi-person-workspace small"></i>
+                <span>By: <strong class="text-dark-subtle">@Model.CreatorName</strong></span>
+            </div>
+        </div>
+
+        <div class="pt-3 border-top border-light-subtle">
+            @if (viewerRole == "Admin")
+            {
+                @if (Model.UserId == null || Model.UserId.ToString() == "0")
+                {
+                    <form asp-controller="Todo" asp-action="QuickAssign" method="post" class="m-0">
+                        <input type="hidden" name="todoId" value="@Model.Id" />
+                        <input type="hidden" name="projectId" value="@projectId" />
+
+                        <div class="input-group assignment-input-group rounded-pill overflow-hidden ps-2 pe-0 d-flex align-items-center">
+                            <span class="text-muted ps-1 d-flex align-items-center" style="font-size: 0.8rem;"><i class="bi bi-person-plus"></i></span>
+                            <select name="userId" class="form-select select-xs flex-grow-1 shadow-none" required>
+                                <option value="">Unassigned</option>
+                                @if (memberList != null)
+                                {
+                                    foreach (var member in memberList)
+                                    {
+                                        <option value="@member.UserId">@member.UserName</option>
+                                    }
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-primary rounded-pill btn-go-xs shadow-sm">
+                                Go
+                            </button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <div class="d-inline-flex align-items-center rounded-pill px-3 py-1 user-pill-premium max-w-100 shadow-none">
+                        <i class="bi bi-person-fill-check me-1.5"></i>
+                        <span class="text-truncate">@Model.UserName</span>
+                    </div>
+                }
+            }
+            else
+            {
+                @if (Model.UserId == null || Model.UserId.ToString() == "0")
+                {
+                    <span class="badge bg-light text-danger border border-danger-subtle rounded-pill px-2.5 py-1.5 font-xs fw-medium" style="font-size: 0.72rem;">
+                        <i class="bi bi-dash-circle me-1"></i> Not Assigned
+                    </span>
+                }
+                else
+                {
+                    <div class="d-inline-flex align-items-center bg-light border text-secondary rounded-pill px-3 py-1 font-xs text-truncate max-w-100" style="font-size: 0.78rem; font-weight: 500;">
+                        <i class="bi bi-person-circle text-secondary text-opacity-75 me-1.5"></i>
+                        <span class="text-truncate">@Model.UserName</span>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

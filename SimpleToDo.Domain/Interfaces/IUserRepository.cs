@@ -5,8 +5,7 @@ using System.Text;
 
 namespace SimpleToDo.Domain.Interfaces
 {
-    public interface IToDoRepository : IRepository<Todo>
+    public interface IUserRepository :IRepository<User>
     {
-        Task<IReadOnlyList<Todo>> GetByUserIdWithProjectAsync(int userId, bool isArchived);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SimpleToDo.Domain.Interfaces;
+using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Domain.Entities;
+using SimpleToDo.Domain.Interfaces;
 using SimpleToDo.Infrastructure.Data;
 using System;
 using System.Collections.Generic;
@@ -8,47 +9,22 @@ using System.Text;
 
 namespace SimpleToDo.Infrastructure.Repositories
 {
-    public class ToDoRepository : IToDoRepository
+    public class ToDoRepository :Repository<Todo>, IToDoRepository
     {
         private readonly SimpleToDoDbContext _context;
-
-        public ToDoRepository(SimpleToDoDbContext context)
+        public ToDoRepository(SimpleToDoDbContext context):base(context)
         {
             _context = context;
         }
 
-        public async Task<ToDoItem> AddAsync(ToDoItem item)
+        public async Task<IReadOnlyList<Todo>> GetByUserIdWithProjectAsync(int userId, bool isArchived)
         {
-            await _context.ToDoItems.AddAsync(item);
-            await _context.SaveChangesAsync();
-            return item;
-        }
+            return await _context.Todos
+                .Where(t=> t.UserId == userId && t.IsArchived== isArchived)
+                .Include(t=>t.Project)
+                .AsNoTracking()
+                .ToListAsync();
 
-        public async Task<bool> DeleteAsync(ToDoItem item)
-        {
-            _context.ToDoItems.Remove(item);
-            return await _context.SaveChangesAsync()>0;
-        }
-
-        public async Task<IReadOnlyList<ToDoItem>> GetAllASync()
-        {
-            return await _context.ToDoItems.AsNoTracking().ToListAsync();
-        }
-
-        public async Task<ToDoItem> GetByIdAsync(int id)
-        {
-            return await _context.ToDoItems.AsNoTracking().FirstOrDefaultAsync(i=> i.Id == id);
-        }
-
-        public async Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId, bool isArchived)
-        {
-            return await _context.ToDoItems.AsNoTracking().Where(i => i.UserId == userId && i.IsArchived== isArchived).ToListAsync();
-        }
-
-        public async Task UpdateAsync(ToDoItem item)
-        {
-            _context.ToDoItems.Update(item);
-            await _context.SaveChangesAsync();
         }
     }
 }

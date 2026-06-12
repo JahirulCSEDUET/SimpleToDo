@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SimpleToDo.Domain.Interfaces;
+using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Application.Services;
+using SimpleToDo.Domain.Interfaces;
 using SimpleToDo.Infrastructure.Data;
 using SimpleToDo.Infrastructure.Identity;
 using SimpleToDo.Infrastructure.Repositories;
@@ -15,8 +16,19 @@ builder.Services.AddDbContext<SimpleToDoDbContext>(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
 builder.Services.AddScoped<IToDoService, ToDoServices>();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+
+builder.Services.AddScoped<IProjectMemberRepository, ProjectMemberRepository>();
+builder.Services.AddScoped<IProjectMemberService, ProjectMemberService>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
@@ -47,7 +59,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=ToDO}/{action=Index}/{id?}")
+    pattern: "{controller=Project}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SimpleToDo.Application.Interfaces;
+using SimpleToDo.Domain.Entities;
 using SimpleToDo.Infrastructure.Identity;
 using SimpleToDo.Web.ViewModels.Auth;
 
@@ -9,11 +11,13 @@ namespace SimpleToDo.Web.Controllers
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IUserService _userService;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUserService userService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _userService = userService;
         }
 
         public IActionResult Login()
@@ -34,7 +38,7 @@ namespace SimpleToDo.Web.Controllers
                 {
                     return Redirect(returnUrl);
                 }
-                return RedirectToAction("Index", "ToDo");
+                return RedirectToAction("Index", "Project");
             }
             ModelState.AddModelError(string.Empty, "Invalid username or password");
             return View(model);
@@ -65,12 +69,19 @@ namespace SimpleToDo.Web.Controllers
                 }
                 return View(model);
             }
+            var userCreate = new User
+            {
+                FullName =user.FullName,
+                UserId = user.Id,
+                Email = user.Email
+            };
+            await _userService.AddAsync(userCreate);
             await _signInManager.SignInAsync(user, isPersistent: true);
             if (!string.IsNullOrEmpty(returnUrl) && returnUrl != null)
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "ToDo");
+            return RedirectToAction("Index", "Project");
         }
         [HttpPost]
         public async Task<IActionResult> Logout()

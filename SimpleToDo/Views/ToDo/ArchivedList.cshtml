@@ -1,0 +1,134 @@
+﻿@model IReadOnlyList<ToDoItemListViewModel>
+
+@{
+    ViewData["Title"] = "Archived Tasks";
+}
+
+<div class="container mt-4">
+    <!-- View Header -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-5 pb-3 border-bottom">
+        <div>
+            <h2 class="mb-1 fw-bold text-dark tracking-tight">
+                <i class="bi bi-archive text-secondary me-2"></i>Archived Tasks
+            </h2>
+            <p class="text-muted mb-0 small">Review, restore, or permanently delete tasks removed from active pipelines.</p>
+        </div>
+        <div class="w-100 w-sm-auto">
+            <a asp-action="Index" class="btn btn-light border rounded-pill px-4 text-secondary d-flex align-items-center gap-2 btn-sm py-2 transition-all shadow-sm" title="Go back to the main task board">
+                <i class="bi bi-arrow-left"></i> Back to Board
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <!-- Premium Empty State -->
+        <div class="card border border-dashed rounded-4 p-5 text-center bg-light bg-opacity-20">
+            <div class="bg-light text-secondary rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 64px; height: 64px;">
+                <i class="bi bi-inbox-fill fs-3 text-secondary text-opacity-50"></i>
+            </div>
+            <h5 class="fw-bold text-dark">Archive is clean</h5>
+            <p class="text-muted small mb-0 mx-auto" style="max-width: 340px;">You don't have any archived tasks sitting in storage right now.</p>
+        </div>
+    }
+    else
+    {
+        <!-- Modern Data Container -->
+        <div class="card shadow-sm border border-light-subtle rounded-4 overflow-hidden bg-white">
+            <div class="card-header bg-light bg-opacity-50 py-3 px-4 border-bottom border-light-subtle">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-secondary small fw-bold text-uppercase tracking-wider">Task Profile Details</span>
+                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2.5">Total: @Model.Count</span>
+                </div>
+            </div>
+
+            <div class="list-group list-group-flush">
+                @foreach (var item in Model)
+                {
+                    <div class="list-group-item p-4 transition-all hover-bg-light">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+
+                            <!-- Left Content Area -->
+                            <div class="text-truncate">
+                                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                    <h6 class="mb-0 fw-semibold text-secondary text-decoration-line-through text-truncate d-inline-block" style="max-width: 500px;" title="@item.Title">
+                                        @item.Title
+                                    </h6>
+                                    <span class="badge bg-light text-secondary border rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">Archived</span>
+                                </div>
+
+                                <!-- Metadata Row -->
+                                @if (item.ProjectId.HasValue && item.ProjectId != 0)
+                                {
+                                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                                        <small class="text-muted d-flex align-items-center gap-1">
+                                            <i class="bi bi-folder2 text-primary text-opacity-70"></i>
+                                            Project: <span class="fw-medium text-dark-subtle">@item.ProjectName</span>
+                                        </small>
+                                        <small class="text-muted d-none d-sm-inline opacity-50">|</small>
+                                        <small class="text-muted d-flex align-items-center gap-1">
+                                            <i class="bi bi-person text-secondary text-opacity-70"></i>
+                                            By: <span class="text-secondary">@item.CreatorName</span>
+                                        </small>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <small class="text-muted-opacity italic style-italic" style="font-size: 0.8rem;">Personal Task</small>
+                                }
+                            </div>
+
+                            <!-- Right Actions Area -->
+                            <div class="shrink-0">
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <!-- 1. Restore Action Button -->
+                                    <form asp-action="ArchivedUnArchived" asp-controller="ToDo" method="post" class="m-0">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3 d-flex align-items-center gap-1.5 fw-medium" title="Restore this task back to the board">
+                                            <i class="bi bi-arrow-counterclockwise"></i> Restore
+                                        </button>
+                                    </form>
+
+                                    <!-- 2. Permanent Delete Action Button -->
+                                    <form asp-action="Delete" asp-controller="ToDo" method="post" class="m-0" onsubmit="return confirm('Are you sure you want to permanently delete this task? This cannot be undone.');">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-link text-danger text-decoration-none px-2 d-flex align-items-center gap-1 opacity-75 hover-opacity-100 fw-medium" title="Permanently delete this task">
+                                            <i class="bi bi-trash3"></i> Delete
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Extra CSS utilities supporting the interactive layouts -->
+<style>
+    .hover-bg-light:hover {
+        background-color: rgba(248, 249, 250, 0.6) !important;
+    }
+
+    .border-dashed {
+        border-style: dashed !important;
+        border-width: 2px !important;
+    }
+
+    .tracking-wider {
+        letter-spacing: 0.05em;
+    }
+
+    .transition-all {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .hover-opacity-100:hover {
+        opacity: 1 !important;
+    }
+</style>

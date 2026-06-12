@@ -1,0 +1,383 @@
+﻿@model SimpleToDo.Web.ViewModels.Project.ProjectDetailsViewModel
+
+@{
+    ViewData["Title"] = "Project Workspace - " + Model.Name;
+}
+
+<style>
+    /* Premium Board Framework Layout styles */
+    .kanban-lane {
+        min-height: 450px;
+        background-color: rgba(248, 249, 250, 0.75);
+        border: 1px dashed #e3e6f0;
+        border-radius: 14px;
+        padding: 12px;
+        transition: background-color 0.2s ease;
+    }
+
+    .sortable-ghost {
+        opacity: 0.35;
+        transform: scale(0.97);
+        filter: saturate(0.5);
+    }
+
+    .project-task-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .project-task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.06) !important;
+        }
+
+    .avatar-circle {
+        width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .transition-all {
+        transition: all 0.2s ease-in-out;
+    }
+</style>
+
+<div class="container-fluid px-0 mt-2">
+
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill px-2.5 small">Project Workspace</span>
+                <span class="text-muted small">&bull; Role: <strong>@Model.DetailsViewerRole</strong></span>
+            </div>
+            <h2 class="mb-0 fw-bold text-dark tracking-tight"><i class="bi bi-folder2-open text-primary me-2"></i>@Model.Name</h2>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-light border rounded-pill px-3 text-secondary d-flex align-items-center gap-2 btn-sm py-2 shadow-sm transition-all" title="Return to Projects Dashboard">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-xl-9 col-lg-8">
+            <div id="kanban-live-alert" class="position-fixed top-0 start-50 translate-middle-x mt-4 d-none" style="z-index: 1080; min-width: 320px; max-width: 450px;">
+            </div>
+            @if (TempData["TodoError"] != null)
+            {
+                <div class="alert alert-danger rounded-3 p-3 mb-3 d-flex align-items-center gap-2 small border-0 shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill fs-6 text-danger"></i> @TempData["TodoError"]
+                </div>
+            }
+            @if (TempData["TodoSuccess"] != null)
+            {
+                <div class="alert alert-success rounded-3 p-3 mb-3 d-flex align-items-center gap-2 small border-0 shadow-sm">
+                    <i class="bi bi-check-circle-fill fs-6 text-success"></i> @TempData["TodoSuccess"]
+                </div>
+            }
+
+            @if (Model.DetailsViewerRole == "Admin")
+            {
+                <div class="card border border-light-subtle rounded-4 shadow-sm bg-white mb-4">
+                    <div class="card-body p-3">
+                        <form asp-controller="Todo" asp-action="QuickCreate" method="post" class="d-flex align-items-center gap-2 m-0">
+                            <input type="hidden" name="projectId" value="@Model.Id" />
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0 text-muted ps-3"><i class="bi bi-plus-circle"></i></span>
+                                <input type="text" name="title" class="form-control border-start-0 px-2 py-2 shadow-none" placeholder="Add a new task objective to this project workspace..." required autocomplete="off" />
+                            </div>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm text-nowrap py-2 btn-sm">
+                                Create Task
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+            <div class="card border border-light-subtle rounded-4 shadow-sm bg-white mb-4">
+                <div class="card-body p-3 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="bg-light text-secondary rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 36px; height: 36px;">
+                            <i class="bi bi-funnel text-secondary"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0 small text-uppercase tracking-wider">Filter Board</h6>
+                            <small class="text-muted">Isolate assignments selectively using team profile metrics.</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2" style="min-width: 250px;">
+                        <span class="text-muted small text-nowrap"><i class="bi bi-filter-left me-1"></i>Assignee:</span>
+                        <select id="member-board-filter" class="form-select form-select-sm rounded-pill border-secondary-subtle shadow-none ps-3 pe-5 py-1.5" style="font-size: 0.8rem; font-weight: 500;">
+                            <option value="all">⚡ All Team Members</option>
+                            <option value="0">⚠️ Unassigned Tasks</option>
+                            @foreach (var member in Model.ProjectMemberList)
+                            {
+                                <option value="@member.UserId">👤 @member.UserName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <div class="p-1 d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="d-inline-block bg-danger rounded-circle" style="width: 8px; height: 8px;"></span>
+                            <span class="fw-bold text-dark small text-uppercase tracking-wider">Todo</span>
+                        </div>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">
+                            @Model.TodoList.Count(t => t.Status.ToString() == "Pending")
+                        </span>
+                    </div>
+
+                    <div class="kanban-lane" id="lane-Pending" data-status="Pending">
+                        @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Pending"))
+                        {
+                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { 
+                                { 
+                                    "ProjectMemberList", Model.ProjectMemberList 
+                                }, 
+                                { 
+                                    "DetailsViewerRole", Model.DetailsViewerRole 
+                                }, 
+                                { 
+                                    "ProjectId", Model.Id 
+                                } 
+                            })
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="p-1 d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="d-inline-block bg-primary rounded-circle" style="width: 8px; height: 8px;"></span>
+                            <span class="fw-bold text-dark small text-uppercase tracking-wider">In Progress</span>
+                        </div>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">
+                            @Model.TodoList.Count(t => t.Status.ToString() == "Processing")
+                        </span>
+                    </div>
+
+                    <div class="kanban-lane" id="lane-Processing" data-status="Processing" style="background-color: rgba(13, 110, 253, 0.02); border-color: rgba(13, 110, 253, 0.12)">
+                        @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Processing"))
+                        {
+                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMemberList }, { "DetailsViewerRole", Model.DetailsViewerRole }, { "ProjectId", Model.Id } })
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="p-1 d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="d-inline-block bg-success rounded-circle" style="width: 8px; height: 8px;"></span>
+                            <span class="fw-bold text-dark small text-uppercase tracking-wider">Completed</span>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
+                            @Model.TodoList.Count(t => t.Status.ToString() == "Completed")
+                        </span>
+                    </div>
+
+                    <div class="kanban-lane" id="lane-Completed" data-status="Completed">
+                        @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Completed"))
+                        {
+                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMemberList }, { "DetailsViewerRole", Model.DetailsViewerRole }, { "ProjectId", Model.Id } })
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        
+        <div class="col-xl-3 col-lg-4">
+
+            
+            @if (TempData["MemberError"] != null || TempData["AssignMemberError"] != null)
+            {
+                <div class="alert alert-danger rounded-3 p-3 mb-3 small border-0 shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i> @(TempData["MemberError"] ?? TempData["AssignMemberError"])
+                </div>
+            }
+            @if (TempData["MemberSuccess"] != null || TempData["AssignMemberSuccess"] != null)
+            {
+                <div class="alert alert-success rounded-3 p-3 mb-3 small border-0 shadow-sm">
+                    <i class="bi bi-check-circle-fill text-success me-1"></i> @(TempData["MemberSuccess"] ?? TempData["AssignMemberSuccess"])
+                </div>
+            }
+
+            
+            <div class="card border border-light-subtle rounded-4 shadow-sm bg-white">
+                <div class="card-header bg-white border-bottom border-light py-3 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-dark small text-uppercase tracking-wider"><i class="bi bi-people me-2 text-secondary"></i>Team Roster</h5>
+                        <span class="badge bg-light text-secondary border rounded-pill px-2">@Model.ProjectMemberList.Count</span>
+                    </div>
+                </div>
+
+                @if (Model.DetailsViewerRole == "Admin")
+                {
+                    
+                    <div class="p-3 bg-light bg-opacity-50 border-bottom border-light">
+                        <form asp-controller="Project" asp-action="QuickAddMember" method="post" class="d-flex flex-column gap-2 m-0">
+                            <input type="hidden" name="projectId" value="@Model.Id" />
+                            <input type="email" name="email" class="form-control form-control-sm rounded-pill border-secondary-subtle shadow-none px-3" placeholder="Invitee email address..." required />
+                            <div class="d-flex gap-2">
+                                <select name="role" class="form-select form-select-sm rounded-pill border-secondary-subtle shadow-none">
+                                    <option value="Contributor">Contributor</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill text-nowrap px-3 fw-semibold">
+                                    Add
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                }
+
+                
+                <div class="card-body p-0 max-vh-50 overflow-auto">
+                    <div class="list-group list-group-flush">
+                        @foreach (var member in Model.ProjectMemberList)
+                        {
+                            <div class="list-group-item px-3 py-2.5 d-flex align-items-center justify-content-between border-bottom-0">
+                                <div class="d-flex align-items-center text-truncate">
+                                    <div class="avatar-circle bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center shadow-none me-2.5 border border-white shrink-0">
+                                        @(string.IsNullOrEmpty(member.UserName) ? "?" : member.UserName.Substring(0, 1).ToUpper())
+                                    </div>
+                                    <div class="text-truncate">
+                                        <div class="fw-semibold text-dark text-truncate small" title="@member.UserName">@member.UserName</div>
+                                    </div>
+                                </div>
+                                <span class="badge @(member.Role.ToString() == "Admin" ? "bg-dark text-white" : "bg-light text-secondary border") rounded-pill px-2 py-1 font-xs" style="font-size:0.7rem;">
+                                    @member.Role
+                                </span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const lanes = ['Pending', 'Processing', 'Completed'];
+
+            lanes.forEach(status => {
+                const laneEl = document.getElementById(`lane-${status}`);
+                if (laneEl) {
+                    new Sortable(laneEl, {
+                        group: 'project-kanban-board',
+                        animation: 180,
+                        ghostClass: 'sortable-ghost',
+                        fallbackTolerance: 3,
+
+                        onEnd: function (evt) {
+                            if (evt.from === evt.to) return;
+
+                            const cardElement = evt.item;
+                            const taskId = cardElement.getAttribute('data-task-id');
+                            const targetStatus = evt.to.getAttribute('data-status');
+                            const todoUserId = cardElement.getAttribute('data-user-id');
+                            const originalLane = evt.from;
+
+                            executeDragStatusUpdate(taskId, targetStatus, todoUserId, originalLane, cardElement);
+                        }
+                    });
+                }
+            });
+            const boardFilter = document.getElementById('member-board-filter');
+            if (boardFilter) {
+                boardFilter.addEventListener('change', function () {
+                    const selectedValue = this.value;
+                    const allCards = document.querySelectorAll('.project-task-card');
+
+                    allCards.forEach(card => {
+                        const cardUserId = card.getAttribute('data-user-id');
+
+                        if (selectedValue === 'all') {
+                            card.classList.remove('d-none');
+                        }
+                        else if (selectedValue === '0') {
+                            if (!cardUserId || cardUserId === '0' || cardUserId.trim() === '') {
+                                card.classList.remove('d-none');
+                            } 
+                            else {
+                                card.classList.add('d-none');
+                            }
+                        }
+                        else {
+                            if (cardUserId === selectedValue) {
+                                card.classList.remove('d-none');
+                            } 
+                            else {
+                                card.classList.add('d-none');
+                            }
+                        }
+                    });
+                });
+            }
+            function executeDragStatusUpdate(taskId, newStatus,todoUserId, fallbackLane, cardElement) {
+                    let formData = new FormData();
+                    formData.append('id', taskId);
+                    formData.append('status', newStatus);
+                    formData.append('userId', todoUserId);
+
+                    fetch('/ToDo/UpdateStatus', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(async response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.message || 'An unexpected pipeline error occurred.');
+                    })
+                    .then(data => {
+                        showLiveAlert(data.message || 'Task status updated!', 'success');
+                        cardElement.classList.remove('card-status-todo', 'card-status-progress', 'card-status-done');
+                        if (newStatus === 'Pending') {
+                            cardElement.classList.add('card-status-todo');
+                        } else if (newStatus === 'Processing') {
+                            cardElement.classList.add('card-status-progress');
+                        } else if (newStatus === 'Completed') {
+                            cardElement.classList.add('card-status-done');
+                        }
+                    })
+                    .catch(error => {
+                        showLiveAlert(error.message, 'danger');
+                        fallbackLane.appendChild(cardElement);
+                    });
+                }
+
+            function showLiveAlert(message, type) {
+                const container = document.getElementById('kanban-live-alert');
+                if (!container) return;
+
+                const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+    
+                container.innerHTML = `
+                    <div class="alert alert-${type} shadow-lg border-0 rounded-4 p-3 d-flex align-items-center gap-2 animate-fade-in">
+                    <i class="bi ${icon} fs-5 text-${type}"></i>
+                    <div class="fw-medium text-dark small flex-grow-1">${message}</div>
+                    <button type="button" class="btn-close small shadow-none ms-2" onclick="this.parentElement.parentElement.classList.add('d-none')" aria-label="Close"></button>
+                    </div>
+                `;
+
+                container.classList.remove('d-none');
+
+                setTimeout(() => {
+                    container.classList.add('d-none');
+                }, 3500);
+            }
+        });
+    </script>
+}
