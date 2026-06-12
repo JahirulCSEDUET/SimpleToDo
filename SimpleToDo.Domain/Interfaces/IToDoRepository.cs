@@ -11,7 +11,7 @@ namespace SimpleToDo.Domain.Interfaces
         Task<bool> DeleteAsync(ToDoItem item);
         Task UpdateAsync(ToDoItem item);
         Task<ToDoItem> GetByIdAsync(int id);
-        Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId);
+        Task<IReadOnlyList<ToDoItem>> GetByUserIdAsync(string userId, bool isArchived);
         Task<IReadOnlyList<ToDoItem>> GetAllASync();
     }
 }
