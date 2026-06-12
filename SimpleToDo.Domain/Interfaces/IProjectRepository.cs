@@ -9,5 +9,6 @@ namespace SimpleToDo.Domain.Interfaces
     {
         Task<IReadOnlyList<Project>> GetByMemberIdAsync(int userId);
         Task<Project> GetByIdWithMemberAndTodoAsync(int projectId);
+        Task<Project> GetByIdAsync(int id);
     }
 }

@@ -10,6 +10,7 @@ namespace SimpleToDo.Domain.Interfaces
         IUserRepository User { get; }
         IProjectRepository Project { get; }
         IProjectMemberRepository ProjectMember { get; }
+        IQueryRepository Query { get; }
         Task<int> SaveAsync();
     }
 }

@@ -12,5 +12,6 @@ namespace SimpleToDo.Domain.Entities
         public string Email { get; set; }
         public ICollection<ProjectMember> ProjectMembers { get; set; } = new List<ProjectMember>();
         public ICollection<Todo> Todos { get; set; } = new List<Todo>();
+        public ICollection<Query> Queries { get; set; } = new List<Query>();
     }
 }

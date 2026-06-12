@@ -1,0 +1,220 @@
+﻿@model ToDoItemDetailsViewModel
+
+@{
+    ViewData["Title"] = "Queries - " + Model.Title;
+
+    string GetUserColorClass(string username)
+    {
+        if (string.IsNullOrEmpty(username)) return "text-secondary";
+
+        string[] colors = { "text-primary", "text-purple", "text-success", "text-info", "text-warning-emphasis" };
+        int index = Math.Abs(username.GetHashCode()) % colors.Length;
+        return colors[index];
+    }
+}
+
+<style>
+    /* AuraSpace Discussion Framework Tokens */
+    .task-post-card {
+        border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        border-radius: 16px !important;
+    }
+
+    .query-item {
+        transition: background-color 0.2s ease;
+    }
+
+        .query-item:hover {
+            background-color: rgba(248, 249, 250, 0.5);
+        }
+
+    .query-avatar {
+        width: 38px;
+        height: 38px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    .query-textarea {
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        resize: none;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .query-textarea:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+    .text-purple {
+        color: #6f42c1;
+    }
+
+    .text-muted-xs {
+        font-size: 0.75rem;
+        color: #8c98a5;
+    }
+
+    .tracking-wider {
+        letter-spacing: 0.04em;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+        <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="btn btn-sm btn-outline-secondary rounded-circle d-inline-flex align-items-center justify-content-center p-0 shadow-sm" style="width: 34px; height: 34px; min-width: 34px;" title="Back to Project Workspace">
+            <i class="bi bi-arrow-left fs-5"></i>
+        </a>
+        <div>
+            <span class="text-muted small">Workspace Portfolio &bull; <strong>@Model.ProjectName</strong></span>
+            <h4 class="mb-0 fw-bold text-dark tracking-tight">Task Matrix Pipeline</h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-8 col-lg-10 mx-auto">
+
+            <div class="card shadow-sm bg-white task-post-card overflow-hidden mb-5">
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        <span class="text-muted-xs text-uppercase fw-bold tracking-wider"><i class="bi bi-hash me-1"></i>Task Assignment Entry</span>
+
+                        @switch (Model.Status.ToString())
+                        {
+                            case "Pending":
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill px-3 py-1.5 fw-semibold small">
+                                    <i class="bi bi-clock-history me-1"></i> Todo
+                                </span>
+                                break;
+                            case "Processing":
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill px-3 py-1.5 fw-semibold small">
+                                    <i class="bi bi-play-circle me-1"></i> In Progress
+                                </span>
+                                break;
+                            case "Completed":
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-semibold small">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Completed
+                                </span>
+                                break;
+                        }
+                    </div>
+
+                    <h2 class="fw-bold text-dark lh-base mb-4">@Model.Title</h2>
+
+                    <div class="row g-3 pt-3 border-top border-light-subtle text-secondary small">
+                        <div class="col-sm-6 d-flex align-items-center gap-2">
+                            <div class="bg-light text-muted rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="bi bi-person"></i>
+                            </div>
+                            <div>
+                                <span class="text-muted-xs d-block">Origin Creator</span>
+                                <strong class="text-dark-subtle">@Model.CreatorName</strong>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 d-flex align-items-center gap-2">
+                            <div class="bg-light text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background-color: #f0f5ff !important;">
+                                <i class="bi bi-person-fill-check"></i>
+                            </div>
+                            <div>
+                                <span class="text-muted-xs d-block">Current Assignee</span>
+                                <strong class="text-primary">@Model.UserName</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h5 class="fw-bold text-dark mb-3 d-flex align-items-center justify-content-between px-1">
+                    <span><i class="bi bi-chat-left-text me-2 text-secondary"></i>Discussion Activity</span>
+                    <span class="badge bg-light text-secondary border rounded-pill font-xs" style="font-size: 0.8rem;">@Model.QueryList.Count Entries</span>
+                </h5>
+
+                @if (!Model.QueryList.Any())
+                {
+                    <div class="card border border-dashed rounded-4 p-4 text-center bg-light bg-opacity-20 mb-4">
+                        <p class="text-muted small mb-0"><i class="bi bi-chat-dots me-1.5"></i>No inquiries or updates have been queried onto this task matrix thread yet.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="card border border-light-subtle rounded-4 overflow-hidden bg-white shadow-sm mb-4">
+                        <div class="list-group list-group-flush">
+                            @foreach (var query in Model.QueryList)
+                            {
+                                var dynamicUserColor = GetUserColorClass(query.UserName);
+
+                                <div class="list-group-item p-3.5 query-item border-light-subtle">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="query-avatar bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center shadow-none border border-white">
+                                            @(string.IsNullOrEmpty(query.UserName) ? "?" : query.UserName.Substring(0, 1).ToUpper())
+                                        </div>
+
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="fw-bold small @dynamicUserColor">@query.UserName</span>
+                                            </div>
+                                            <p class="mb-0 text-dark small lh-base fw-normal" style="color: #000000 !important;">
+                                                @query.Body
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="card border border-light-subtle rounded-4 shadow-sm bg-white">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-pencil-square text-primary"></i>
+                            <h6 class="mb-0 fw-bold text-dark small text-uppercase tracking-wider">Post New Query Update</h6>
+                        </div>
+                    </div>
+
+                    @if (TempData["QueryError"] != null)
+                    {
+                        <div class="alert alert-danger rounded-3 p-3 mb-3 d-flex align-items-center gap-2 small border-0 shadow-sm animate-fade-in">
+                            <i class="bi bi-exclamation-triangle-fill fs-6 text-danger"></i>
+                            <span class="fw-medium text-dark">@TempData["QueryError"]</span>
+                        </div>
+                    }
+                    @if (TempData["QuerySuccess"] != null)
+                    {
+                        <div class="alert alert-success rounded-3 p-3 mb-3 d-flex align-items-center gap-2 small border-0 shadow-sm animate-fade-in">
+                            <i class="bi bi-check-circle-fill fs-6 text-success"></i>
+                            <span class="fw-medium text-dark">@TempData["QuerySuccess"]</span>
+                        </div>
+                    }
+
+                    <form asp-controller="Query" asp-action="Create" method="post" class="m-0">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-2 fw-medium"></div>
+
+                        <input type="hidden" name="todoId" value="@Model.Id" />
+
+                        <div class="form-group mb-2">
+                            <textarea name="body" class="form-control query-textarea p-3 small shadow-none" rows="3" placeholder="Type your observation request, technical block, or query notes here..." required autocomplete="off"></textarea>
+                        </div>
+
+                        <span class="text-danger small d-block mb-3 fw-medium" data-valmsg-for="body" data-valmsg-replace="true"></span>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm btn-sm py-2 transition-all">
+                                Submit Query <i class="bi bi-send-fill ms-1.5 small"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

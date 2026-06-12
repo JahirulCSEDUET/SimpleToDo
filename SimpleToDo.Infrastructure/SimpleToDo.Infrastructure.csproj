@@ -20,5 +20,4 @@
     <ProjectReference Include="..\SimpleToDo.Application\SimpleToDo.Application.csproj" />
     <ProjectReference Include="..\SimpleToDo.Domain\SimpleToDo.Domain.csproj" />
   </ItemGroup>
-
 </Project>
