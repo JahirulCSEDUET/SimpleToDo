@@ -11,10 +11,14 @@
         int index = Math.Abs(username.GetHashCode()) % colors.Length;
         return colors[index];
     }
+
+    // Determine the main asset file properties securely
+    var fileExt = !string.IsNullOrEmpty(Model.FilePath) ? System.IO.Path.GetExtension(Model.FilePath).ToLowerInvariant() : "";
+    var isImage = fileExt == ".jpg" || fileExt == ".jpeg" || fileExt == ".png";
 }
 
 <style>
-    /* AuraSpace Discussion Framework Tokens */
+    /* AuraSpace Discussion Framework Design Tokens */
     .task-post-card {
         border: 1px solid rgba(0, 0, 0, 0.08) !important;
         border-radius: 16px !important;
@@ -60,6 +64,39 @@
     .tracking-wider {
         letter-spacing: 0.04em;
     }
+
+    /* 📄 Premium Asset Management Containers */
+    .attachment-preview-box {
+        max-width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
+    .file-download-tray {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        transition: background-color 0.15s ease-in-out;
+    }
+
+        .file-download-tray:hover {
+            background-color: #f1f3f5;
+        }
+
+    /* 💬 Micro Attachment Layout Tokens for Queries Feed */
+    .query-img-preview {
+        max-height: 160px;
+        object-fit: contain;
+        border-radius: 6px;
+    }
+
+    .query-file-box {
+        max-width: 420px;
+        background-color: #f8f9fa;
+        border: 1px solid #e3e6f0;
+        border-radius: 10px;
+    }
 </style>
 
 <div class="container mt-4">
@@ -69,7 +106,7 @@
         </a>
         <div>
             <span class="text-muted small">Workspace Portfolio &bull; <strong>@Model.ProjectName</strong></span>
-            <h4 class="mb-0 fw-bold text-dark tracking-tight">Task Matrix Pipeline</h4>
+            <h4 class="mb-0 fw-bold text-dark tracking-tight">Task Details</h4>
         </div>
     </div>
 
@@ -104,7 +141,62 @@
 
                     <h2 class="fw-bold text-dark lh-base mb-4">@Model.Title</h2>
 
-                    <div class="row g-3 pt-3 border-top border-light-subtle text-secondary small">
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <div class="mb-4 pb-2">
+                            <p class="text-dark lh-base text-wrap" style="white-space: pre-line; font-size: 0.95rem; color: #2d3748 !important;">@Model.Description</p>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.FilePath))
+                    {
+                        <div class="mb-4 pb-4 border-bottom border-light-subtle">
+                            <span class="text-muted-xs text-uppercase fw-bold tracking-wider d-block mb-2">
+                                <i class="bi bi-paperclip me-1"></i> Task Attachment Assets
+                            </span>
+
+                            @if (isImage)
+                            {
+                                <div class="d-inline-block border rounded-3 p-1 bg-light shadow-sm overflow-hidden max-w-100">
+                                    <a href="/@Model.FilePath" target="_blank" title="Expand image in new window">
+                                        <img src="/@Model.FilePath" class="img-fluid attachment-preview-box d-block" alt="Task Document Resource" />
+                                    </a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="p-3 file-download-tray d-flex align-items-center justify-content-between gap-3 flex-wrap flex-sm-nowrap">
+                                    <div class="d-flex align-items-center gap-2.5 text-truncate">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; min-width: 38px;">
+                                            @if (fileExt == ".zip")
+                                            {
+                                                <i class="bi bi-file-earmark-zip-fill fs-5"></i>
+                                            }
+                                            else if (fileExt == ".pdf")
+                                            {
+
+                                                <i class="bi bi-file-earmark-pdf-fill fs-5"></i>
+                                            }
+                                            else
+                                            {
+
+                                                <i class="bi bi-file-earmark-text-fill fs-5"></i>
+                                            }
+                                        </div>
+                                        <div class="text-truncate">
+                                            <span class="d-block fw-semibold text-dark text-truncate small" title="@Model.FileName">@Model.FileName</span>
+                                            <span class="text-muted-xs text-uppercase" style="font-size: 0.65rem;">@fileExt File asset</span>
+                                        </div>
+                                    </div>
+                                    <a href="/@Model.FilePath" download="@Model.FileName" class="btn btn-sm btn-primary rounded-pill px-3.5 d-inline-flex align-items-center gap-1.5 shadow-sm fw-medium shrink-0">
+                                        Download <i class="bi bi-cloud-arrow-down-fill"></i>
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <div class="row g-3 text-secondary small pt-3 border-top border-light-subtle">
                         <div class="col-sm-6 d-flex align-items-center gap-2">
                             <div class="bg-light text-muted rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                                 <i class="bi bi-person"></i>
@@ -149,6 +241,9 @@
                             {
                                 var dynamicUserColor = GetUserColorClass(query.UserName);
 
+                                var qExt = !string.IsNullOrEmpty(query.FilePath) ? System.IO.Path.GetExtension(query.FilePath).ToLowerInvariant() : "";
+                                var qIsImage = qExt == ".jpg" || qExt == ".jpeg" || qExt == ".png";
+
                                 <div class="list-group-item p-3.5 query-item border-light-subtle">
                                     <div class="d-flex align-items-start gap-3">
                                         <div class="query-avatar bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center shadow-none border border-white">
@@ -159,9 +254,51 @@
                                             <div class="d-flex justify-content-between align-items-center mb-1">
                                                 <span class="fw-bold small @dynamicUserColor">@query.UserName</span>
                                             </div>
-                                            <p class="mb-0 text-dark small lh-base fw-normal" style="color: #000000 !important;">
-                                                @query.Body
-                                            </p>
+                                            <p class="mb-2 text-dark small lh-base fw-normal" style="color: #000000 !important; white-space: pre-line;">@query.Body</p>
+
+                                            @if (!string.IsNullOrEmpty(query.FilePath))
+                                            {
+                                                <div class="mt-2.5">
+                                                    @if (qIsImage)
+                                                    {
+                                                        <div class="d-inline-block border rounded-3 p-1 bg-light shadow-sm overflow-hidden" style="max-width: 260px;">
+                                                            <a href="/@query.FilePath" target="_blank" title="Expand response resource">
+                                                                <img src="/@query.FilePath" class="img-fluid d-block query-img-preview" alt="Response graphic asset" />
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="p-2 query-file-box d-flex align-items-center justify-content-between gap-3">
+                                                            <div class="d-flex align-items-center gap-2 text-truncate">
+                                                                <div class="text-primary d-flex align-items-center justify-content-center" style="font-size: 1.25rem;">
+                                                                    @if (qExt == ".zip")
+                                                                    {
+                                                                        <i class="bi bi-file-earmark-zip-fill"></i>
+                                                                    }
+                                                                    else if (qExt == ".pdf")
+                                                                    {
+
+                                                                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                                                                    }
+                                                                    else
+                                                                    {
+
+                                                                        <i class="bi bi-file-earmark-text-fill"></i>
+                                                                    }
+                                                                </div>
+                                                                <div class="text-truncate">
+                                                                    <span class="d-block fw-semibold text-dark text-truncate" style="font-size: 0.78rem;" title="@query.FileName">@query.FileName</span>
+                                                                    <span class="text-muted-xs text-uppercase" style="font-size: 0.6rem;">@qExt asset</span>
+                                                                </div>
+                                                            </div>
+                                                            <a href="/@query.FilePath" download="@query.FileName" class="btn btn-sm btn-outline-primary rounded-pill py-0.5 px-2.5 fw-semibold shrink-0" style="font-size: 0.72rem;">
+                                                                Download <i class="bi bi-cloud-arrow-down-fill"></i>
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -195,18 +332,26 @@
                         </div>
                     }
 
-                    <form asp-controller="Query" asp-action="Create" method="post" class="m-0">
+                    <form asp-controller="Query" asp-action="Create" method="post" enctype="multipart/form-data" class="m-0">
                         <div asp-validation-summary="ModelOnly" class="text-danger small mb-2 fw-medium"></div>
 
                         <input type="hidden" name="todoId" value="@Model.Id" />
 
-                        <div class="form-group mb-2">
+                        <div class="form-group mb-3">
                             <textarea name="body" class="form-control query-textarea p-3 small shadow-none" rows="3" placeholder="Type your observation request, technical block, or query notes here..." required autocomplete="off"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="queryFileAttachment" class="form-label text-dark fw-bold small text-uppercase tracking-wider mb-1" style="font-size: 0.72rem;">
+                                <i class="bi bi-paperclip me-1"></i> Add Attachment <span class="text-muted fw-normal text-lowercase">(Optional)</span>
+                            </label>
+                            <input type="file" name="file" id="queryFileAttachment" class="form-control form-control-sm shadow-none" accept=".jpg,.jpeg,.png,.pdf,.zip" style="border-radius: 8px; padding: 0.45rem 0.75rem;" />
+                            <div class="form-text text-muted-xs mt-1" style="font-size: 0.68rem;">Allowed profiles: .jpg, .png, .pdf, .zip (Max 5MB)</div>
                         </div>
 
                         <span class="text-danger small d-block mb-3 fw-medium" data-valmsg-for="body" data-valmsg-replace="true"></span>
 
-                        <div class="d-flex justify-content-end">
+                        <div class="d-flex justify-content-end pt-2 border-top">
                             <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm btn-sm py-2 transition-all">
                                 Submit Query <i class="bi bi-send-fill ms-1.5 small"></i>
                             </button>
@@ -218,3 +363,9 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

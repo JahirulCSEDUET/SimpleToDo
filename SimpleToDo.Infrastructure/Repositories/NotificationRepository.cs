@@ -17,9 +17,24 @@ namespace SimpleToDo.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<int> CountUnreadNotificationByUserIdAsync(int userId)
+        {
+            return await _context.Notifications.Where(i=> !i.IsRead && i.UserId==userId).CountAsync();
+        }
+
+        public async Task<Notification> GetByIdAsync(int id)
+        {
+            return await _context.Notifications.AsNoTracking().FirstOrDefaultAsync(i=> i.Id==id);
+        }
+
         public async Task<IReadOnlyList<Notification>> GetByUserIdAsync(int userId)
         {
             return await _context.Notifications.Where(i => i.UserId == userId).ToListAsync();
+        }
+
+        public async Task<List<Notification>> GetUnreadNotificationByIdAsync(int userId)
+        {
+            return await _context.Notifications.Where(n => n.UserId == userId && !n.IsRead).ToListAsync();
         }
     }
 }

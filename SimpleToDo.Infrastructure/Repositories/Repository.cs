@@ -37,5 +37,9 @@ namespace SimpleToDo.Infrastructure.Repositories
             _dbSet.Update(item);
         }
 
+        public void UpdateRange(ICollection<T> items)
+        {
+            _dbSet.UpdateRange(items);
+        }
     }
 }

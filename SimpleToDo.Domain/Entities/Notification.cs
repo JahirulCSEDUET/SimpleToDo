@@ -14,5 +14,7 @@ namespace SimpleToDo.Domain.Entities
         public User userId { get; set; }
         public bool IsRead { get; set; }
         public RedirectLink RedirectLink { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public int RedirectId { get; set; }
     }
 }

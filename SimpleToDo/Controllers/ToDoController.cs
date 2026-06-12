@@ -14,13 +14,17 @@ namespace SimpleToDo.Web.Controllers
     {
         private readonly IToDoService _todoService;
         private readonly IUserService _userService;
+        private readonly IProjectService _projectService;
         private readonly INotificationService _notificationService;
+        private readonly IFileService _fileService;
 
-        public ToDoController(IToDoService todoService, IUserService userService, INotificationService notificationService)
+        public ToDoController(IToDoService todoService, IUserService userService, INotificationService notificationService, IProjectService projectService, IFileService fileService)
         {
             _todoService = todoService;
             _userService = userService;
             _notificationService = notificationService;
+            _projectService = projectService;
+            _fileService = fileService;
         }
 
         public async Task<IActionResult> Index()
@@ -47,16 +51,21 @@ namespace SimpleToDo.Web.Controllers
             }).ToList();
             return View(todoList);
         }
-        public IActionResult Create()
+        public async Task<IActionResult> Create(int projectId)
         {
-            return View();
+            var project = await _projectService.GetByIdAsync(projectId);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            return View(new ToDoItemCreateViewModel { ProjectId=projectId, ProjectName=project.Name});
         }
         [HttpPost]
-        public async Task<IActionResult> Create(ToDoItemCreateViewModel item)
+        public async Task<IActionResult> Create(ToDoItemCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(item);
+                return View(model);
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
@@ -71,17 +80,33 @@ namespace SimpleToDo.Web.Controllers
             var todo = new Todo
             {
                 Status = Status.Pending,
-                Title = item.Title,
-                Description = item.Description,
-                UserId = user.Id,
+                Title = model.Title,
+                Description = model.Description,
                 CreatorId = user.Id,
                 CreatorName =user.FullName,
                 IsArchived = false,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.Now,
+                ProjectId = model.ProjectId
             };
-            
-            await _todoService.AddAsync(todo);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                if (model.File != null && model.File.Length > 0)
+                {
+                    using var stream = model.File.OpenReadStream();
+
+                    var (storedPath, fileName) = await _fileService.SaveAsync(stream, model.File.FileName, "tasks");
+
+                    todo.FilePath = storedPath;
+                    todo.FileName = fileName;
+                }
+                await _todoService.AddAsync(todo);
+                return RedirectToAction("Details", "Project", new { Id = model.ProjectId });
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(nameof(model.File), ex.Message);
+                return View(model);
+            }            
         }
         [HttpPost]
         public async Task<IActionResult> QuickCreate(int projectId, string title)
@@ -108,6 +133,7 @@ namespace SimpleToDo.Web.Controllers
                 CreatorId = user.Id,
                 CreatorName=user.FullName,
                 IsArchived = false,
+                Description=""
             };
             await _todoService.AddAsync(todo);
             return RedirectToAction("Details","Project", new { id = projectId });
@@ -163,6 +189,10 @@ namespace SimpleToDo.Web.Controllers
                 Challenge();
             }
             var user = _userService.GetByUserId(userId);
+            if (user == null)
+            {
+                Challenge();
+            }
             var todos = await _todoService.GetByUserIdAsync(user.Id, true);
             var todoList = todos.Select(t => new ToDoItemListViewModel
             {
@@ -190,26 +220,40 @@ namespace SimpleToDo.Web.Controllers
                 TempData["AssignMemberError"] = $"Assigmn member unsuccessfull.";
                 return RedirectToAction("Details", "Project", new { id = projectId });
             }
+
             var user = await _userService.GetByIdAsync(userId);
             if (user == null) 
             {
                 TempData["AssignMemberError"] = $"Invalid member.";
             }
             var todo = await _todoService.GetByIdAsync(todoId);
-            if (user == null)
+            if (todo == null)
             {
                 TempData["AssignMemberError"] = $"Invalid todo.";
             }
-            todo.UserId = userId;
-            
+            todo.UserId = userId;            
             await _todoService.UpdateAsync(todo);
+
+            string loginUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (loginUserId == null)
+            {
+                Challenge();
+            }
+            var loginUser = _userService.GetByUserId(loginUserId);
+            if (loginUser == null)
+            {
+                Challenge();
+            }
+
             var notification = new Notification
             {
                 Title = "New Task Assigned",
-                Message = $"{user.FullName} assigned you to the task: {todo.Title} in workspace {todo.Project.Name}.",
+                Message = $"{loginUser.FullName} assigned you to the task: {todo.Title} in workspace {todo.Project.Name}.",
                 RedirectLink = RedirectLink.Todo,
                 UserId = userId,
-                IsRead = false
+                IsRead = false,
+                CreatedTime = DateTime.Now,
+                RedirectId = todo.Id
             };
             await _notificationService.AddAsync(notification);
             return RedirectToAction("Details", "Project", new { Id = projectId });
@@ -235,7 +279,10 @@ namespace SimpleToDo.Web.Controllers
             {
                 Id = todo.Id,
                 Title = todo.Title,
+                Description = todo.Description,
                 Status = todo.Status,
+                FileName = todo.FileName,
+                FilePath = todo.FilePath,
                 CreatorId = todo.CreatorId,
                 CreatorName = todo.CreatorName,
                 UserId = todo.UserId.Value,
@@ -247,7 +294,9 @@ namespace SimpleToDo.Web.Controllers
                     Id = q.Id,
                     Body = q.Body,
                     UserId = q.UserId,
-                    UserName = q.User.FullName
+                    UserName = q.User.FullName,
+                    FilePath= q.FilePath,
+                    FileName = q.FileName
                 }).ToList()
             };
             return View(todovm);

@@ -25,10 +25,10 @@
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-        .project-task-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.06) !important;
-        }
+    .project-task-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.06) !important;
+    }
 
     .avatar-circle {
         width: 36px;
@@ -39,6 +39,11 @@
 
     .transition-all {
         transition: all 0.2s ease-in-out;
+    }
+
+    .action-banner-card {
+        border: 1px solid rgba(13, 110, 253, 0.08) !important;
+        background: linear-gradient(135deg, #fff 70%, rgba(13, 110, 253, 0.01)) !important;
     }
 </style>
 
@@ -79,21 +84,28 @@
 
             @if (Model.DetailsViewerRole == "Admin")
             {
-                <div class="card border border-light-subtle rounded-4 shadow-sm bg-white mb-4">
-                    <div class="card-body p-3">
-                        <form asp-controller="Todo" asp-action="QuickCreate" method="post" class="d-flex align-items-center gap-2 m-0">
-                            <input type="hidden" name="projectId" value="@Model.Id" />
-                            <div class="input-group">
-                                <span class="input-group-text bg-transparent border-end-0 text-muted ps-3"><i class="bi bi-plus-circle"></i></span>
-                                <input type="text" name="title" class="form-control border-start-0 px-2 py-2 shadow-none" placeholder="Add a new task objective to this project workspace..." required autocomplete="off" />
+                <div class="card border border-light-subtle rounded-4 shadow-sm bg-white action-banner-card mb-4">
+                    <div class="card-body p-3.5 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; min-width: 42px;">
+                                <i class="bi bi-layers-half fs-5"></i>
                             </div>
-                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm text-nowrap py-2 btn-sm">
-                                Create Task
-                            </button>
-                        </form>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-0.5 small text-uppercase tracking-wider">Workspace Management</h6>
+                                <p class="text-muted small mb-0">Initialize full matrix tasks complete with scope profiles and attachments.</p>
+                            </div>
+                        </div>
+                        
+                        <a asp-controller="Todo" 
+                           asp-action="Create" 
+                           asp-route-projectId="@Model.Id" 
+                           class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm text-nowrap py-2 btn-sm d-inline-flex align-items-center gap-2 transition-all">
+                            <i class="bi bi-plus-circle-fill fs-6"></i> Create New Task
+                        </a>
                     </div>
                 </div>
             }
+
             <div class="card border border-light-subtle rounded-4 shadow-sm bg-white mb-4">
                 <div class="card-body p-3 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
                     <div class="d-flex align-items-center gap-2">
@@ -118,6 +130,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="row g-3">
 
                 <div class="col-md-4">
@@ -135,15 +148,9 @@
                         @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Pending"))
                         {
                             @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { 
-                                { 
-                                    "ProjectMemberList", Model.ProjectMemberList 
-                                }, 
-                                { 
-                                    "DetailsViewerRole", Model.DetailsViewerRole 
-                                }, 
-                                { 
-                                    "ProjectId", Model.Id 
-                                } 
+                                { "ProjectMemberList", Model.ProjectMemberList }, 
+                                { "DetailsViewerRole", Model.DetailsViewerRole }, 
+                                { "ProjectId", Model.Id } 
                             })
                         }
                     </div>
@@ -191,9 +198,7 @@
 
         </div>
 
-        
         <div class="col-xl-3 col-lg-4">
-
             
             @if (TempData["MemberError"] != null || TempData["AssignMemberError"] != null)
             {
@@ -208,7 +213,6 @@
                 </div>
             }
 
-            
             <div class="card border border-light-subtle rounded-4 shadow-sm bg-white">
                 <div class="card-header bg-white border-bottom border-light py-3 px-4">
                     <div class="d-flex justify-content-between align-items-center">
@@ -219,7 +223,6 @@
 
                 @if (Model.DetailsViewerRole == "Admin")
                 {
-                    
                     <div class="p-3 bg-light bg-opacity-50 border-bottom border-light">
                         <form asp-controller="Project" asp-action="QuickAddMember" method="post" class="d-flex flex-column gap-2 m-0">
                             <input type="hidden" name="projectId" value="@Model.Id" />
@@ -236,7 +239,6 @@
                     </div>
                 }
 
-                
                 <div class="card-body p-0 max-vh-50 overflow-auto">
                     <div class="list-group list-group-flush">
                         @foreach (var member in Model.ProjectMemberList)
@@ -266,118 +268,5 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
 @section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const lanes = ['Pending', 'Processing', 'Completed'];
-
-            lanes.forEach(status => {
-                const laneEl = document.getElementById(`lane-${status}`);
-                if (laneEl) {
-                    new Sortable(laneEl, {
-                        group: 'project-kanban-board',
-                        animation: 180,
-                        ghostClass: 'sortable-ghost',
-                        fallbackTolerance: 3,
-
-                        onEnd: function (evt) {
-                            if (evt.from === evt.to) return;
-
-                            const cardElement = evt.item;
-                            const taskId = cardElement.getAttribute('data-task-id');
-                            const targetStatus = evt.to.getAttribute('data-status');
-                            const todoUserId = cardElement.getAttribute('data-user-id');
-                            const originalLane = evt.from;
-
-                            executeDragStatusUpdate(taskId, targetStatus, todoUserId, originalLane, cardElement);
-                        }
-                    });
-                }
-            });
-            const boardFilter = document.getElementById('member-board-filter');
-            if (boardFilter) {
-                boardFilter.addEventListener('change', function () {
-                    const selectedValue = this.value;
-                    const allCards = document.querySelectorAll('.project-task-card');
-
-                    allCards.forEach(card => {
-                        const cardUserId = card.getAttribute('data-user-id');
-
-                        if (selectedValue === 'all') {
-                            card.classList.remove('d-none');
-                        }
-                        else if (selectedValue === '0') {
-                            if (!cardUserId || cardUserId === '0' || cardUserId.trim() === '') {
-                                card.classList.remove('d-none');
-                            } 
-                            else {
-                                card.classList.add('d-none');
-                            }
-                        }
-                        else {
-                            if (cardUserId === selectedValue) {
-                                card.classList.remove('d-none');
-                            } 
-                            else {
-                                card.classList.add('d-none');
-                            }
-                        }
-                    });
-                });
-            }
-            function executeDragStatusUpdate(taskId, newStatus,todoUserId, fallbackLane, cardElement) {
-                    let formData = new FormData();
-                    formData.append('id', taskId);
-                    formData.append('status', newStatus);
-                    formData.append('userId', todoUserId);
-
-                    fetch('/ToDo/UpdateStatus', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(async response => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.message || 'An unexpected pipeline error occurred.');
-                    })
-                    .then(data => {
-                        showLiveAlert(data.message || 'Task status updated!', 'success');
-                        cardElement.classList.remove('card-status-todo', 'card-status-progress', 'card-status-done');
-                        if (newStatus === 'Pending') {
-                            cardElement.classList.add('card-status-todo');
-                        } else if (newStatus === 'Processing') {
-                            cardElement.classList.add('card-status-progress');
-                        } else if (newStatus === 'Completed') {
-                            cardElement.classList.add('card-status-done');
-                        }
-                    })
-                    .catch(error => {
-                        showLiveAlert(error.message, 'danger');
-                        fallbackLane.appendChild(cardElement);
-                    });
-                }
-
-            function showLiveAlert(message, type) {
-                const container = document.getElementById('kanban-live-alert');
-                if (!container) return;
-
-                const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
-    
-                container.innerHTML = `
-                    <div class="alert alert-${type} shadow-lg border-0 rounded-4 p-3 d-flex align-items-center gap-2 animate-fade-in">
-                    <i class="bi ${icon} fs-5 text-${type}"></i>
-                    <div class="fw-medium text-dark small flex-grow-1">${message}</div>
-                    <button type="button" class="btn-close small shadow-none ms-2" onclick="this.parentElement.parentElement.classList.add('d-none')" aria-label="Close"></button>
-                    </div>
-                `;
-
-                container.classList.remove('d-none');
-
-                setTimeout(() => {
-                    container.classList.add('d-none');
-                }, 3500);
-            }
-        });
-    </script>
+    <script src="~/js/project-details.js" asp-append-version="true"></script>
 }

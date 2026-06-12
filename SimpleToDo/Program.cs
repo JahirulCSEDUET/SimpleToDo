@@ -6,6 +6,7 @@ using SimpleToDo.Domain.Interfaces;
 using SimpleToDo.Infrastructure.Data;
 using SimpleToDo.Infrastructure.Identity;
 using SimpleToDo.Infrastructure.Repositories;
+using SimpleToDo.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,12 @@ builder.Services.AddScoped<IQueryService, QueryService>();
 
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
+builder.Services.AddScoped<IFileService>(provider =>
+{
+    var environment = provider.GetRequiredService<IWebHostEnvironment>();
+    return new LocalFileService(environment.WebRootPath);
+});
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

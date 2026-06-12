@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Domain.Entities;
+using SimpleToDo.Domain.Enums;
 using System.Security.Claims;
 
 namespace SimpleToDo.Web.Controllers
@@ -9,14 +10,20 @@ namespace SimpleToDo.Web.Controllers
     {
         private readonly IQueryService _queryService;
         private readonly IUserService _userService;
-        public QueryController(IQueryService queryService, IUserService userService)
+        private readonly IFileService _fileService;
+        private readonly INotificationService _notificationService;
+        private readonly IToDoService _todoService;
+        public QueryController(IQueryService queryService, IUserService userService, IFileService fileService, INotificationService notificationService, IToDoService todoService)
         {
             _queryService = queryService;
             _userService = userService;
+            _fileService = fileService;
+            _notificationService = notificationService;
+            _todoService = todoService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(int todoId, string body)
+        public async Task<IActionResult> Create(int todoId, string body, IFormFile? file=null)
         {
             if (!ModelState.IsValid)
             {
@@ -39,7 +46,53 @@ namespace SimpleToDo.Web.Controllers
                 TodoId = todoId,
                 UserId = user.Id
             };
-            await _queryService.AddAsync(query);
+            
+            try
+            {
+                if (file != null && file.Length > 0)
+                {
+                    using var stream = file.OpenReadStream();
+                    var (storedPath, fileName) = await _fileService.SaveAsync(stream, file.FileName, "tasks");
+                    query.FilePath = storedPath;
+                    query.FileName = fileName;
+                }
+                await _queryService.AddAsync(query);
+                var todo = await _todoService.GetByIdAsync(todoId);
+                if(todo.UserId != user.Id)
+                {
+                    var notification = new Notification
+                    {
+                        Title = "New Query Posted",
+                        Message = $"{user.FullName} has a query you to the task: {todo.Title} in workspace {todo.Project.Name}.",
+                        RedirectLink = RedirectLink.Todo,
+                        UserId = todo.UserId.Value,
+                        IsRead = false,
+                        CreatedTime = DateTime.Now,
+                        RedirectId = todo.Id
+                    };
+                    await _notificationService.AddAsync(notification);
+                }
+                if(todo.CreatorId != user.Id)
+                {
+                    var notification = new Notification
+                    {
+                        Title = "New Query Posted",
+                        Message = $"{user.FullName} posted a new query on the task '{todo.Title}' in workspace '{todo.Project.Name}'.",
+                        RedirectLink = RedirectLink.Todo,
+                        UserId = todo.CreatorId,
+                        IsRead = false,
+                        CreatedTime = DateTime.Now,
+                        RedirectId = todo.Id
+                    };
+                    await _notificationService.AddAsync(notification);
+                }
+                
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(nameof(file), ex.Message);
+                return RedirectToAction("Details", "Todo", new { Id = todoId });
+            }
             return RedirectToAction("Details", "Todo", new { Id = todoId });
         }
     }
