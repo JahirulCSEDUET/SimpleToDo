@@ -29,7 +29,7 @@ namespace SimpleToDo.Infrastructure.Repositories
 
         public async Task<IReadOnlyList<Notification>> GetByUserIdAsync(int userId)
         {
-            return await _context.Notifications.Where(i => i.UserId == userId).ToListAsync();
+            return await _context.Notifications.Where(i => i.UserId == userId).OrderByDescending(i=>i.Id).ToListAsync();
         }
 
         public async Task<List<Notification>> GetUnreadNotificationByIdAsync(int userId)
