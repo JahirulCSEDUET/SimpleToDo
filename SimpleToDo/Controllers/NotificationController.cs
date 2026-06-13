@@ -2,7 +2,7 @@
 using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Application.Services;
 using SimpleToDo.Domain.Entities;
-using SimpleToDo.Web.Views.Shared;
+using SimpleToDo.Web.ViewModels.Notifications;
 using System.Security.Claims;
 
 namespace SimpleToDo.Web.Controllers
