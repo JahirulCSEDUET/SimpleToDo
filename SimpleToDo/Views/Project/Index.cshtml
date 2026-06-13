@@ -4,13 +4,13 @@
 
 @{
     ViewData["Title"] = "Workspace";
-
+    int CurrentUserId = ViewBag.CurrentUserId;
     var ownProjects = Model.Where(p => p.ProjectMembers
-        .Any(m => m.UserId == p.CurrentUserId && m.Role.ToString() == "Admin"))
+        .Any(m => m.UserId == CurrentUserId && m.Role.ToString() == "Admin"))
         .ToList();
 
     var contributions = Model.Where(p => p.ProjectMembers
-        .Any(m => m.UserId == p.CurrentUserId && m.Role.ToString() == "Contributor"))
+        .Any(m => m.UserId == CurrentUserId && m.Role.ToString() == "Contributor"))
         .ToList();
 }
 
