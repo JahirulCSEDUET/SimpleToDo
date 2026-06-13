@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Application.Services;
 using SimpleToDo.Domain.Entities;
@@ -7,6 +8,7 @@ using System.Security.Claims;
 
 namespace SimpleToDo.Web.Controllers
 {
+    [Authorize]
     public class NotificationController : Controller
     {
         private readonly INotificationService _notificationService;

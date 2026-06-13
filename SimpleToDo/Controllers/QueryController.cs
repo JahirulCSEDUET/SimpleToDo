@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Domain.Entities;
 using SimpleToDo.Domain.Enums;
@@ -6,6 +7,7 @@ using System.Security.Claims;
 
 namespace SimpleToDo.Web.Controllers
 {
+    [Authorize]
     public class QueryController : Controller
     {
         private readonly IQueryService _queryService;
