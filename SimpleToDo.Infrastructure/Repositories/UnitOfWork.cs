@@ -23,7 +23,6 @@ namespace SimpleToDo.Infrastructure.Repositories
         public IUserRepository User { get; }
 
         public IProjectRepository Project { get; }
-
         public IProjectMemberRepository ProjectMember { get; }
         public IQueryRepository Query { get; }
         public INotificationRepository Notification { get; }

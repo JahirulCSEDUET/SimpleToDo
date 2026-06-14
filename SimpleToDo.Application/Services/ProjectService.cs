@@ -43,13 +43,13 @@ namespace SimpleToDo.Application.Services
 
         public async Task<Project> GetByIdWithMemberAndTodoAsync(int projectId)
         {
-            return await _unitOfWork.Project.GetByIdWithMemberAndTodoAsync(projectId);
+            return await _unitOfWork.Project.GetByIdAsync(projectId);
 
         }
 
         public async Task<IReadOnlyList<Project>> GetByMemberIdAsync(int userId)
         {
-            return await _unitOfWork.Project.GetByMemberIdAsync(userId);
+            return await _unitOfWork.Project.GetByUserIdAsync(userId);
         }
 
         public async Task UpdateAsync(Project project)

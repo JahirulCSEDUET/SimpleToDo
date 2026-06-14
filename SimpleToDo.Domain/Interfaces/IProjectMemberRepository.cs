@@ -7,5 +7,6 @@ namespace SimpleToDo.Domain.Interfaces
 {
     public interface IProjectMemberRepository:IRepository<ProjectMember>
     {
+        Task<ProjectMember> GetProjectMemberByIdAsync(int projectId,  int userId);
     }
 }
