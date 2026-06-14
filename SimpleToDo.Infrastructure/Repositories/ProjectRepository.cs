@@ -19,7 +19,13 @@ namespace SimpleToDo.Infrastructure.Repositories
 
         public async Task<Project> GetByIdAsync(int id)
         {
-            return await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Projects
+                .AsNoTracking()
+                .Include(i=> i.ProjectMembers)
+                    .ThenInclude(pm=>pm.User)
+                .Include(p=> p.Todos)
+                    .ThenInclude(t=>t.User)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<Project> GetByIdWithMemberAndTodoAsync(int projectId)

@@ -15,13 +15,15 @@ namespace SimpleToDo.Web.Controllers
         private readonly IFileService _fileService;
         private readonly INotificationService _notificationService;
         private readonly IToDoService _todoService;
-        public QueryController(IQueryService queryService, IUserService userService, IFileService fileService, INotificationService notificationService, IToDoService todoService)
+        private readonly IMapper _mapper;
+        public QueryController(IQueryService queryService, IUserService userService, IFileService fileService, INotificationService notificationService, IToDoService todoService, IMapper mapper)
         {
             _queryService = queryService;
             _userService = userService;
             _fileService = fileService;
             _notificationService = notificationService;
             _todoService = todoService;
+            _mapper = mapper;
         }
 
         [HttpPost]

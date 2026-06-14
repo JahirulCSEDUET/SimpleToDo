@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Domain.Entities;
@@ -16,40 +17,22 @@ namespace SimpleToDo.Web.Controllers
         private readonly IUserService _userService;
         private readonly IProjectMemberService _projectMemberService;
         private readonly INotificationService _notificationService;
-        public ProjectController(IProjectService projectService, IUserService userService, IProjectMemberService projectMemberService, INotificationService notificationService)
+        private readonly IMapper _mapper;
+        public ProjectController(IProjectService projectService, IUserService userService, IProjectMemberService projectMemberService, INotificationService notificationService, IMapper mapper)
         {
             _projectService = projectService;
             _userService = userService;
             _projectMemberService = projectMemberService;
             _notificationService = notificationService;
+            _mapper = mapper;
         }
 
         public async Task<IActionResult> Index()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-            {
-                Challenge();
-            }
-            var user = _userService.GetByUserId(userId);
-            if (user == null)
-            {
-                Challenge();
-            }
+            var user = GetCurrentUser();
             var projects = await _projectService.GetByMemberIdAsync(user.Id);
-            var projectList = projects.Select(p=> new ProjectListViewModel
-            {
-                Id = p.Id,
-                Name = p.Name,
-                CurrentUserId = user.Id,
-                ProjectMembers = p.ProjectMembers.Select(m => new ProjectMemberListViewModel
-                {
-                    Id = m.Id,
-                    Role = m.Role,
-                    UserId = m.UserId, 
-                    UserName = m.User?.FullName ?? "N/A"
-                }).ToList()
-            }).ToList();
+            var projectList = _mapper.Map<IReadOnlyList<ProjectListViewModel>>(projects);
+            ViewBag.CurrentUserId = user.Id; 
             return View(projectList);
         }
         public IActionResult Create()
@@ -59,12 +42,7 @@ namespace SimpleToDo.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAsync(ProjectCreateViewModel model)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-            {
-                Challenge();
-            }
-            var user = _userService.GetByUserId(userId);
+            var user = GetCurrentUser();
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -86,49 +64,19 @@ namespace SimpleToDo.Web.Controllers
         }
         public async Task<IActionResult> Details(int id)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
+            var user = GetCurrentUser();
+            var projectMember = _projectMemberService.GetProjectMemberById(user.Id, id);
+            if (projectMember == null)
             {
-                Challenge();
-            }
-            var user = _userService.GetByUserId(userId);
-            if (user == null)
-            {
-                Challenge();
-            }
-
-            var project = await _projectService.GetByIdWithMemberAndTodoAsync(id);
-            if (project == null) 
-            { 
                 return NotFound();
             }
-
-            var projectMember = _projectMemberService.GetProjectMemberById(user.Id, project.Id);
-
-            var projectvm = new ProjectDetailsViewModel
+            var project = await _projectService.GetByIdAsync(id);
+            if(project == null)
             {
-                Id = project.Id,
-                Name = project.Name,
-                DetailsViewerRole = projectMember.Role.ToString(),
-                ProjectMemberList = project.ProjectMembers.Select(pm => new ProjectMemberListViewModel
-                {
-                    Id = pm.Id,
-                    UserName = pm.User.FullName,
-                    Role = pm.Role,
-                    UserId = pm.UserId
-                }).ToList(),
-                TodoList = project.Todos.Select(t=> new ToDoItemListViewModel
-                {
-                    Id =t.Id,
-                    UserId = t.UserId??0,
-                    UserName =t.User?.FullName??"Not Asigned.",
-                    CreatedBy = t.CreatorId,
-                    CreatorName = t.CreatorName,
-                    ProjectId = t.ProjectId,
-                    Status =t.Status,
-                    Title = t.Title
-                }).ToList()
-            };
+                return NotFound();
+            }
+            var projectvm = _mapper.Map<ProjectDetailsViewModel>(project);
+            projectvm.DetailsViewerRole = projectMember.Role.ToString();
             return View(projectvm);
         }
         [HttpPost]
@@ -158,18 +106,7 @@ namespace SimpleToDo.Web.Controllers
                 Role = Role.Contributor
             };
 
-            string loginUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (loginUserId == null)
-            {
-                Challenge();
-            }
-            var loginUser = _userService.GetByUserId(loginUserId);
-            if (loginUser == null)
-            {
-                Challenge();
-            }
-
-
+            var loginUser = GetCurrentUser();
             var project = await _projectService.GetByIdAsync(projectId);
             
             await _projectMemberService.AddAsync(projectMember);
@@ -185,6 +122,20 @@ namespace SimpleToDo.Web.Controllers
             };
             await _notificationService.AddAsync(notification);
             return RedirectToAction("Details","Project", new {Id=projectId});
+        }
+        private User GetCurrentUser()
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                Challenge();
+            }
+            var user = _userService.GetByUserId(userId);
+            if (user == null)
+            {
+                Challenge();
+            }
+            return user;
         }
     }
 }

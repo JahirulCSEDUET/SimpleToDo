@@ -1,7 +1,7 @@
 ﻿using SimpleToDo.Domain.Entities;
 using SimpleToDo.Domain.Enums;
 
-namespace SimpleToDo.Web.Views.Shared
+namespace SimpleToDo.Web.ViewModels.Notifications
 {
     public class NotificationListViewModel
     {

@@ -7,6 +7,7 @@ using SimpleToDo.Infrastructure.Data;
 using SimpleToDo.Infrastructure.Identity;
 using SimpleToDo.Infrastructure.Repositories;
 using SimpleToDo.Infrastructure.Services;
+using SimpleToDo.Web.MappingProfiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<SimpleToDoDbContext>(options =>
 });
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -36,6 +38,8 @@ builder.Services.AddScoped<IQueryService, QueryService>();
 
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
+builder.Services.AddAutoMapper(cfg => { }, typeof(TodoMappingProfile).Assembly);
 
 builder.Services.AddScoped<IFileService>(provider =>
 {
