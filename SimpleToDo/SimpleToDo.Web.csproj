@@ -20,8 +20,4 @@
     <ProjectReference Include="..\SimpleToDo.Infrastructure\SimpleToDo.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Validators\" />
-  </ItemGroup>
-
 </Project>
