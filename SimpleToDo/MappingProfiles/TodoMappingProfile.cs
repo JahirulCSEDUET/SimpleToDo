@@ -16,13 +16,13 @@ namespace SimpleToDo.Web.MappingProfiles
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName))
                 .ForMember(dest => dest.ProjectName, opt => opt.MapFrom(src => src.Project.Name))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId.HasValue ? src.UserId.Value : 0))
-                .ForMember(dest => dest.ProjectId, opt => opt.MapFrom(src => src.ProjectId.HasValue ? src.ProjectId.Value : 0))
+                .ForMember(dest => dest.ProjectId, opt => opt.MapFrom(src => src.ProjectId))
                 .ForMember(dst=>dst.QueryList, opt => opt.MapFrom(src=>src.Queries));
             CreateMap<Todo, ToDoItemListViewModel>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName))
                 .ForMember(dest => dest.ProjectName, opt => opt.MapFrom(src => src.Project.Name))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId.HasValue ? src.UserId.Value : 0))
-                .ForMember(dest => dest.ProjectId, opt => opt.MapFrom(src => src.ProjectId.HasValue ? src.ProjectId.Value : 0));
+                .ForMember(dest => dest.ProjectId, opt => opt.MapFrom(src => src.ProjectId));
 
             //ViewModel --> Entity
             CreateMap<ToDoItemCreateViewModel, Todo>()

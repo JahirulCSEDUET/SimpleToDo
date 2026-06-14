@@ -19,7 +19,7 @@ namespace SimpleToDo.Domain.Entities
         public string CreatorName { get; set; }
         public int? UserId { get; set; }
         public User? User { get; set; }
-        public int? ProjectId { get; set; }
+        public int ProjectId { get; set; }
         public Project Project { get; set; }
         public ICollection<Query> Queries { get; set; } = new List<Query>();
     }

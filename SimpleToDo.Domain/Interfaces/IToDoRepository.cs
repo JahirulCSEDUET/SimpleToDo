@@ -7,7 +7,7 @@ namespace SimpleToDo.Domain.Interfaces
 {
     public interface IToDoRepository : IRepository<Todo>
     {
-        Task<IReadOnlyList<Todo>> GetByUserIdWithProjectAsync(int userId, bool isArchived);
+        Task<IReadOnlyList<Todo>> GetTodoByUserId(int userId, bool isArchived);
         Task<Todo> GetByIdAsync(int id);
     }
 }

@@ -27,11 +27,14 @@ namespace SimpleToDo.Infrastructure.Repositories
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public async Task<IReadOnlyList<Todo>> GetByUserIdWithProjectAsync(int userId, bool isArchived)
+        public async Task<IReadOnlyList<Todo>> GetTodoByUserId(int userId, bool isArchived)
         {
             return await _context.Todos
                 .Where(t=> t.UserId == userId && t.IsArchived== isArchived)
-                .Include(t=>t.Project)
+                .Include(t => t.User)
+                .Include(t => t.Queries)
+                    .ThenInclude(q => q.User)
+                .Include(t => t.Project)
                 .AsNoTracking()
                 .ToListAsync();
 

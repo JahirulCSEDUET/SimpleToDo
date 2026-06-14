@@ -86,7 +86,7 @@ namespace SimpleToDo.Application.Services
 
         public async Task<IReadOnlyList<Todo>> GetByUserIdWithProjectAsync(int userId, bool isArchived)
         {
-            return await _unitOfWork.Todo.GetByUserIdWithProjectAsync(userId, isArchived);
+            return await _unitOfWork.Todo.GetTodoByUserId(userId, isArchived);
         }
     }
 }
