@@ -12,8 +12,8 @@ namespace SimpleToDo.Application.Mappings
         public NotificationMappingProfiles() 
         {
             CreateMap<Notification, NotificationDto>()
-                .ForMember(d => d.RedirectLink, o => o.MapFrom(d => d.RedirectLink.ToString()))
-                .ForMember(d=> d.TimeAgo, o=> o.MapFrom(d=> (DateTime.Now -d.CreatedTime).Minutes));
+                .ForCtorParam("RedirectLink", o => o.MapFrom(d => d.RedirectLink.ToString()))
+                .ForCtorParam("TimeAgo", o=> o.MapFrom(src => (int)(DateTime.Now - src.CreatedTime).TotalMinutes));
 
         }
     }

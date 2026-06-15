@@ -31,7 +31,7 @@ namespace SimpleToDo.Application.Features.ProjectMembers.Commands
                 throw new InvalidOperationException("Project is not found.");
             }
             var existedMember = await _unitOfWork.ProjectMember.GetProjectMemberByIdAsync(request.projectId, user.Id);
-            if(existedMember == null)
+            if(existedMember != null)
             {
                 throw new InvalidOperationException("Member already exist.");
             }

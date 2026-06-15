@@ -27,15 +27,14 @@ namespace SimpleToDo.Web.Controllers
         }
 
         public async Task<IActionResult> Index()
-        {
+        {   
             var user = await GetCurrentUserAsync();
             if (user == null) return Challenge();
 
             var projects = await _mediator.Send(new GetProjectsByUserIdQuery(user.Id));
-            var projectList = _mapper.Map<IReadOnlyList<ProjectListViewModel>>(projects);
 
             ViewBag.CurrentUserId = user.Id;
-            return View(projectList);
+            return View(projects);
         }
 
         public IActionResult Create()
@@ -64,24 +63,21 @@ namespace SimpleToDo.Web.Controllers
             var user = await GetCurrentUserAsync();
             if (user == null) return Challenge();
 
-            // 3. Verify security access and roles via ProjectMembers queries
             var projectMember = await _mediator.Send(new GetProjectMemberByUserAndProjectIdQuery(user.Id, id));
             if (projectMember == null)
             {
                 return NotFound();
             }
 
-            // 4. Using GetProjectByIdQuery from your Queries folder structure
             var project = await _mediator.Send(new GetProjectByIdQuery(id));
             if (project == null)
             {
                 return NotFound();
             }
 
-            var projectvm = _mapper.Map<ProjectDetailsViewModel>(project);
-            projectvm.DetailsViewerRole = projectMember.Role.ToString();
+            ViewBag.ViewerRole = projectMember.role.ToString();
 
-            return View(projectvm);
+            return View(project);
         }
 
         [HttpPost]

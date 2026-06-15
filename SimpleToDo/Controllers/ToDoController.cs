@@ -43,13 +43,11 @@ namespace SimpleToDo.Web.Controllers
             var project = await _mediator.Send(new GetProjectByIdQuery(projectId));
             if (project == null) return NotFound();
 
-            ViewBag.ProjectId = projectId;
-            ViewBag.ProjectName = project.Name;
-            return View();
+            return View(new ToDoItemCreateViewModel { ProjectId =projectId, ProjectName = project.Name });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateTodoCommand model, IFormFile? File)
+        public async Task<IActionResult> Create(ToDoItemCreateViewModel model)
         {
 
             if (!ModelState.IsValid) {
@@ -70,10 +68,10 @@ namespace SimpleToDo.Web.Controllers
             try
             {
                 
-                if (File != null && File.Length > 0)
+                if (model.File != null && model.File.Length > 0)
                 {
-                    using var stream = File.OpenReadStream();
-                    var (path, name) = await _fileService.SaveAsync(stream, File.FileName, "tasks");
+                    using var stream = model.File.OpenReadStream();
+                    var (path, name) = await _fileService.SaveAsync(stream, model.File.FileName, "tasks");
                     storedPath = path;
                     fileName = name;
                 }

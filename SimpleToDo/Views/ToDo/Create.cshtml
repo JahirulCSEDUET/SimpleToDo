@@ -1,8 +1,7 @@
-﻿@using SimpleToDo.Application.Features.Todos.Commands
-@model CreateTodoCommand
+﻿@model ToDoItemCreateViewModel
 
 @{
-    ViewData["Title"] = "Create Task - " + ViewBag.ProjectName;
+    ViewData["Title"] = "Create Task - " + Model.ProjectName;
 }
 
 <style>
@@ -55,7 +54,7 @@
             <span class="text-muted small text-uppercase tracking-wider fw-semibold" style="font-size: 0.72rem;">
                 <i class="bi bi-folder2-open text-primary me-1"></i> Target Project Workspace
             </span>
-            <h3 class="mb-0 fw-bold text-dark tracking-tight">@ViewBag.ProjectName</h3>
+            <h3 class="mb-0 fw-bold text-dark tracking-tight">@Model.ProjectName</h3>
         </div>
     </div>
 
@@ -67,7 +66,8 @@
                     <form asp-action="Create" method="post" enctype="multipart/form-data" class="m-0">
                         <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 fw-medium"></div>
 
-                        <input type="hidden" asp-for="ProjectId" value="@ViewBag.ProjectId" />
+                        <input type="hidden" asp-for="ProjectId" value="@Model.ProjectId" />
+                        <input type="hidden" asp-for="ProjectName" value="@Model.ProjectName" />
 
                         <div class="mb-2 text-muted-xs text-uppercase fw-bold tracking-wider mb-3" style="font-size: 0.75rem; color: #8c98a5;">
                             <i class="bi bi-layers-half me-1"></i> Task Definition Entry

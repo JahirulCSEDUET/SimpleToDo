@@ -1,4 +1,5 @@
-﻿@model SimpleToDo.Web.ViewModels.Project.ProjectDetailsViewModel
+﻿@using SimpleToDo.Application.DTOs
+@model ProjectDto
 
 @{
     ViewData["Title"] = "Project Workspace - " + Model.Name;
@@ -53,7 +54,7 @@
         <div>
             <div class="d-flex align-items-center gap-2 mb-1">
                 <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill px-2.5 small">Project Workspace</span>
-                <span class="text-muted small">&bull; Role: <strong>@Model.DetailsViewerRole</strong></span>
+                <span class="text-muted small">&bull; Role: <strong>@ViewBag.ViewerRole</strong></span>
             </div>
             <h2 class="mb-0 fw-bold text-dark tracking-tight"><i class="bi bi-folder2-open text-primary me-2"></i>@Model.Name</h2>
         </div>
@@ -82,7 +83,7 @@
                 </div>
             }
 
-            @if (Model.DetailsViewerRole == "Admin")
+            @if (ViewBag.ViewerRole == "Admin")
             {
                 <div class="card border border-light-subtle rounded-4 shadow-sm bg-white action-banner-card mb-4">
                     <div class="card-body p-3.5 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
@@ -122,9 +123,9 @@
                         <select id="member-board-filter" class="form-select form-select-sm rounded-pill border-secondary-subtle shadow-none ps-3 pe-5 py-1.5" style="font-size: 0.8rem; font-weight: 500;">
                             <option value="all">⚡ All Team Members</option>
                             <option value="0">⚠️ Unassigned Tasks</option>
-                            @foreach (var member in Model.ProjectMemberList)
+                            @foreach (var member in Model.ProjectMembers)
                             {
-                                <option value="@member.UserId">👤 @member.UserName</option>
+                                <option value="@member.userId">👤 @member.userName</option>
                             }
                         </select>
                     </div>
@@ -148,8 +149,8 @@
                         @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Pending"))
                         {
                             @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { 
-                                { "ProjectMemberList", Model.ProjectMemberList }, 
-                                { "DetailsViewerRole", Model.DetailsViewerRole }, 
+                                { "ProjectMemberList", Model.ProjectMembers }, 
+                                { "DetailsViewerRole", ViewBag.ViewerRole }, 
                                 { "ProjectId", Model.Id } 
                             })
                         }
@@ -170,7 +171,7 @@
                     <div class="kanban-lane" id="lane-Processing" data-status="Processing" style="background-color: rgba(13, 110, 253, 0.02); border-color: rgba(13, 110, 253, 0.12)">
                         @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Processing"))
                         {
-                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMemberList }, { "DetailsViewerRole", Model.DetailsViewerRole }, { "ProjectId", Model.Id } })
+                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMembers }, { "DetailsViewerRole", ViewBag.ViewerRole }, { "ProjectId", Model.Id } })
                         }
                     </div>
                 </div>
@@ -189,7 +190,7 @@
                     <div class="kanban-lane" id="lane-Completed" data-status="Completed">
                         @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Completed"))
                         {
-                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMemberList }, { "DetailsViewerRole", Model.DetailsViewerRole }, { "ProjectId", Model.Id } })
+                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMembers }, { "DetailsViewerRole", ViewBag.ViewerRole }, { "ProjectId", Model.Id } })
                         }
                     </div>
                 </div>
@@ -217,11 +218,11 @@
                 <div class="card-header bg-white border-bottom border-light py-3 px-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 fw-bold text-dark small text-uppercase tracking-wider"><i class="bi bi-people me-2 text-secondary"></i>Team Roster</h5>
-                        <span class="badge bg-light text-secondary border rounded-pill px-2">@Model.ProjectMemberList.Count</span>
+                        <span class="badge bg-light text-secondary border rounded-pill px-2">@Model.ProjectMembers.Count</span>
                     </div>
                 </div>
 
-                @if (Model.DetailsViewerRole == "Admin")
+                @if (ViewBag.ViewerRole == "Admin")
                 {
                     <div class="p-3 bg-light bg-opacity-50 border-bottom border-light">
                         <form asp-controller="Project" asp-action="QuickAddMember" method="post" class="d-flex flex-column gap-2 m-0">
@@ -241,19 +242,19 @@
 
                 <div class="card-body p-0 max-vh-50 overflow-auto">
                     <div class="list-group list-group-flush">
-                        @foreach (var member in Model.ProjectMemberList)
+                        @foreach (var member in Model.ProjectMembers)
                         {
                             <div class="list-group-item px-3 py-2.5 d-flex align-items-center justify-content-between border-bottom-0">
                                 <div class="d-flex align-items-center text-truncate">
                                     <div class="avatar-circle bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center shadow-none me-2.5 border border-white shrink-0">
-                                        @(string.IsNullOrEmpty(member.UserName) ? "?" : member.UserName.Substring(0, 1).ToUpper())
+                                        @(string.IsNullOrEmpty(member.userName) ? "?" : member.userName.Substring(0, 1).ToUpper())
                                     </div>
                                     <div class="text-truncate">
-                                        <div class="fw-semibold text-dark text-truncate small" title="@member.UserName">@member.UserName</div>
+                                        <div class="fw-semibold text-dark text-truncate small" title="@member.userName">@member.userName</div>
                                     </div>
                                 </div>
-                                <span class="badge @(member.Role.ToString() == "Admin" ? "bg-dark text-white" : "bg-light text-secondary border") rounded-pill px-2 py-1 font-xs" style="font-size:0.7rem;">
-                                    @member.Role
+                                <span class="badge @(member.role.ToString() == "Admin" ? "bg-dark text-white" : "bg-light text-secondary border") rounded-pill px-2 py-1 font-xs" style="font-size:0.7rem;">
+                                    @member.role
                                 </span>
                             </div>
                         }

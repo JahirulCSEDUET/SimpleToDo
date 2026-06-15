@@ -9,18 +9,19 @@ namespace SimpleToDo.Application.Mappings
         public ProjectMappingProfile()
         {
             CreateMap<ProjectMember, ProjectMemberDto>()
-                .ForMember(dst=> dst.UserName,opt=> opt.MapFrom(s=>s.User.FullName));
+                .ForCtorParam("userName", opt => opt.MapFrom(src => src.User.FullName));
+            CreateMap<Query, QueryDto>()
+                .ForCtorParam("UserName", opt => opt.MapFrom(src => src.User.FullName));
             CreateMap<Todo, TodoDto>()
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName))
-                .ForMember(dest => dest.ProjectName, opt => opt.MapFrom(src => src.Project.Name))
-                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId.HasValue ? src.UserId.Value : 0))
-                .ForMember(dest => dest.ProjectId, opt => opt.MapFrom(src => src.ProjectId));
+                .ForCtorParam("UserName", opt => opt.MapFrom(src => src.User.FullName))
+                .ForCtorParam("ProjectName", opt => opt.MapFrom(src => src.Project.Name))
+                .ForCtorParam("UserId", opt => opt.MapFrom(src => src.UserId.HasValue ? src.UserId.Value : 0))
+                .ForCtorParam("QueryList", opt => opt.MapFrom(src => src.Queries));
             CreateMap<Project, ProjectDto>()
-                .ForMember(dst => dst.TodoList, otp => otp.MapFrom(s => s.Todos))
-                .ForMember(dst => dst.ProjectMemberList, otp => otp.MapFrom(s => s.ProjectMembers))
-                .ForMember(dst => dst.DetailsViewerRole, otp => otp.Ignore());
+                .ForCtorParam("TodoList", opt => opt.MapFrom(src => src.Todos));
             CreateMap<Project, ProjectListDto>()
                 .ForMember(dst => dst.ProjectMembers, otp => otp.MapFrom(s => s.ProjectMembers));
+
         }
     }
 }
