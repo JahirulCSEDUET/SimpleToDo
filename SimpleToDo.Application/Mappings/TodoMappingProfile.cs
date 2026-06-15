@@ -4,7 +4,7 @@ using SimpleToDo.Application.Features.Todos.Commands;
 using SimpleToDo.Domain.Entities;
 using SimpleToDo.Domain.Enums;
 
-namespace SimpleToDo.Web.MappingProfiles
+namespace SimpleToDo.Application.Mappings
 {
     public class TodoMappingProfile:Profile
     {

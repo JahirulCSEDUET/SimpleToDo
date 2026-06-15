@@ -1,11 +1,11 @@
-﻿@model SimpleToDo.Web.ViewModels.ToDo.ToDoItemCreateViewModel
+﻿@using SimpleToDo.Application.Features.Todos.Commands
+@model CreateTodoCommand
 
 @{
-    ViewData["Title"] = "Create Task - " + Model.ProjectName;
+    ViewData["Title"] = "Create Task - " + ViewBag.ProjectName;
 }
 
 <style>
-    /* Premium AuraSpace Layout Configuration Framework */
     .task-create-card {
         border: 1px solid rgba(0, 0, 0, 0.08) !important;
         border-radius: 16px !important;
@@ -24,7 +24,7 @@
             box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
         }
 
-    /* Interactive Premium File Upload Zone */
+    
     .upload-zone-wrapper {
         border: 2px dashed #dee2e6;
         border-radius: 12px;
@@ -55,7 +55,7 @@
             <span class="text-muted small text-uppercase tracking-wider fw-semibold" style="font-size: 0.72rem;">
                 <i class="bi bi-folder2-open text-primary me-1"></i> Target Project Workspace
             </span>
-            <h3 class="mb-0 fw-bold text-dark tracking-tight">@Model.ProjectName</h3>
+            <h3 class="mb-0 fw-bold text-dark tracking-tight">@ViewBag.ProjectName</h3>
         </div>
     </div>
 
@@ -67,8 +67,7 @@
                     <form asp-action="Create" method="post" enctype="multipart/form-data" class="m-0">
                         <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 fw-medium"></div>
 
-                        <input type="hidden" asp-for="ProjectId" />
-                        <input type="hidden" asp-for="ProjectName" />
+                        <input type="hidden" asp-for="ProjectId" value="@ViewBag.ProjectId" />
 
                         <div class="mb-2 text-muted-xs text-uppercase fw-bold tracking-wider mb-3" style="font-size: 0.75rem; color: #8c98a5;">
                             <i class="bi bi-layers-half me-1"></i> Task Definition Entry
@@ -87,7 +86,7 @@
                         </div>
 
                         <div class="mb-5">
-                            <label asp-for="File" class="form-label text-dark fw-bold small text-uppercase tracking-wider" style="font-size: 0.78rem;">
+                            <label for="fileUpload" class="form-label text-dark fw-bold small text-uppercase tracking-wider" style="font-size: 0.78rem;">
                                 Supported Attachments <span class="text-muted fw-normal text-lowercase">(Optional)</span>
                             </label>
 
@@ -97,7 +96,7 @@
                                 <p class="text-muted small mb-3" style="font-size: 0.78rem;">Files are securely attached to the data pipeline context logs.</p>
 
                                 <div class="col-sm-8 mx-auto mb-3">
-                                    <input asp-for="File" class="form-control form-control-sm shadow-none" type="file" accept=".jpg,.jpeg,.png,.pdf,.zip" />
+                                    <input id="fileUpload" name="File" class="form-control form-control-sm shadow-none" type="file" accept=".jpg,.jpeg,.png,.pdf,.zip" />
                                 </div>
 
                                 <div class="d-flex justify-content-center flex-wrap gap-2">
@@ -107,7 +106,8 @@
                                     <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary-subtle rounded-pill ext-badge">.ZIP</span>
                                 </div>
                             </div>
-                            <span asp-validation-for="File" class="text-danger small d-block mt-1 fw-medium"></span>
+
+                            @Html.ValidationMessage("File", "", new { @class = "text-danger small d-block mt-1 fw-medium" })
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center pt-3 border-top border-light-subtle">

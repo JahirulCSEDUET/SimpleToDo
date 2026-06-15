@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SimpleToDo.Application.Validations
 {
-    public class UpdateTodoCommandValidator : AbstractValidator<UpdateTodoCommand>
+    public class UpdateTodoCommandValidator : AbstractValidator<UpdateTodoStatusCommand>
     {
         public UpdateTodoCommandValidator()
         {

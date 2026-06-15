@@ -1,13 +1,16 @@
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SimpleToDo.Application.Common.Behaviors;
 using SimpleToDo.Application.Interfaces;
+using SimpleToDo.Application.Mappings;
 using SimpleToDo.Application.Services;
 using SimpleToDo.Domain.Interfaces;
 using SimpleToDo.Infrastructure.Data;
 using SimpleToDo.Infrastructure.Identity;
 using SimpleToDo.Infrastructure.Repositories;
 using SimpleToDo.Infrastructure.Services;
-using SimpleToDo.Web.MappingProfiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +42,15 @@ builder.Services.AddScoped<IQueryService, QueryService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
-builder.Services.AddAutoMapper(cfg => { }, typeof(TodoMappingProfile).Assembly);
+var applicationAssembly = typeof(TodoMappingProfile).Assembly;
+
+builder.Services.AddAutoMapper(cfg => { }, applicationAssembly);
+builder.Services.AddValidatorsFromAssembly(applicationAssembly);
+builder.Services.AddMediatR(cfg => {
+    cfg.RegisterServicesFromAssembly(applicationAssembly);
+    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+});
+
 
 builder.Services.AddScoped<IFileService>(provider =>
 {

@@ -1,10 +1,10 @@
-﻿@model IReadOnlyList<ToDoItemListViewModel>
+﻿@using SimpleToDo.Application.DTOs
+@model IReadOnlyList<TodoDto>
 
 @{
     ViewData["Title"] = "My To-Do List";
 }
 
-<!-- Dynamic Style Overrides for Advanced UI Feel -->
 <style>
     .kanban-column {
         min-height: 550px;
@@ -155,7 +155,7 @@
         group: 'todo-board',
         animation: 180,
         ghostClass: 'sortable-ghost',
-        handle: '.drag-handle', // Enforces professional handle usage
+        handle: '.drag-handle', 
         fallbackTolerance: 3,
 
         onEnd: function (evt) {

@@ -7,8 +7,8 @@ using System.Text;
 
 namespace SimpleToDo.Application.Features.Users.Queries
 {
-    public record GetUserByUserQuery(string UserId) : IRequest<User>;
-    public class GetUserByUserQueryHandler : IRequestHandler<GetUserByUserQuery, User>
+    public record GetUserByUserIdQuery(string UserId) : IRequest<User>;
+    public class GetUserByUserQueryHandler : IRequestHandler<GetUserByUserIdQuery, User>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -17,7 +17,7 @@ namespace SimpleToDo.Application.Features.Users.Queries
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<User> Handle(GetUserByUserQuery request, CancellationToken cancellationToken)
+        public async Task<User> Handle(GetUserByUserIdQuery request, CancellationToken cancellationToken)
         {
             return await _unitOfWork.User.GetByUserIdAsync(request.UserId);
         }

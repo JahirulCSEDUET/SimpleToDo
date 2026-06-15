@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SimpleToDo.Application.Features.Users.Commands;
 using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Domain.Entities;
 using SimpleToDo.Infrastructure.Identity;
@@ -11,13 +13,13 @@ namespace SimpleToDo.Web.Controllers
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IUserService _userService;
+        private readonly ISender _mediator;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUserService userService)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,ISender mediator)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _userService = userService;
+            _mediator = mediator;
         }
 
         public IActionResult Login()
@@ -69,13 +71,7 @@ namespace SimpleToDo.Web.Controllers
                 }
                 return View(model);
             }
-            var userCreate = new User
-            {
-                FullName =user.FullName,
-                UserId = user.Id,
-                Email = user.Email
-            };
-            await _userService.AddAsync(userCreate);
+            await _mediator.Send(new CreateUserCommand(user.Id,user.FullName, user.Email));
             await _signInManager.SignInAsync(user, isPersistent: true);
             if (!string.IsNullOrEmpty(returnUrl) && returnUrl != null)
             {

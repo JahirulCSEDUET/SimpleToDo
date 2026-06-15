@@ -29,5 +29,12 @@ namespace SimpleToDo.Infrastructure.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.UserId == userId);
         }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _context.Members
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
     }
 }

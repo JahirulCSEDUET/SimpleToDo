@@ -2,7 +2,7 @@
 using SimpleToDo.Application.DTOs;
 using SimpleToDo.Domain.Entities;
 
-namespace SimpleToDo.Application.MappingProfiles
+namespace SimpleToDo.Application.Mappings
 {
     public class ProjectMappingProfile:Profile
     {

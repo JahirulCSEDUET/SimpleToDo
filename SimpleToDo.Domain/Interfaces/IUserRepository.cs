@@ -9,6 +9,7 @@ namespace SimpleToDo.Domain.Interfaces
     {
         Task<User> GetByIdAsync(int id);
         Task<User> GetByUserIdAsync(string userId);
-        
+        Task<User> GetUserByEmailAsync(string email);
+
     }
 }
