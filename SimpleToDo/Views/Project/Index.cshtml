@@ -5,6 +5,7 @@
 @{
     ViewData["Title"] = "Workspace";
     int CurrentUserId = ViewBag.CurrentUserId;
+    
     var ownProjects = Model.Where(p => p.ProjectMembers
         .Any(m => m.userId == CurrentUserId && m.role.ToString() == "Admin"))
         .ToList();
@@ -14,7 +15,6 @@
         .ToList();
 }
 
-<!-- Dashboard Header -->
 <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom">
     <div>
         <h2 class="mb-1 fw-bold text-dark tracking-tight">Your workspaces</h2>
@@ -27,7 +27,6 @@
 
 <div class="d-flex flex-column gap-5">
 
-    <!-- SECTION 1: MY PROJECTS (UPPER) -->
     <section>
         <div class="d-flex align-items-center gap-2 mb-3">
             <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
@@ -44,7 +43,6 @@
                 {
                     <div class="col">
                         <div class="card h-100 border border-light-subtle shadow-sm rounded-4 hover-shadow transition-all position-relative overflow-hidden">
-                            <!-- Top subtle highlight border -->
                             <div class="position-absolute top-0 start-0 end-0 bg-primary" style="height: 4px;"></div>
 
                             <div class="card-body p-4 d-flex flex-column justify-content-between">
@@ -67,9 +65,17 @@
                                     <span class="text-muted small d-flex align-items-center gap-1">
                                         👥 @project.ProjectMembers.Count Members
                                     </span>
-                                    <a asp-action="Details" asp-route-id="@project.Id" class="btn btn-sm btn-link text-primary fw-semibold p-0 text-decoration-none stretched-link">
-                                        Open Workspace &rarr;
-                                    </a>
+                                    
+                                    <div class="d-flex gap-3">
+                                        <a asp-action="Analytics" asp-route-id="@project.Id" class="btn btn-sm btn-link text-secondary fw-semibold p-0 text-decoration-none position-relative z-3" title="View Analytics Data">
+                                            <i class="bi bi-bar-chart-line me-1"></i>Analytics
+                                        </a>
+                                        
+                                        
+                                        <a asp-action="Details" asp-route-id="@project.Id" class="btn btn-sm btn-link text-primary fw-semibold p-0 text-decoration-none stretched-link">
+                                            Open Workspace &rarr;
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -79,7 +85,6 @@
         }
         else
         {
-            <!-- Empty State for My Projects -->
             <div class="card border border-dashed rounded-4 p-5 text-center bg-light bg-opacity-20">
                 <div class="bg-light text-secondary rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 64px; height: 64px;">
                     <span class="fs-3">📁</span>
@@ -107,22 +112,21 @@
                 {
                     <div class="col">
                         <div class="card h-100 border border-light-subtle shadow-sm rounded-4 hover-shadow transition-all position-relative overflow-hidden">
-                            <!-- Top subtle highlight border -->
-                            <div class="position-absolute top-0 start-0 end-0 bg-info" style="height: 4px;"></div>
+                            <div class="position-absolute top-0 start-0 end-0 bg-primary" style="height: 4px;"></div>
 
                             <div class="card-body p-4 d-flex flex-column justify-content-between">
                                 <div>
                                     <div class="d-flex align-items-center gap-3 mb-3">
-                                        <div class="bg-info bg-opacity-10 text-info rounded-3 d-flex justify-content-center align-items-center fw-bold text-uppercase fs-5 shadow-sm" style="width: 48px; height: 48px; min-width: 48px;">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-flex justify-content-center align-items-center fw-bold text-uppercase fs-5 shadow-sm" style="width: 48px; height: 48px; min-width: 48px;">
                                             @project.Name.Substring(0, 1)
                                         </div>
                                         <div class="text-truncate">
                                             <h5 class="card-title mb-1 fw-bold text-dark text-truncate" title="@project.Name">@project.Name</h5>
-                                            <span class="badge bg-light text-info border border-info-subtle rounded-pill px-2 py-1 fs-xs fw-semibold">Contributor</span>
+                                            <span class="badge bg-light text-primary border border-primary-subtle rounded-pill px-2 py-1 fs-xs fw-semibold">Admin</span>
                                         </div>
                                     </div>
                                     <p class="text-muted small card-text text-secondary mb-4 line-clamp-2">
-                                        Collaborate on active milestones, update tasks, and check updates.
+                                        Manage workspace parameters, tasks, and team configurations.
                                     </p>
                                 </div>
 
@@ -130,9 +134,17 @@
                                     <span class="text-muted small d-flex align-items-center gap-1">
                                         👥 @project.ProjectMembers.Count Members
                                     </span>
-                                    <a asp-action="Details" asp-route-id="@project.Id" class="btn btn-sm btn-link text-info fw-semibold p-0 text-decoration-none stretched-link">
-                                        Open Workspace &rarr;
-                                    </a>
+
+                                    <div class="d-flex gap-3">
+                                        <a asp-action="Analytics" asp-route-id="@project.Id" class="btn btn-sm btn-link text-secondary fw-semibold p-0 text-decoration-none position-relative z-3" title="View Analytics Data">
+                                            <i class="bi bi-bar-chart-line me-1"></i>Analytics
+                                        </a>
+
+                                        
+                                        <a asp-action="Details" asp-route-id="@project.Id" class="btn btn-sm btn-link text-primary fw-semibold p-0 text-decoration-none stretched-link">
+                                            Open Workspace &rarr;
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -142,7 +154,6 @@
         }
         else
         {
-            <!-- Empty State for Contributions -->
             <div class="card border border-dashed rounded-4 p-5 text-center bg-light bg-opacity-20">
                 <div class="bg-light text-secondary rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 64px; height: 64px;">
                     <span class="fs-3">🌱</span>
@@ -152,33 +163,26 @@
             </div>
         }
     </section>
-
 </div>
 
-<!-- Small CSS injection for premium UX behaviors -->
 <style>
     .hover-shadow {
         transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     }
-
-        .hover-shadow:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.08) !important;
-        }
-
+    .hover-shadow:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.08) !important;
+    }
     .transition-all {
         transition: all 0.2s ease-in-out;
     }
-
     .border-dashed {
         border-style: dashed !important;
         border-width: 2px !important;
     }
-
     .fs-xs {
         font-size: 0.75rem;
     }
-
     .line-clamp-2 {
         display: -webkit-box;
         -webkit-line-clamp: 2;

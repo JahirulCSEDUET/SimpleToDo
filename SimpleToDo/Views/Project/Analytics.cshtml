@@ -1,0 +1,224 @@
+﻿@model ProjectAnalyticsDto
+
+@{
+    ViewData["Title"] = "Workspace Intelligence - " + Model.ProjectName;
+
+    // Serialize primitive metrics arrays into standard data strings safely
+    var labelsJson = System.Text.Json.JsonSerializer.Serialize(Model.AssigneeConditions.Select(m => m.UserName));
+    var todoJson = System.Text.Json.JsonSerializer.Serialize(Model.AssigneeConditions.Select(m => m.TodoCount));
+    var progressJson = System.Text.Json.JsonSerializer.Serialize(Model.AssigneeConditions.Select(m => m.InProgressCount));
+    var doneJson = System.Text.Json.JsonSerializer.Serialize(Model.AssigneeConditions.Select(m => m.DoneCount));
+}
+
+<!-- 🌐 Load Chart.js for High-Fidelity Rendering -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    /* AuraSpace Premium Dashboard Design Framework Tokens */
+    .kpi-card {
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-radius: 16px !important;
+    background-color: #ffffff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.04) !important;
+    }
+
+    .analytics-panel {
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-radius: 16px !important;
+    }
+
+    .progress-glow {
+    box-shadow: 0 2px 6px rgba(25, 135, 84, 0.15);
+    }
+
+    .tracking-wider {
+    letter-spacing: 0.04em;
+    }
+
+    .text-muted-xs {
+    font-size: 0.72rem;
+    color: #8c98a5;
+    }
+
+    .chart-container {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    }
+
+    @@media (max-width: 576px) {
+    .btn-sm {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    font-size: 0.78rem !important;
+    }
+    }
+</style>
+
+<div class="container-fluid px-0 mt-2">
+
+    <!-- 🧭 HEADER ROW -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-2.5 small">Workspace Intelligence</span>
+                <span class="text-muted small">&bull; Automated Visual Intelligence Engine</span>
+            </div>
+            <h2 class="mb-0 fw-bold text-dark tracking-tight">
+                <i class="bi bi-graph-up-arrow text-success me-2"></i>@Model.ProjectName Metrics
+            </h2>
+        </div>
+        <div>
+            <a asp-action="Details" asp-route-id="@Model.ProjectId" class="btn btn-light border rounded-pill px-3 text-secondary d-flex align-items-center gap-2 btn-sm py-2 shadow-sm transition-all text-nowrap">
+                <i class="bi bi-arrow-left"></i> Return to Board
+            </a>
+        </div>
+    </div>
+
+    <!-- 📊 KPI SCORECARDS STRIP -->
+    <div class="row g-3 mb-4">
+        <!-- Card 1: Total Tasks -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card kpi-card shadow-sm h-100">
+                <div class="card-body p-3.5 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted-xs text-uppercase fw-bold tracking-wider d-block mb-1">Total Tasks Mapping</span>
+                        <h3 class="mb-0 fw-bold text-dark">@Model.TotalTasks</h3>
+                    </div>
+                    <div class="bg-light text-dark rounded-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                        <i class="bi bi-list-task fs-4 text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Active Processing Tasks -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card kpi-card shadow-sm h-100">
+                <div class="card-body p-3.5 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted-xs text-uppercase fw-bold tracking-wider d-block mb-1">Active Operations</span>
+                        <h3 class="mb-0 fw-bold text-primary">@Model.InProgressTasks</h3>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                        <i class="bi bi-play-circle fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Unassigned Tasks -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card kpi-card shadow-sm h-100">
+                <div class="card-body p-3.5 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted-xs text-uppercase fw-bold tracking-wider d-block mb-1">Unassigned Objectives</span>
+                        <h3 class="mb-0 fw-bold @(Model.UnassignedTasks > 0 ? "text-warning-emphasis" : "text-muted")">@Model.UnassignedTasks</h3>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                        <i class="bi bi-person-dash fs-4 text-warning-emphasis"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Completed Tasks -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card kpi-card shadow-sm h-100">
+                <div class="card-body p-3.5 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted-xs text-uppercase fw-bold tracking-wider d-block mb-1">Completed Milestones</span>
+                        <h3 class="mb-0 fw-bold text-success">@Model.CompletedTasks</h3>
+                    </div>
+                    <div class="bg-success bg-opacity-10 text-success rounded-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                        <i class="bi bi-check-circle-fill fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card bg-white analytics-panel border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-2.5">
+                <div>
+                    <h6 class="fw-bold text-dark mb-0.5 text-uppercase tracking-wider small">Total Project Lifecycle Progress</h6>
+                    <p class="text-muted small mb-0">Calculated completion vectors based on compiled closed database task elements.</p>
+                </div>
+                <div class="text-end">
+                    <span class="fs-4 fw-extrabold text-success font-monospace">@Model.ProgressPercentage%</span>
+                </div>
+            </div>
+
+            <div class="progress rounded-pill progress-glow" style="height: 12px; background-color: #f0f2f5;">
+                <div class="progress-bar bg-success progress-bar-striped progress-bar-animated rounded-pill"
+                     role="progressbar"
+                     style="width: @Model.ProgressPercentage%;"
+                     aria-valuenow="@Model.ProgressPercentage"
+                     aria-valuemin="0"
+                     aria-valuemax="100"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card bg-white analytics-panel border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom p-4 py-3">
+                    <h6 class="mb-0 fw-bold text-dark small text-uppercase tracking-wider">
+                        <i class="bi bi-pie-chart text-muted me-1.5"></i>Status Share Overview
+                    </h6>
+                </div>
+                <div class="card-body p-4 d-flex align-items-center justify-content-center">
+                    <div class="chart-container">
+                        <canvas id="statusDoughnutChart"
+                                data-pending="@Model.PendingTasks"
+                                data-progress="@Model.InProgressTasks"
+                                data-completed="@Model.CompletedTasks"
+                                data-unassigned="@Model.UnassignedTasks"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card bg-white analytics-panel border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom p-4 py-3">
+                    <h6 class="mb-0 fw-bold text-dark small text-uppercase tracking-wider">
+                        <i class="bi bi-bar-chart-steps text-muted me-1.5"></i>Team Workload Balance Chart
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+                    @if (!Model.AssigneeConditions.Any())
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-people mb-2 d-block fs-3 text-opacity-25"></i>
+                            No active developer workload records found to plot inside the visual matrix.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="chart-container">
+                            <canvas id="workloadBarChart"
+                                    data-labels="@labelsJson"
+                                    data-todo="@todoJson"
+                                    data-progress="@progressJson"
+                                    data-done="@doneJson"></canvas>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/project-analytics.js" asp-append-version="true"></script>
+}

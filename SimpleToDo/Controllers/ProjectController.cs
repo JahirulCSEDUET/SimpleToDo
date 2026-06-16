@@ -108,7 +108,19 @@ namespace SimpleToDo.Web.Controllers
             return RedirectToAction("Details", "Project", new { Id = projectId });
         }
 
+        public async Task<IActionResult> Analytics(int id)
+        {
+            try
+            {
+                var report = await _mediator.Send(new GetProjectAnalyticsQuery(id));
+                return View(report);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound();
+            }
 
+        }
         private async Task<User?> GetCurrentUserAsync()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
