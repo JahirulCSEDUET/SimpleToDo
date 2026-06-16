@@ -1,7 +1,8 @@
-﻿@model ToDoItemListViewModel
+﻿
+@model TodoDto
 
 @{
-    var memberList = ViewData["ProjectMemberList"] as List<ProjectMemberListViewModel>;
+    var memberList = ViewData["ProjectMemberList"] as List<ProjectMemberDto>;
     var viewerRole = ViewData["DetailsViewerRole"]?.ToString();
     var projectId = ViewData["ProjectId"];
 
@@ -143,7 +144,7 @@
                                 {
                                     foreach (var member in memberList)
                                     {
-                                        <option value="@member.UserId">@member.UserName</option>
+                                        <option value="@member.userId">@member.userName</option>
                                     }
                                 }
                             </select>

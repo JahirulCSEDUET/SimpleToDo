@@ -1,13 +1,15 @@
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SimpleToDo.Application.Common.Behaviors;
 using SimpleToDo.Application.Interfaces;
-using SimpleToDo.Application.Services;
+using SimpleToDo.Application.Mappings;
 using SimpleToDo.Domain.Interfaces;
 using SimpleToDo.Infrastructure.Data;
 using SimpleToDo.Infrastructure.Identity;
 using SimpleToDo.Infrastructure.Repositories;
 using SimpleToDo.Infrastructure.Services;
-using SimpleToDo.Web.MappingProfiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,24 +24,21 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
-builder.Services.AddScoped<IToDoService, ToDoServices>();
-
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
-
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-builder.Services.AddScoped<IProjectService, ProjectService>();
-
 builder.Services.AddScoped<IProjectMemberRepository, ProjectMemberRepository>();
-builder.Services.AddScoped<IProjectMemberService, ProjectMemberService>();
-
 builder.Services.AddScoped<IQueryRepository, QueryRepository>();
-builder.Services.AddScoped<IQueryService, QueryService>();
-
-builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
-builder.Services.AddAutoMapper(cfg => { }, typeof(TodoMappingProfile).Assembly);
+var applicationAssembly = typeof(TodoMappingProfile).Assembly;
+
+builder.Services.AddAutoMapper(cfg => { }, applicationAssembly);
+builder.Services.AddValidatorsFromAssembly(applicationAssembly);
+builder.Services.AddMediatR(cfg => {
+    cfg.RegisterServicesFromAssembly(applicationAssembly);
+    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+});
+
 
 builder.Services.AddScoped<IFileService>(provider =>
 {

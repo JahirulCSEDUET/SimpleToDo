@@ -1,16 +1,16 @@
-﻿@using SimpleToDo.Web.ViewModels.Project
+﻿@using SimpleToDo.Application.DTOs
 
-@model IReadOnlyList<ProjectListViewModel>
+@model IReadOnlyList<ProjectListDto>
 
 @{
     ViewData["Title"] = "Workspace";
     int CurrentUserId = ViewBag.CurrentUserId;
     var ownProjects = Model.Where(p => p.ProjectMembers
-        .Any(m => m.UserId == CurrentUserId && m.Role.ToString() == "Admin"))
+        .Any(m => m.userId == CurrentUserId && m.role.ToString() == "Admin"))
         .ToList();
 
     var contributions = Model.Where(p => p.ProjectMembers
-        .Any(m => m.UserId == CurrentUserId && m.Role.ToString() == "Contributor"))
+        .Any(m => m.userId == CurrentUserId && m.role.ToString() == "Contributor"))
         .ToList();
 }
 

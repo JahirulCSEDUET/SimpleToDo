@@ -8,5 +8,8 @@ namespace SimpleToDo.Domain.Interfaces
     public interface IUserRepository :IRepository<User>
     {
         Task<User> GetByIdAsync(int id);
+        Task<User> GetByUserIdAsync(string userId);
+        Task<User> GetUserByEmailAsync(string email);
+
     }
 }

@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SimpleToDo.Application.Interfaces;
+using SimpleToDo.Application.Features.ProjectMembers.Commands;
+using SimpleToDo.Application.Features.ProjectMembers.Queries;
+using SimpleToDo.Application.Features.Projects.Commands;
+using SimpleToDo.Application.Features.Projects.Queries;
+using SimpleToDo.Application.Features.Users.Queries;
 using SimpleToDo.Domain.Entities;
-using SimpleToDo.Domain.Enums;
 using SimpleToDo.Web.ViewModels.Project;
-using SimpleToDo.Web.ViewModels.ToDo;
 using System.Security.Claims;
 
 namespace SimpleToDo.Web.Controllers
@@ -13,129 +16,105 @@ namespace SimpleToDo.Web.Controllers
     [Authorize]
     public class ProjectController : Controller
     {
-        private readonly IProjectService _projectService;
-        private readonly IUserService _userService;
-        private readonly IProjectMemberService _projectMemberService;
-        private readonly INotificationService _notificationService;
+        private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-        public ProjectController(IProjectService projectService, IUserService userService, IProjectMemberService projectMemberService, INotificationService notificationService, IMapper mapper)
+
+        // Clean constructor: Controller now only needs Mediator and AutoMapper
+        public ProjectController(IMediator mediator, IMapper mapper)
         {
-            _projectService = projectService;
-            _userService = userService;
-            _projectMemberService = projectMemberService;
-            _notificationService = notificationService;
+            _mediator = mediator;
             _mapper = mapper;
         }
 
         public async Task<IActionResult> Index()
-        {
-            var user = GetCurrentUser();
-            var projects = await _projectService.GetByMemberIdAsync(user.Id);
-            var projectList = _mapper.Map<IReadOnlyList<ProjectListViewModel>>(projects);
-            ViewBag.CurrentUserId = user.Id; 
-            return View(projectList);
+        {   
+            var user = await GetCurrentUserAsync();
+            if (user == null) return Challenge();
+
+            var projects = await _mediator.Send(new GetProjectsByUserIdQuery(user.Id));
+
+            ViewBag.CurrentUserId = user.Id;
+            return View(projects);
         }
+
         public IActionResult Create()
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateAsync(ProjectCreateViewModel model)
         {
-            var user = GetCurrentUser();
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
-            var project = new Project
-            {
-                Name = model.Name,
-                ProjectMembers = new List<ProjectMember>()
-                {
-                    new ProjectMember
-                    {
-                        UserId =user.Id,
-                        Role = Role.Admin
-                    }
-                }                
-            };
-            var projectCreated = await _projectService.AddAsync(project);
+
+            var user = await GetCurrentUserAsync();
+            if (user == null) return Challenge();
+
+            await _mediator.Send(new CreateProjectCommand(model.Name, user.Id));
+
             return RedirectToAction(nameof(Index));
         }
+
         public async Task<IActionResult> Details(int id)
         {
-            var user = GetCurrentUser();
-            var projectMember = _projectMemberService.GetProjectMemberById(user.Id, id);
+            var user = await GetCurrentUserAsync();
+            if (user == null) return Challenge();
+
+            var projectMember = await _mediator.Send(new GetProjectMemberByUserAndProjectIdQuery(user.Id, id));
             if (projectMember == null)
             {
                 return NotFound();
             }
-            var project = await _projectService.GetByIdAsync(id);
-            if(project == null)
+
+            var project = await _mediator.Send(new GetProjectByIdQuery(id));
+            if (project == null)
             {
                 return NotFound();
             }
-            var projectvm = _mapper.Map<ProjectDetailsViewModel>(project);
-            projectvm.DetailsViewerRole = projectMember.Role.ToString();
-            return View(projectvm);
+
+            ViewBag.ViewerRole = projectMember.role.ToString();
+
+            return View(project);
         }
+
         [HttpPost]
         public async Task<IActionResult> QuickAddMember(int projectId, string email)
         {
             if (!ModelState.IsValid)
             {
-                TempData["MemberError"] = $"Please enter email address.";
+                TempData["MemberError"] = "Please enter email address.";
                 return RedirectToAction("Details", new { id = projectId });
             }
-            var user = _userService.GetByEmail(email);
-            if (user == null)
-            {
-                TempData["MemberError"] = $"Could not find a user with the email '{email}'.";
-                return RedirectToAction("Details", new { id = projectId });
-            }
-            var existingMember = _projectMemberService.GetProjectMemberById(user.Id, projectId);
-            if (existingMember!=null)
-            {
-                TempData["MemberError"] = $"This user is already a member of the project.";
-                return RedirectToAction("Details", new { id = projectId });
-            }
-            var projectMember = new ProjectMember
-            {
-                ProjectId = projectId,
-                UserId = user.Id,
-                Role = Role.Contributor
-            };
 
-            var loginUser = GetCurrentUser();
-            var project = await _projectService.GetByIdAsync(projectId);
-            
-            await _projectMemberService.AddAsync(projectMember);
-            var notification = new Notification
+            var loginUser = await GetCurrentUserAsync();
+            if (loginUser == null) return Challenge();
+
+            try
             {
-                Title = "Added to Workspace",
-                Message = $"{loginUser.FullName} added you in workspace {project.Name}.",
-                RedirectLink = RedirectLink.Project,
-                UserId = user.Id,
-                IsRead = false,
-                CreatedTime = DateTime.Now,
-                RedirectId = projectId
-            };
-            await _notificationService.AddAsync(notification);
-            return RedirectToAction("Details","Project", new {Id=projectId});
+                var command = new CreateProjectMemberCommand(projectId, email, loginUser.Id, loginUser.FullName);
+                await _mediator.Send(command);
+                TempData["MemberSuccess"] = $"User: {email} added.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                
+                TempData["MemberError"] = ex.Message;
+            }
+
+            
+            return RedirectToAction("Details", "Project", new { Id = projectId });
         }
-        private User GetCurrentUser()
+
+
+        private async Task<User?> GetCurrentUserAsync()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-            {
-                Challenge();
-            }
-            var user = _userService.GetByUserId(userId);
-            if (user == null)
-            {
-                Challenge();
-            }
-            return user;
+            if (userId == null) return null;
+
+            return await _mediator.Send(new GetUserByUserIdQuery(userId));
         }
     }
 }

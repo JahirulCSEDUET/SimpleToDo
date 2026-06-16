@@ -300,7 +300,7 @@ namespace SimpleToDo.Infrastructure.Migrations
                     b.Property<bool>("IsArchived")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("ProjectId")
+                    b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
@@ -520,7 +520,9 @@ namespace SimpleToDo.Infrastructure.Migrations
                 {
                     b.HasOne("SimpleToDo.Domain.Entities.Project", "Project")
                         .WithMany("Todos")
-                        .HasForeignKey("ProjectId");
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SimpleToDo.Domain.Entities.User", "User")
                         .WithMany("Todos")

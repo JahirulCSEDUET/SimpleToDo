@@ -28,18 +28,7 @@ namespace SimpleToDo.Infrastructure.Repositories
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<Project> GetByIdWithMemberAndTodoAsync(int projectId)
-        {
-            return await _context.Projects
-                .Include(p => p.ProjectMembers)
-                    .ThenInclude(pm => pm.User)
-                .Include(p=> p.Todos)
-                    .ThenInclude(pm => pm.User)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Id == projectId);
-                
-        }
-        public async Task<IReadOnlyList<Project>> GetByMemberIdAsync(int userId)
+        public async Task<IReadOnlyList<Project>> GetByUserIdAsync(int userId)
         {
             return await _context.Projects
                 .Where(p => p.ProjectMembers.Any(pm => pm.UserId == userId))
