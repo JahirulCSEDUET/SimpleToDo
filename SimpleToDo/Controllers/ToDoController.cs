@@ -216,6 +216,7 @@ namespace SimpleToDo.Web.Controllers
             return View(todoDto);
         }
 
+        
         private async Task<User?> GetCurrentUserAsync()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -223,5 +224,6 @@ namespace SimpleToDo.Web.Controllers
 
             return await _mediator.Send(new GetUserByUserIdQuery(userId));
         }
+
     }
 }
