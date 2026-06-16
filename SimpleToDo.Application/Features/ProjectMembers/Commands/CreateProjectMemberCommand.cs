@@ -21,9 +21,14 @@ namespace SimpleToDo.Application.Features.ProjectMembers.Commands
         public async Task<int> Handle(CreateProjectMemberCommand request, CancellationToken cancellationToken)
         {
             var user = await _unitOfWork.User.GetUserByEmailAsync(request.email);
+            var loginUser = await _unitOfWork.ProjectMember.GetProjectMemberByIdAsync(request.projectId, request.loginUserId);
+            if (loginUser.Role != Role.Admin)
+            {
+                throw new InvalidOperationException($"Only Admin can add member.");
+            }
             if (user == null)
             {
-                throw new InvalidOperationException("User with this email is not found in the system.");
+                throw new InvalidOperationException($"User with email: {request.email} is not found in the system.");
             }
             var project = await _unitOfWork.Project.GetByIdAsync(request.projectId);
             if (project == null)
@@ -33,7 +38,7 @@ namespace SimpleToDo.Application.Features.ProjectMembers.Commands
             var existedMember = await _unitOfWork.ProjectMember.GetProjectMemberByIdAsync(request.projectId, user.Id);
             if(existedMember != null)
             {
-                throw new InvalidOperationException("Member already exist.");
+                throw new InvalidOperationException($"Member with email {request.email} already exist.");
             }
             var projectMember = new ProjectMember
             {

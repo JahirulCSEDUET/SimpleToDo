@@ -96,6 +96,7 @@ namespace SimpleToDo.Web.Controllers
             {
                 var command = new CreateProjectMemberCommand(projectId, email, loginUser.Id, loginUser.FullName);
                 await _mediator.Send(command);
+                TempData["MemberSuccess"] = $"User: {email} added.";
             }
             catch (InvalidOperationException ex)
             {
@@ -103,6 +104,7 @@ namespace SimpleToDo.Web.Controllers
                 TempData["MemberError"] = ex.Message;
             }
 
+            
             return RedirectToAction("Details", "Project", new { Id = projectId });
         }
 
