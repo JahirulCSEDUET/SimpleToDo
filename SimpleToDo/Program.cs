@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using SimpleToDo.Application.Common.Behaviors;
 using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Application.Mappings;
-using SimpleToDo.Application.Services;
 using SimpleToDo.Domain.Interfaces;
 using SimpleToDo.Infrastructure.Data;
 using SimpleToDo.Infrastructure.Identity;
@@ -25,21 +24,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
-builder.Services.AddScoped<IToDoService, ToDoServices>();
-
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
-
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-builder.Services.AddScoped<IProjectService, ProjectService>();
-
 builder.Services.AddScoped<IProjectMemberRepository, ProjectMemberRepository>();
-builder.Services.AddScoped<IProjectMemberService, ProjectMemberService>();
-
 builder.Services.AddScoped<IQueryRepository, QueryRepository>();
-builder.Services.AddScoped<IQueryService, QueryService>();
-
-builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 var applicationAssembly = typeof(TodoMappingProfile).Assembly;
