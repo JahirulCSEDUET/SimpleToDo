@@ -24,6 +24,8 @@ namespace SimpleToDo.Application.Features.Projects.Commands
             var project = new Project
             {
                 Name = request.Name,
+                IsDeleted =false,
+                Status = ProjectStatus.Running,
                 ProjectMembers = new List<ProjectMember>
                 {
                     new ProjectMember { UserId = request.userId, Role = Role.Admin}

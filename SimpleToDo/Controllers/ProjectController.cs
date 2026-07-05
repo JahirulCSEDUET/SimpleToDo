@@ -18,8 +18,7 @@ namespace SimpleToDo.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-
-        // Clean constructor: Controller now only needs Mediator and AutoMapper
+        
         public ProjectController(IMediator mediator, IMapper mapper)
         {
             _mediator = mediator;
@@ -119,7 +118,50 @@ namespace SimpleToDo.Web.Controllers
             {
                 return NotFound();
             }
+        }
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var user = GetCurrentUserAsync();
+                var res = await _mediator.Send(new SafeDeleteProjectCommand(id, user.Id));
+                if(res) 
+                    TempData["DeleteSuccess"] = "Deleted Successfully";
+                else
+                    TempData["DeleteError"] = "Unsuccessfully";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["DeleteError"] = ex.Message;
+            }
+            catch(ArgumentNullException ex)
+            {
+                TempData["DeleteError"] = ex.Message;
+            }
+            return RedirectToAction("Details", "Project", new { Id = id });
+        }
 
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> UpdateStatusAsync(int id, string status)
+        {
+            try
+            {
+                var user = GetCurrentUserAsync();
+                await _mediator.Send(new UpdateProjectStatusCommand(id, status));
+                TempData["UpdateSuccess"] = "Deleted Successfully";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["UpdateError"] = ex.Message;
+            }
+            catch (ArgumentNullException ex)
+            {
+                TempData["UpdateError"] = ex.Message;
+            }
+            return RedirectToAction("Details", "Project", new { Id = id });
         }
         private async Task<User?> GetCurrentUserAsync()
         {
