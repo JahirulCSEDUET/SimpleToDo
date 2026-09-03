@@ -17,6 +17,8 @@ namespace SimpleToDo.Infrastructure.Data
         public DbSet<ProjectMember> ProjectMembers { get; set; }
         public DbSet<Query> Queries { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Chat> Chats { get;  set; }
+        public DbSet<Message> Messages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -30,6 +32,11 @@ namespace SimpleToDo.Infrastructure.Data
                 .HasOne(pm => pm.User)
                 .WithMany(m => m.ProjectMembers)
                 .HasForeignKey(pm => pm.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Message>()
+                .HasOne(c => c.Chat)
+                .WithMany(m => m.Messages)
+                .HasForeignKey(m => m.ChatId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

@@ -1,23 +1,30 @@
 ﻿@model TodoDto
 
 <style>
-    /* Premium AuraSpace Miniature Task Card Design Framework Tokens */
-    .task-card-premium {
-        cursor: grab;
-        border: 1px solid rgba(0, 0, 0, 0.06) !important;
-        border-radius: 14px !important;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    /* ===================================================
+           1. Base Task Card Layout & Typography
+           =================================================== */
+    .kanban-card.task-card-premium {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        position: relative;
     }
 
-        .task-card-premium:active {
-            cursor: grabbing;
+        .kanban-card.task-card-premium:hover {
+            transform: translateY(-2.5px);
         }
 
-        .task-card-premium:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0.6rem 1.2rem rgba(13, 110, 253, 0.05) !important;
-            border-color: rgba(13, 110, 253, 0.15) !important;
-        }
+    .drag-grip-icon {
+        opacity: 0.25;
+        transition: opacity 0.15s ease, color 0.15s ease;
+    }
+
+    .kanban-card.task-card-premium:hover .drag-grip-icon {
+        opacity: 0.75;
+    }
 
     .line-clamp-title {
         display: -webkit-box;
@@ -25,102 +32,230 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-size: 0.88rem;
+        font-weight: 600;
+        line-height: 1.35;
+        color: #0f172a;
     }
 
-    .meta-label-xs {
-        font-size: 0.76rem;
+    .project-pill {
+        font-size: 0.71rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        max-width: 175px;
+        transition: all 0.15s ease;
+    }
+
+    .status-indicator-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        transition: background-color 0.2s ease;
+    }
+
+    .creator-pill {
+        font-size: 0.72rem;
         font-weight: 500;
+        color: #64748b;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
     }
 
-    .query-badge-pill {
+    .query-count-badge {
+        font-size: 0.72rem;
+        font-weight: 500;
+        color: #64748b;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 3px 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4.5px;
+    }
+
+    .btn-card-action {
         font-size: 0.74rem;
         font-weight: 600;
-        padding: 0.35rem 0.65rem;
-        background-color: #f8f9fa;
-        border: 1px solid #e3e6f0;
-        transition: all 0.15s ease-in-out;
-    }
-
-    .task-card-premium:hover .query-badge-pill {
-        background-color: rgba(13, 110, 253, 0.03);
-        border-color: rgba(13, 110, 253, 0.12);
-        color: #0d6efd !important;
-    }
-
-    .btn-badge-details {
-        font-size: 0.74rem;
-        font-weight: 600;
-        padding: 0.35rem 0.75rem;
-        border-radius: 50rem;
-        transition: all 0.15s ease-in-out;
+        color: #475569;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 3px 10px;
         text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s ease-in-out;
     }
 
-        .btn-badge-details:hover {
-            background-color: #0d6efd !important;
-            color: #fff !important;
-            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.12);
+        .btn-card-action:hover {
+            background-color: #0f172a;
+            border-color: #0f172a;
+            color: #ffffff !important;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
         }
+
+    .btn-archive-trigger {
+        color: #94a3b8;
+        padding: 2px 6px;
+        border-radius: 6px;
+        transition: all 0.15s ease;
+    }
+
+        .btn-archive-trigger:hover {
+            color: #dc3545;
+            background-color: #fee2e2;
+        }
+
+    /* ===================================================
+           2. Dynamic Lane Colors: Pending (Red)
+           =================================================== */
+    #Pending .kanban-card {
+        border-left: 5px solid #dc3545 !important;
+        background: linear-gradient(to right, rgba(220, 53, 69, 0.03) 0%, #ffffff 12%);
+    }
+
+        #Pending .kanban-card:hover {
+            border-color: rgba(220, 53, 69, 0.4) !important;
+            border-left-color: #dc3545 !important;
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.08) !important;
+        }
+
+    #Pending .status-indicator-dot {
+        background-color: #dc3545 !important;
+    }
+
+    #Pending .status-badge-text {
+        color: #dc3545 !important;
+        background-color: rgba(220, 53, 69, 0.08) !important;
+        border-color: rgba(220, 53, 69, 0.2) !important;
+    }
+
+    /* ===================================================
+           3. Dynamic Lane Colors: In Progress (Blue)
+           =================================================== */
+    #Processing .kanban-card {
+        border-left: 5px solid #0d6efd !important;
+        background: linear-gradient(to right, rgba(13, 110, 253, 0.03) 0%, #ffffff 12%);
+    }
+
+        #Processing .kanban-card:hover {
+            border-color: rgba(13, 110, 253, 0.4) !important;
+            border-left-color: #0d6efd !important;
+            box-shadow: 0 8px 20px rgba(13, 110, 253, 0.08) !important;
+        }
+
+    #Processing .status-indicator-dot {
+        background-color: #0d6efd !important;
+    }
+
+    #Processing .status-badge-text {
+        color: #0d6efd !important;
+        background-color: rgba(13, 110, 253, 0.08) !important;
+        border-color: rgba(13, 110, 253, 0.2) !important;
+    }
+
+    /* ===================================================
+           4. Dynamic Lane Colors: Completed (Green)
+           =================================================== */
+    #Completed .kanban-card {
+        border-left: 5px solid #198754 !important;
+        background: linear-gradient(to right, rgba(25, 135, 84, 0.03) 0%, #ffffff 12%);
+    }
+
+        #Completed .kanban-card:hover {
+            border-color: rgba(25, 135, 84, 0.4) !important;
+            border-left-color: #198754 !important;
+            box-shadow: 0 8px 20px rgba(25, 135, 84, 0.08) !important;
+        }
+
+    #Completed .status-indicator-dot {
+        background-color: #198754 !important;
+    }
+
+    #Completed .status-badge-text {
+        color: #198754 !important;
+        background-color: rgba(25, 135, 84, 0.08) !important;
+        border-color: rgba(25, 135, 84, 0.2) !important;
+    }
 </style>
 
-<div class="card mb-3 shadow-sm bg-white task-card-premium" data-id="@Model.Id">
-    <div class="card-body p-3">
+<div class="card mb-3 kanban-card task-card-premium"
+     data-id="@Model.Id"
+     data-user-id="@Model.UserId">
+    <div class="card-body p-3 d-flex flex-column gap-2.5">
 
-        <div class="d-flex justify-content-between align-items-start gap-2 mb-2.5">
-            <div class="d-flex align-items-start gap-1 flex-grow-1 text-truncate">
-                <div class="drag-handle text-muted pt-0.5 px-1 shrink-0">
-                    <i class="bi bi-grip-vertical fs-5 text-secondary text-opacity-40"></i>
-                </div>
+        <!-- Top Row: Status Dot, Project Tag, and Actions -->
+        <div class="d-flex align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center gap-1.5 text-truncate">
+                <span class="status-indicator-dot"></span>
 
-                <div class="text-truncate">
-                    <h6 class="mb-0 fw-bold text-dark text-wrap line-clamp-title lh-base small" style="letter-spacing: -0.1px;" title="@Model.Title">
-                        @Model.Title
-                    </h6>
-                </div>
+                @if (Model.ProjectId != 0)
+                {
+                    <span class="project-pill status-badge-text text-truncate" title="@Model.ProjectName">
+                        <i class="bi bi-layers-half" style="font-size: 0.72rem;"></i>
+                        <span class="text-truncate">@Model.ProjectName</span>
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-light text-muted border border-light-subtle rounded-pill font-xs">Personal</span>
+                }
             </div>
 
-            <form asp-action="ArchivedUnArchived" asp-controller="ToDo" method="post" class="m-0 archive-form shrink-0 @(Model.Status.ToString() == "Completed" ? "" : "d-none")">
-                <input type="hidden" name="id" value="@Model.Id" />
-                <button type="submit" class="btn btn-link text-danger p-0 border-0 text-decoration-none opacity-50 hover-opacity-100 transition-all" title="Archive Completed Element">
-                    <i class="bi bi-archive-fill fs-6"></i>
-                </button>
-            </form>
+            <div class="d-flex align-items-center gap-1">
+                <form asp-action="ArchivedUnArchived" asp-controller="ToDo" method="post"
+                      class="m-0 archive-form @(Model.Status.ToString() == "Completed" ? "" : "d-none")">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-link btn-archive-trigger border-0 text-decoration-none" title="Archive Completed Task">
+                        <i class="bi bi-archive fs-6"></i>
+                    </button>
+                </form>
+
+                <div class="drag-handle px-1" title="Drag to reorder or change column">
+                    <i class="bi bi-grip-vertical fs-5 drag-grip-icon"></i>
+                </div>
+            </div>
         </div>
 
-        @if (Model.ProjectId != 0)
-        {
-            <div class="mb-3 d-flex flex-column gap-1">
-                <div class="d-flex align-items-center gap-2 text-truncate">
-                    <i class="bi bi-folder2 text-primary text-opacity-75 shrink-0" style="font-size: 0.85rem;"></i>
-                    <span class="text-muted text-truncate meta-label-xs">
-                        <span class="text-dark-subtle fw-semibold">@Model.ProjectName</span>
-                    </span>
-                </div>
+        <!-- Task Title -->
+        <div>
+            <h6 class="mb-0 line-clamp-title text-wrap" title="@Model.Title">
+                @Model.Title
+            </h6>
+        </div>
 
-                <div class="d-flex align-items-center gap-2 text-truncate">
-                    <i class="bi bi-person-circle text-secondary text-opacity-60 shrink-0" style="font-size: 0.85rem;"></i>
-                    <span class="text-muted text-truncate meta-label-xs">
-                        <span class="text-secondary">@Model.CreatorName</span>
-                    </span>
-                </div>
+        <!-- Creator Metadata -->
+        @if (!string.IsNullOrEmpty(Model.CreatorName))
+        {
+            <div class="creator-pill text-truncate">
+                <i class="bi bi-person-circle opacity-75" style="font-size: 0.78rem;"></i>
+                <span class="text-truncate">@Model.CreatorName</span>
             </div>
         }
 
-        <div class="pt-2.5 border-top border-light-subtle d-flex align-items-center justify-content-between gap-2">
-
-            <span class="badge text-secondary rounded-pill d-inline-flex align-items-center gap-1.5 query-badge-pill" title="Discussion thread responses matching task parameters">
-                <i class="bi bi-chat-left-text-fill text-muted text-opacity-40" style="font-size: 0.74rem;"></i>
+        <!-- Bottom Row: Query Count & Details Trigger -->
+        <div class="pt-2 border-top border-light-subtle d-flex align-items-center justify-content-between gap-2 mt-0.5">
+            <span class="query-count-badge" title="@Model.QueryList.Count() collaboration comments">
+                <i class="bi bi-chat-text opacity-75"></i>
                 <span>@Model.QueryList.Count()</span>
             </span>
 
             <a asp-controller="ToDo"
                asp-action="Details"
                asp-route-id="@Model.Id"
-               class="btn-badge-details btn btn-light text-secondary bg-light-subtle border border-light-subtle shadow-none d-inline-flex align-items-center gap-1"
-               title="Open collaborative workspace query thread details">
-                Details <i class="bi bi-arrow-right small text-opacity-70"></i>
+               class="btn-card-action"
+               title="View task overview and collaboration feed">
+                Details <i class="bi bi-chevron-right" style="font-size: 0.65rem;"></i>
             </a>
-
         </div>
 
     </div>

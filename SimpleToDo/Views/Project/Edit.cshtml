@@ -1,0 +1,83 @@
+﻿@model SimpleToDo.Web.ViewModels.Project.ProjectEditViewModel
+@using SimpleToDo.Domain.Enums
+
+@{
+    ViewData["Title"] = "Edit Project";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <div class="card border-0 shadow rounded-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
+                    <h4 class="fw-bold text-primary mb-0">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Project
+                    </h4>
+                    <p class="text-muted small mb-0 mt-1">Update your project details and status.</p>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <!-- TempData Error Display -->
+                    @if (TempData["UpdateError"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show rounded-3 d-flex align-items-center" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill fs-5 me-3"></i>
+                            <div>
+                                @TempData["UpdateError"]
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Edit" method="post">
+                        <!-- Validation Summary for standard model errors -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Hidden ID -->
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- Project Name Field (Floating Label) -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="Name" class="form-control rounded-3" placeholder="Project Name" autocomplete="off" />
+                            <label asp-for="Name">Project Name</label>
+                            <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Status Dropdown (Floating Label) -->
+                        <div class="form-floating mb-4">
+                            <select asp-for="Status"
+                                    class="form-select rounded-3"
+                                    asp-items="Html.GetEnumSelectList<ProjectStatus>()"
+                                    aria-label="Project Status">
+                            </select>
+                            <label asp-for="Status">Project Status</label>
+                            <span asp-validation-for="Status" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-2 border-top">
+                            <!-- Change 'Index' to whatever your return action/controller is -->
+                            <a asp-action="Index" class="btn btn-light px-4 rounded-pill fw-semibold">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 rounded-pill shadow-sm fw-semibold">
+                                <i class="bi bi-save2 me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Client-side validation -->
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

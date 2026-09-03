@@ -155,6 +155,72 @@ namespace SimpleToDo.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("SimpleToDo.Domain.Entities.Chat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("LastUpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId")
+                        .IsUnique();
+
+                    b.ToTable("Chats");
+                });
+
+            modelBuilder.Entity("SimpleToDo.Domain.Entities.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ChatId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SenderName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Messages");
+                });
+
             modelBuilder.Entity("SimpleToDo.Domain.Entities.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -201,9 +267,15 @@ namespace SimpleToDo.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -467,6 +539,36 @@ namespace SimpleToDo.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SimpleToDo.Domain.Entities.Chat", b =>
+                {
+                    b.HasOne("SimpleToDo.Domain.Entities.Project", "Project")
+                        .WithOne("Chat")
+                        .HasForeignKey("SimpleToDo.Domain.Entities.Chat", "ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("SimpleToDo.Domain.Entities.Message", b =>
+                {
+                    b.HasOne("SimpleToDo.Domain.Entities.Chat", "Chat")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SimpleToDo.Domain.Entities.User", "User")
+                        .WithMany("Messages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SimpleToDo.Domain.Entities.Notification", b =>
                 {
                     b.HasOne("SimpleToDo.Domain.Entities.User", "userId")
@@ -533,8 +635,16 @@ namespace SimpleToDo.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SimpleToDo.Domain.Entities.Chat", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
             modelBuilder.Entity("SimpleToDo.Domain.Entities.Project", b =>
                 {
+                    b.Navigation("Chat")
+                        .IsRequired();
+
                     b.Navigation("ProjectMembers");
 
                     b.Navigation("Todos");
@@ -547,6 +657,8 @@ namespace SimpleToDo.Infrastructure.Migrations
 
             modelBuilder.Entity("SimpleToDo.Domain.Entities.User", b =>
                 {
+                    b.Navigation("Messages");
+
                     b.Navigation("Notifications");
 
                     b.Navigation("ProjectMembers");

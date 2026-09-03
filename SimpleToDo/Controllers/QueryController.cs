@@ -1,9 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using SimpleToDo.Application.Features.Queries.Commands;
 using SimpleToDo.Application.Features.Users.Queries; 
 using SimpleToDo.Application.Interfaces;
+using SimpleToDo.Web.Hubs;
 using System.Security.Claims;
 
 namespace SimpleToDo.Web.Controllers
@@ -13,11 +15,13 @@ namespace SimpleToDo.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IFileService _fileService;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public QueryController(IMediator mediator, IFileService fileService)
+        public QueryController(IMediator mediator, IFileService fileService, IHubContext<NotificationHub> hubContext)
         {
             _mediator = mediator;
             _fileService = fileService;
+            _hubContext = hubContext;
         }
 
         [HttpPost]
@@ -47,10 +51,10 @@ namespace SimpleToDo.Web.Controllers
                     storedPath = path;
                     fileName = name;
                 }
-
                 
                 var command = new CreateQueryCommand(body, todoId, user.Id, storedPath, fileName);
-                await _mediator.Send(command);
+                var Ids = await _mediator.Send(command);
+                await _hubContext.Clients.Users(Ids).SendAsync("UpdateNotificationBadge");
             }
             catch (InvalidOperationException ex)
             {

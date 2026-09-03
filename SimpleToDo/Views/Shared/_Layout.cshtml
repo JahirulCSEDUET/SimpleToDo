@@ -5,76 +5,238 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - AuraSpace</title>
     <script type="importmap"></script>
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SimpleToDo.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
-        
-        .nav-link-custom {
-        font-weight: 500;
-        color: var(--bs-secondary-color);
-        transition: color 0.15s ease-in-out;
-        position: relative;
-        }
+            :root {
+                --brand: #1F4D42;
+                --brand-dark: #143229;
+                --brand-soft: #E7EEEA;
+                --ink: #171B21;
+                --ink-soft: #565F6B;
+                --paper: #F7F7F4;
+                --surface: #FFFFFF;
+                --border-c: #E3E4DE;
+                --rust: #A8501F;
+                --gold: #B9862B;
+                --slate: #3E5878;
+            }
 
-        .nav-link-custom:hover, .nav-link-custom.active {
-        color: var(--bs-primary) !important;
-        }
+            body {
+                background-color: var(--paper) !important;
+                color: var(--ink);
+            }
 
-        .navbar-brand-custom {
-        font-weight: 700;
-        letter-spacing: -0.5px;
-        background: linear-gradient(45deg, #0d6efd, #0dcaf0);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        }
+            /* Reskin core Bootstrap primary utilities site-wide to match brand palette */
+            .bg-primary {
+                background-color: var(--brand) !important;
+            }
 
-        .btn-logout:hover {
-        color: var(--bs-danger) !important;
-        }
+            .text-primary {
+                color: var(--brand) !important;
+            }
 
-        
-        .fb-notification-btn {
-        background-color: #f0f2f5 !important;
-        transition: background-color 0.2s ease;
-        }
+            .border-primary {
+                border-color: var(--brand) !important;
+            }
 
-        .fb-notification-btn:hover {
-        background-color: #e4e6eb !important;
-        }
+            .bg-primary-subtle {
+                background-color: var(--brand-soft) !important;
+            }
 
-        .fb-notification-item {
-        border-bottom: 1px solid #f0f2f5;
-        transition: background-color 0.15s ease;
-        cursor: pointer;
-        }
+            .border-primary-subtle {
+                border-color: var(--brand-soft) !important;
+            }
 
-        .fb-notification-item:hover {
-        background-color: #f8f9fa;
-        }
+            .btn-primary {
+                background-color: var(--brand);
+                border-color: var(--brand);
+            }
 
-        .fb-unread-dot {
-        width: 8px;
-        height: 8px;
-        background-color: #0064d2;
-        border-radius: 50%;
-        flex-shrink: 0;
-        }
+                .btn-primary:hover, .btn-primary:focus {
+                    background-color: var(--brand-dark);
+                    border-color: var(--brand-dark);
+                }
 
-        .text-muted-xs {
-        font-size: 0.72rem;
-        color: #8c98a5;
-        }
+            .btn-outline-primary {
+                color: var(--brand);
+                border-color: var(--brand);
+            }
+
+                .btn-outline-primary:hover {
+                    background-color: var(--brand);
+                    border-color: var(--brand);
+                }
+
+            .nav-link-custom {
+                font-weight: 500;
+                color: var(--ink-soft);
+                transition: color 0.15s ease-in-out;
+                position: relative;
+            }
+
+                .nav-link-custom:hover, .nav-link-custom.active {
+                    color: var(--brand) !important;
+                }
+
+            .navbar-brand-custom {
+                font-weight: 700;
+                letter-spacing: -0.5px;
+                background: linear-gradient(45deg, var(--brand), var(--slate));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .btn-logout:hover {
+                color: #B23A3A !important;
+            }
+
+            /* Nav utility buttons (messages / notifications) */
+            .fb-nav-btn {
+                background-color: var(--paper) !important;
+                border: 1px solid var(--border-c) !important;
+                transition: background-color 0.2s ease, border-color 0.2s ease;
+            }
+
+                .fb-nav-btn:hover {
+                    background-color: var(--brand-soft) !important;
+                    border-color: var(--brand-soft) !important;
+                }
+
+            .fb-dropdown-item {
+                border-bottom: 1px solid var(--border-c);
+                transition: background-color 0.15s ease;
+                cursor: pointer;
+                text-decoration: none;
+                display: block;
+            }
+
+                .fb-dropdown-item:hover {
+                    background-color: var(--paper);
+                }
+
+            .fb-unread-dot {
+                width: 8px;
+                height: 8px;
+                background-color: var(--brand);
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+
+            .avatar-circle-sm {
+                width: 38px;
+                height: 38px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                flex-shrink: 0;
+            }
+
+            .text-muted-xs {
+                font-size: 0.72rem;
+                color: #8C9088;
+            }
+
+            .line-clamp-1 {
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            /* Floating chat dock */
+            .fb-chat-dock {
+                position: fixed;
+                bottom: 0;
+                right: 24px;
+                z-index: 1075;
+                display: flex;
+                align-items: flex-end;
+                gap: 12px;
+                pointer-events: none;
+            }
+
+            .fb-chat-box {
+                width: 330px;
+                background: var(--surface);
+                border-radius: 14px 14px 0 0;
+                box-shadow: 0 8px 24px rgba(23, 27, 33, 0.16);
+                border: 1px solid var(--border-c);
+                border-bottom: 0;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                pointer-events: auto;
+                animation: slideUpChat 0.2s ease-out;
+            }
+
+            @@keyframes slideUpChat {
+                from {
+                    transform: translateY(100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .fb-chat-header {
+                background: var(--brand-dark);
+                color: #ffffff;
+                padding: 10px 14px;
+                cursor: pointer;
+            }
+
+            .fb-chat-body {
+                height: 310px;
+                overflow-y: auto;
+                padding: 12px;
+                background-color: var(--paper);
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .fb-bubble {
+                max-width: 80%;
+                padding: 8px 12px;
+                font-size: 0.82rem;
+                line-height: 1.4;
+                word-break: break-word;
+            }
+
+            .fb-bubble-me {
+                background-color: var(--brand);
+                color: #ffffff;
+                align-self: flex-end;
+                border-radius: 14px 14px 2px 14px;
+            }
+
+            .fb-bubble-other {
+                background-color: var(--brand-soft);
+                color: var(--ink);
+                align-self: flex-start;
+                border-radius: 14px 14px 14px 2px;
+            }
+
+            .fb-chat-footer {
+                background: var(--surface);
+                border-top: 1px solid var(--border-c);
+                padding: 8px 10px;
+            }
     </style>
 </head>
-<body class="d-flex flex-column h-100 bg-light bg-opacity-25">
+<body class="d-flex flex-column h-100">
 
     <header>
         <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom border-light-subtle py-3 shadow-sm">
             <div class="container">
-                <a class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2 fs-4" asp-area="" asp-controller="Project" asp-action="Index">
+                <a class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2 fs-4" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="bi bi-cloud-haze2 text-primary"></i> AuraSpace
                 </a>
 
@@ -86,12 +248,15 @@
                 <div class="navbar-collapse collapse" id="navbarContent">
                     <ul class="navbar-nav me-auto mb-2 mb-md-0 gap-1 gap-md-3 mt-2 mt-md-0">
                         <li class="nav-item">
-                            <a class="nav-link nav-link-custom d-flex align-items-center gap-1.5" asp-area="" asp-controller="Project" asp-action="Index"> Home</a>
+                            <a class="nav-link nav-link-custom d-flex align-items-center gap-1.5" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link nav-link-custom d-flex align-items-center gap-1.5" asp-area="" asp-controller="ToDo" asp-action="Index">My Todos</a>
+                                <a class="nav-link nav-link-custom d-flex align-items-center gap-1.5" asp-area="" asp-controller="Project" asp-action="Index">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-custom d-flex align-items-center gap-1.5" asp-area="" asp-controller="ToDo" asp-action="Index">My Tasks</a>
                             </li>
                         }
                         <li class="nav-item">
@@ -109,8 +274,32 @@
                                 </span>
                             </li>
 
+                            <!-- MESSAGES DROPDOWN HUB -->
+                            <li class="nav-item dropdown">
+                                <button type="button" class="btn fb-nav-btn border-0 position-relative rounded-circle p-0 d-flex align-items-center justify-content-center" id="fbMessageDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 38px;" title="Messages">
+                                    <i class="bi bi-chat-dots-fill text-dark fs-5"></i>
+                                    <span id="message-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary d-none" style="font-size: 0.65rem; padding: 0.25em 0.5em; transform: translate(-35%, -5%) !important;">
+                                        0
+                                    </span>
+                                </button>
+
+                                <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 py-0 overflow-hidden mt-2" aria-labelledby="fbMessageDropdown" style="width: 360px; max-width: 90vw; z-index: 1050;">
+                                    <div class="p-3 bg-white border-bottom d-flex align-items-center justify-content-between">
+                                        <h5 class="mb-0 fw-bold text-dark fs-5" style="letter-spacing: -0.3px;">Messages</h5>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-primary-subtle text-primary rounded-pill font-xs px-2 py-1" id="message-header-count">0 Unread</span>
+                                        </div>
+                                    </div>
+
+                                    <div id="message-items-list" class="overflow-auto" style="max-height: 380px; background-color: #fff;">
+                                        <div class="text-center py-4 text-muted small">Loading messages...</div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <!-- NOTIFICATION DROPDOWN HUB -->
                             <li class="nav-item dropdown me-md-2">
-                                <button type="button" class="btn fb-notification-btn border-0 position-relative rounded-circle p-0 d-flex align-items-center justify-content-center" id="fbNotificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 38px;">
+                                <button type="button" class="btn fb-nav-btn border-0 position-relative rounded-circle p-0 d-flex align-items-center justify-content-center" id="fbNotificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 38px;" title="Notifications">
                                     <i class="bi bi-bell-fill text-dark fs-5"></i>
                                     <span id="notification-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.65rem; padding: 0.25em 0.5em; transform: translate(-35%, -5%) !important;">
                                         0
@@ -118,7 +307,6 @@
                                 </button>
 
                                 <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 py-0 overflow-hidden mt-2" aria-labelledby="fbNotificationDropdown" style="width: 360px; max-width: 90vw; z-index: 1050;">
-
                                     <div class="p-3 bg-white border-bottom d-flex align-items-center justify-content-between">
                                         <h5 class="mb-0 fw-bold text-dark fs-5" style="letter-spacing: -0.3px;">Notifications</h5>
                                         <div class="d-flex align-items-center gap-2">
@@ -133,6 +321,7 @@
                                     </div>
                                 </div>
                             </li>
+
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline m-0">
                                     <button type="submit" class="nav-link btn btn-link btn-logout text-secondary border-0 d-flex align-items-center gap-1.5 py-1.5 transition-all">
@@ -162,6 +351,9 @@
         </main>
     </div>
 
+    <!-- FLOATING CHAT DOCK (Docks bottom-right chat windows) -->
+    <div id="fb-chat-dock" class="fb-chat-dock"></div>
+
     <footer class="footer mt-auto py-4 bg-white border-top border-light-subtle text-muted">
         <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 small">
             <div>
@@ -178,10 +370,14 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script> *@
     @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
         <script src="~/js/notifications.js" asp-append-version="true"></script>
+        <script src="~/js/messages.js" asp-append-version="true"></script>
+        <script src="~/js/todo-board.js" asp-append-version="true"></script>
     }
 
     @await RenderSectionAsync("Scripts", required: false)

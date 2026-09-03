@@ -1,4 +1,16 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
+    const NotificationConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/notificationHub")
+        .withAutomaticReconnect()
+        .build();
+
+    NotificationConnection.start().catch(err => console.error("SignalR Connection Error: ", err));
+    NotificationConnection.on("UpdateNotificationBadge", function () {
+        // Automatically re-fetch notifications and update the bell badge
+        if (typeof fetchNotifications === "function") {
+            fetchNotifications();
+        }
+    });
     const badge = document.getElementById('notification-badge');
     const headerCount = document.getElementById('notification-header-count');
     const itemsList = document.getElementById('notification-items-list');

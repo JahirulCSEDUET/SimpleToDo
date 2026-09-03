@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using SimpleToDo.Application.DTOs;
 using SimpleToDo.Application.Features.Projects.Queries;
 using SimpleToDo.Application.Features.Todos.Commands;
@@ -9,6 +10,7 @@ using SimpleToDo.Application.Features.Todos.Queries;
 using SimpleToDo.Application.Features.Users.Queries;
 using SimpleToDo.Application.Interfaces;
 using SimpleToDo.Domain.Entities;
+using SimpleToDo.Web.Hubs;
 using SimpleToDo.Web.ViewModels.ToDo;
 using System.Security.Claims;
 
@@ -20,11 +22,13 @@ namespace SimpleToDo.Web.Controllers
         private readonly IMediator _mediator;
         private readonly IFileService _fileService;
         private readonly IMapper _mapper;
-        public ToDoController(IMediator mediator, IFileService fileService, IMapper mapper)
+        private readonly IHubContext<NotificationHub> _hubContext;
+        public ToDoController(IMediator mediator, IFileService fileService, IMapper mapper, IHubContext<NotificationHub> hubContext)
         {
             _mediator = mediator;
             _fileService = fileService;
             _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         public async Task<IActionResult> Index()
@@ -196,6 +200,9 @@ namespace SimpleToDo.Web.Controllers
             try
             {
                 await _mediator.Send(new QuickAssignTodoCommand(userId, projectId, todoId, currentUser.Id, currentUser.FullName));
+                var notifyUser = await _mediator.Send(new GetUserByIdQuery(userId));
+                await _hubContext.Clients.User(notifyUser.UserId)
+                    .SendAsync("UpdateNotificationBadge");
             }
             catch (ArgumentNullException ex)
             {
@@ -216,7 +223,6 @@ namespace SimpleToDo.Web.Controllers
             return View(todoDto);
         }
 
-        
         private async Task<User?> GetCurrentUserAsync()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace SimpleToDo.Application.Features.ProjectMembers.Commands
 {
-    public record CreateProjectMemberCommand(int projectId, string email, int loginUserId, string loginUserName) : IRequest<int>;
+    public record CreateProjectMemberCommand(int projectId, string email, int loginUserId, string loginUserName, string role) : IRequest<int>;
     public class CreateProjectMemberCommandHandler : IRequestHandler<CreateProjectMemberCommand, int>
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -43,9 +43,20 @@ namespace SimpleToDo.Application.Features.ProjectMembers.Commands
             var projectMember = new ProjectMember
             {
                 UserId = user.Id,
-                ProjectId = request.projectId,
-                Role = Role.Contributor
+                ProjectId = request.projectId
             };
+            if(request.role == Role.Admin.ToString())
+            {
+                projectMember.Role = Role.Admin;
+            }
+            else if(request.role == Role.Contributor.ToString())
+            {
+                projectMember.Role = Role.Contributor;
+            }
+            else if(request.role == Role.Coordinator.ToString())
+            {
+                projectMember.Role = Role.Coordinator;
+            }
             await _unitOfWork.ProjectMember.AddAsync(projectMember);
 
 

@@ -2,12 +2,15 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using SimpleToDo.Application.Features.ProjectMembers.Commands;
 using SimpleToDo.Application.Features.ProjectMembers.Queries;
 using SimpleToDo.Application.Features.Projects.Commands;
 using SimpleToDo.Application.Features.Projects.Queries;
 using SimpleToDo.Application.Features.Users.Queries;
 using SimpleToDo.Domain.Entities;
+using SimpleToDo.Domain.Enums;
+using SimpleToDo.Web.Hubs;
 using SimpleToDo.Web.ViewModels.Project;
 using System.Security.Claims;
 
@@ -18,11 +21,13 @@ namespace SimpleToDo.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-        
-        public ProjectController(IMediator mediator, IMapper mapper)
+        private readonly IHubContext<NotificationHub> _hubContext;
+
+        public ProjectController(IMediator mediator, IMapper mapper, IHubContext<NotificationHub> hubContext)
         {
             _mediator = mediator;
             _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         public async Task<IActionResult> Index()
@@ -57,6 +62,45 @@ namespace SimpleToDo.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> Edit(int projectId)
+        {
+            var user = await GetCurrentUserAsync(); if (user == null) Challenge();
+
+            var projectMember = await _mediator.Send(new GetProjectMemberByUserAndProjectIdQuery(user.Id, projectId));
+            if(projectMember==null || projectMember.role != Domain.Enums.Role.Admin)
+            {
+                return NotFound();
+            }
+            var project = await _mediator.Send(new GetProjectByIdQuery(projectId));
+            var projectVM = new ProjectEditViewModel
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Status = project.Status
+            };
+            return View(projectVM);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditAsync(ProjectEditViewModel model)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                await _mediator.Send(new UpdateProjectCommand(model.Id, model.Name, model.Status.ToString()));
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["UpdateError"] = ex.Message;
+            }
+            catch (ArgumentNullException ex)
+            {
+                TempData["UpdateError"] = ex.Message;
+            }
+            return RedirectToAction("Details", "Project", new { model.Id });
+        }
+
         public async Task<IActionResult> Details(int id)
         {
             var user = await GetCurrentUserAsync();
@@ -80,7 +124,8 @@ namespace SimpleToDo.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> QuickAddMember(int projectId, string email)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> QuickAddMember(int projectId, string email, string role)
         {
             if (!ModelState.IsValid)
             {
@@ -93,9 +138,12 @@ namespace SimpleToDo.Web.Controllers
 
             try
             {
-                var command = new CreateProjectMemberCommand(projectId, email, loginUser.Id, loginUser.FullName);
+                var command = new CreateProjectMemberCommand(projectId, email, loginUser.Id, loginUser.FullName, role);
                 await _mediator.Send(command);
                 TempData["MemberSuccess"] = $"User: {email} added.";
+                var notifyUser = await _mediator.Send(new GetUserByEmailQuery(email));
+                await _hubContext.Clients.User(notifyUser.UserId)
+                    .SendAsync("UpdateNotificationBadge");
             }
             catch (InvalidOperationException ex)
             {
@@ -119,18 +167,19 @@ namespace SimpleToDo.Web.Controllers
                 return NotFound();
             }
         }
+        
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var user = GetCurrentUserAsync();
+                var user =await GetCurrentUserAsync();
                 var res = await _mediator.Send(new SafeDeleteProjectCommand(id, user.Id));
                 if(res) 
-                    TempData["DeleteSuccess"] = "Deleted Successfully";
+                    TempData["DeleteSuccess"] = "Successfully Deleted!";
                 else
-                    TempData["DeleteError"] = "Unsuccessfully";
+                    TempData["DeleteError"] = "Unsuccessful";
             }
             catch (InvalidOperationException ex)
             {
@@ -143,32 +192,12 @@ namespace SimpleToDo.Web.Controllers
             return RedirectToAction("Details", "Project", new { Id = id });
         }
 
-        [HttpPost]
-        [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> UpdateStatusAsync(int id, string status)
-        {
-            try
-            {
-                var user = GetCurrentUserAsync();
-                await _mediator.Send(new UpdateProjectStatusCommand(id, status));
-                TempData["UpdateSuccess"] = "Deleted Successfully";
-            }
-            catch (InvalidOperationException ex)
-            {
-                TempData["UpdateError"] = ex.Message;
-            }
-            catch (ArgumentNullException ex)
-            {
-                TempData["UpdateError"] = ex.Message;
-            }
-            return RedirectToAction("Details", "Project", new { Id = id });
-        }
         private async Task<User?> GetCurrentUserAsync()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return null;
-
-            return await _mediator.Send(new GetUserByUserIdQuery(userId));
+            var user = await _mediator.Send(new GetUserByUserIdQuery(userId));
+            return user;
         }
     }
 }

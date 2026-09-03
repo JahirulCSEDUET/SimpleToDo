@@ -10,9 +10,10 @@ using SimpleToDo.Infrastructure.Data;
 using SimpleToDo.Infrastructure.Identity;
 using SimpleToDo.Infrastructure.Repositories;
 using SimpleToDo.Infrastructure.Services;
+using SimpleToDo.Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddSignalR();
 builder.Services.AddDbContext<SimpleToDoDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -29,6 +30,8 @@ builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectMemberRepository, ProjectMemberRepository>();
 builder.Services.AddScoped<IQueryRepository, QueryRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 var applicationAssembly = typeof(TodoMappingProfile).Assembly;
 
@@ -67,7 +70,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.MapHub<ChatHub>("/chatHub");
+app.MapHub<NotificationHub>("/notificationHub");
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -75,7 +79,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Project}/{action=Index}/{id?}")
+    pattern: "{controller=Home}/{action=Index}")
     .WithStaticAssets();
 
 

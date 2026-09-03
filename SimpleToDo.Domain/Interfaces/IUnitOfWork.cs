@@ -12,6 +12,8 @@ namespace SimpleToDo.Domain.Interfaces
         IProjectMemberRepository ProjectMember { get; }
         IQueryRepository Query { get; }
         INotificationRepository Notification { get; }
+        IChatRepository Chats { get; }
+        IMessageRepository Messages { get; }
         Task<int> SaveAsync();
     }
 }

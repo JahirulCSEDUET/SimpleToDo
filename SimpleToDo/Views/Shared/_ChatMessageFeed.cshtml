@@ -1,0 +1,76 @@
+﻿@using SimpleToDo.Application.DTOs
+@model List<ChatMessageDetailDto>
+
+<style>
+    .fb-chat-feed {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .fb-bubble {
+        max-width: 80%;
+        padding: 8px 12px;
+        font-size: 0.82rem;
+        line-height: 1.4;
+        word-break: break-word;
+    }
+
+    .fb-bubble-me {
+        background-color: #0d6efd;
+        color: #ffffff;
+        align-self: flex-end;
+        border-radius: 14px 14px 2px 14px;
+    }
+
+    .fb-bubble-other {
+        background-color: #e4e6eb;
+        color: #050505;
+        align-self: flex-start;
+        border-radius: 14px 14px 14px 2px;
+    }
+
+    .sender-tag {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #65676b;
+        margin-bottom: 2px;
+    }
+
+    .msg-timestamp {
+        font-size: 0.65rem;
+        opacity: 0.75;
+        margin-top: 2px;
+    }
+</style>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="text-center py-5 text-muted small">
+        <i class="bi bi-chat-heart fs-3 d-block opacity-50 mb-1"></i>
+        No messages yet. Send a greeting to start the conversation!
+    </div>
+}
+else
+{
+    <div class="fb-chat-feed">
+        @foreach (var message in Model)
+        {
+            if (message.IsMe)
+            {
+                <div class="fb-bubble fb-bubble-me shadow-none">
+                    <div>@message.Body</div>
+                    <div class="msg-timestamp text-end text-white-50">@message.FormattedTime</div>
+                </div>
+            }
+            else
+            {
+                <div class="fb-bubble fb-bubble-other shadow-none">
+                    <div class="sender-tag">@message.SenderName</div>
+                    <div>@message.Body</div>
+                    <div class="msg-timestamp text-muted">@message.FormattedTime</div>
+                </div>
+            }
+        }
+    </div>
+}

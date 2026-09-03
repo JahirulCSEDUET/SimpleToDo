@@ -7,6 +7,8 @@ namespace SimpleToDo.Domain.Enums
     public enum Role
     {
         Admin,
+        Coordinator,
         Contributor
+        
     }
 }

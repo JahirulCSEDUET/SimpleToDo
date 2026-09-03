@@ -9,8 +9,8 @@ using System.Text;
 
 namespace SimpleToDo.Application.Features.Queries.Commands
 {
-    public record CreateQueryCommand(string Body, int TodoId, int UserId, string? FilePath = null, string? FileName = null) : IRequest<int>;
-    public class CreateQueryCommandHandler : IRequestHandler<CreateQueryCommand, int>
+    public record CreateQueryCommand(string Body, int TodoId, int UserId, string? FilePath = null, string? FileName = null) : IRequest<List<string>>;
+    public class CreateQueryCommandHandler : IRequestHandler<CreateQueryCommand, List<string>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -20,7 +20,7 @@ namespace SimpleToDo.Application.Features.Queries.Commands
             _mapper = mapper;
         }
 
-        public async Task<int> Handle(CreateQueryCommand request, CancellationToken cancellationToken)
+        public async Task<List<string>> Handle(CreateQueryCommand request, CancellationToken cancellationToken)
         {
             var query = new Query
             {
@@ -33,6 +33,7 @@ namespace SimpleToDo.Application.Features.Queries.Commands
             await _unitOfWork.Query.AddAsync(query);
             var todo = await _unitOfWork.Todo.GetByIdAsync(request.TodoId);
             var user = await _unitOfWork.User.GetByIdAsync(request.UserId);
+            List<string> Ids = new List<string>();
             if (todo.UserId != request.UserId)
             {
                 var notification = new Notification
@@ -46,6 +47,8 @@ namespace SimpleToDo.Application.Features.Queries.Commands
                     RedirectId = todo.Id
                 };
                 await _unitOfWork.Notification.AddAsync(notification);
+                var causer = await _unitOfWork.User.GetByIdAsync(todo.UserId.Value);
+                Ids.Add(causer.UserId);
             }
             if (todo.CreatorId != request.UserId)
             {
@@ -60,9 +63,11 @@ namespace SimpleToDo.Application.Features.Queries.Commands
                     RedirectId = todo.Id
                 };
                 await _unitOfWork.Notification.AddAsync(notification);
+                var causer = await _unitOfWork.User.GetByIdAsync(todo.CreatorId);
+                Ids.Add(causer.UserId);
             }
             await _unitOfWork.SaveAsync();
-            return query.TodoId;
+            return Ids;
         }
     }
 }

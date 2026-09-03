@@ -9,19 +9,19 @@ using System.Text;
 namespace SimpleToDo.Application.Features.Projects.Commands
 {
     
-    public record UpdateProjectStatusCommand(int id, string status) : IRequest;
-    public class UpdateProjectStatusCommandHandler : IRequestHandler<UpdateProjectStatusCommand>
+    public record UpdateProjectCommand(int id, string name, string status) : IRequest;
+    public class UpdateProjectStatusCommandHandler : IRequestHandler<UpdateProjectCommand>
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork; 
 
         public UpdateProjectStatusCommandHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(UpdateProjectStatusCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateProjectCommand request, CancellationToken cancellationToken)
         {
-            var project =await _unitOfWork.Project.GetByIdAsync(request.id);
+            var project =await _unitOfWork.Project.GetByIdForUpdateAsync(request.id);
             if (project == null)
             {
                 throw new ArgumentNullException($"Project with id {request.id} is not exist.");
@@ -30,9 +30,9 @@ namespace SimpleToDo.Application.Features.Projects.Commands
             {
                 throw new InvalidOperationException("All Task in this workspace are not completed.");
             }
-            if (request.status == ProjectStatus.Postponed.ToString())
+            if (request.status == ProjectStatus.Running.ToString())
             {
-                project.Status = ProjectStatus.Postponed;
+                project.Status = ProjectStatus.Running;
             }
             else if(request.status == ProjectStatus.Completed.ToString())
             {
@@ -42,7 +42,8 @@ namespace SimpleToDo.Application.Features.Projects.Commands
             {
                 project.Status = ProjectStatus.Postponed;
             }
-            _unitOfWork.Project.Update(project);
+            project.Name = request.name;
+            //_unitOfWork.Project.Update(project);
             await _unitOfWork.SaveAsync();
         }
     }

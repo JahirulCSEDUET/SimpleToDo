@@ -128,7 +128,7 @@
         </div>
 
         <div class="pt-3 border-top border-light-subtle">
-            @if (viewerRole == "Admin")
+            @if (viewerRole == "Admin" || viewerRole == "Coordinator")
             {
                 @if (Model.UserId == null || Model.UserId.ToString() == "0")
                 {

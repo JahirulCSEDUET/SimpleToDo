@@ -21,7 +21,16 @@ namespace SimpleToDo.Infrastructure.Repositories
         {
             return await _context.Projects
                 .AsNoTracking()
-                .Include(i=> i.ProjectMembers)
+                .Include(i=> i.ProjectMembers.OrderBy(pm=> pm.Role))
+                    .ThenInclude(pm=>pm.User)
+                .Include(p=> p.Todos)
+                    .ThenInclude(t=>t.User)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+        public async Task<Project> GetByIdForUpdateAsync(int id)
+        {
+            return await _context.Projects
+                .Include(i=> i.ProjectMembers.OrderBy(pm=> pm.Role))
                     .ThenInclude(pm=>pm.User)
                 .Include(p=> p.Todos)
                     .ThenInclude(t=>t.User)

@@ -29,7 +29,13 @@ namespace SimpleToDo.Application.Features.Projects.Commands
                 ProjectMembers = new List<ProjectMember>
                 {
                     new ProjectMember { UserId = request.userId, Role = Role.Admin}
+                },
+                Chat = new Chat
+                {
+                    Name = request.Name,
+                    LastUpdateDateTime = DateTime.Now
                 }
+                
             };
             await _unitOfWork.Project.AddAsync(project);
             await _unitOfWork.SaveAsync();

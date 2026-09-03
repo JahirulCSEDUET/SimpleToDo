@@ -3,18 +3,362 @@
 
 @{
     ViewData["Title"] = "Project Workspace - " + Model.Name;
+    bool isDeactivated = Model.Status.ToString() == "Postponed" || Model.Status.ToString() == "Completed";
 }
 
 <style>
-    /* Premium Board Framework Layout styles */
+    .project-page {
+        --ink: #171B21;
+        --ink-soft: #565F6B;
+        --paper: #F7F7F4;
+        --surface: #FFFFFF;
+        --border-c: #E3E4DE;
+        --brand: #1F4D42;
+        --brand-dark: #143229;
+        --brand-soft: #E7EEEA;
+        --rust: #A8501F;
+        --rust-soft: #F3E4D8;
+        --gold: #B9862B;
+        --gold-soft: #F3E9D3;
+        --slate: #3E5878;
+        --slate-soft: #E5EAF1;
+        --danger: #B23A3A;
+        --danger-soft: #F6DEDE;
+    }
+
+        .project-page * {
+            box-sizing: border-box;
+        }
+
+        .project-page h2, .project-page h5, .project-page h6 {
+            color: var(--ink);
+        }
+
+        .project-page .text-muted, .project-page small {
+            color: var(--ink-soft) !important;
+        }
+
+    /* Header */
+    .ws-status-tag {
+        font-size: 0.74rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 4px 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .ws-status-tag.neutral {
+            background: var(--paper);
+            color: var(--ink-soft);
+            border: 1px solid var(--border-c);
+        }
+
+        .ws-status-tag.brand {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+        .ws-status-tag.gold {
+            background: var(--gold-soft);
+            color: var(--gold);
+        }
+
+        .ws-status-tag.muted {
+            background: #EDEEEA;
+            color: var(--ink-soft);
+        }
+
+    .ws-status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+    }
+
+        .ws-status-dot.brand {
+            background: var(--brand);
+        }
+
+        .ws-status-dot.gold {
+            background: var(--gold);
+        }
+
+        .ws-status-dot.muted {
+            background: var(--ink-soft);
+        }
+
+    .project-page h2.ws-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .project-page h2.ws-title i {
+            color: var(--brand);
+        }
+
+    .header-action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        color: var(--ink-soft);
+        border-radius: 999px;
+        padding: 8px 18px;
+        font-size: 0.83rem;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: all 0.15s ease;
+    }
+
+        .header-action-btn:hover {
+            background: var(--brand-soft);
+            border-color: var(--brand-soft);
+            color: var(--brand);
+        }
+
+    /* Alerts */
+    .ws-alert {
+        border-radius: 12px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.87rem;
+        border: 1px solid transparent;
+    }
+
+        .ws-alert.danger {
+            background: var(--danger-soft);
+            color: var(--danger);
+        }
+
+        .ws-alert.success {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+    /* Controls banner */
+    .controls-card {
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        border-radius: 18px;
+    }
+
+    .controls-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--brand-soft);
+        color: var(--brand);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        flex-shrink: 0;
+    }
+
+    .controls-card h6 {
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--ink-soft);
+        margin-bottom: 2px;
+    }
+
+    .controls-card p {
+        font-size: 0.84rem;
+        color: var(--ink-soft);
+        margin: 0;
+    }
+
+    .btn-pill {
+        border-radius: 999px;
+        padding: 7px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: all 0.15s ease;
+        white-space: nowrap;
+        background: none;
+    }
+
+        .btn-pill.brand {
+            color: var(--brand);
+            border-color: var(--brand);
+        }
+
+            .btn-pill.brand:hover {
+                background: var(--brand);
+                color: #fff;
+            }
+
+        .btn-pill.gold {
+            color: var(--gold);
+            border-color: var(--gold);
+        }
+
+            .btn-pill.gold:hover {
+                background: var(--gold);
+                color: #fff;
+            }
+
+        .btn-pill.danger {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+            .btn-pill.danger:hover {
+                background: var(--danger);
+                color: #fff;
+            }
+
+        .btn-pill.disabled {
+            opacity: 0.45;
+            pointer-events: none;
+            color: var(--ink-soft);
+            border-color: var(--border-c);
+        }
+
+    /* Filter card */
+    .filter-card {
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        border-radius: 18px;
+    }
+
+    .filter-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--paper);
+        border: 1px solid var(--border-c);
+        color: var(--ink-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .filter-card h6 {
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--ink-soft);
+        margin-bottom: 2px;
+    }
+
+    .filter-card small {
+        color: var(--ink-soft);
+    }
+
+    .form-select-brand {
+        border-radius: 999px;
+        border: 1px solid var(--border-c);
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--ink);
+    }
+
+        .form-select-brand:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px var(--brand-soft);
+        }
+
+    /* Kanban lanes */
+    .lane-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 2px;
+        margin-bottom: 8px;
+    }
+
+    .lane-head-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .lane-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+        .lane-dot.rust {
+            background: var(--rust);
+        }
+
+        .lane-dot.slate {
+            background: var(--slate);
+        }
+
+        .lane-dot.brand {
+            background: var(--brand);
+        }
+
+    .lane-title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: 0.02em;
+    }
+
+    .lane-count {
+        font-size: 0.72rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 2px 9px;
+    }
+
+        .lane-count.rust {
+            background: var(--rust-soft);
+            color: var(--rust);
+        }
+
+        .lane-count.slate {
+            background: var(--slate-soft);
+            color: var(--slate);
+        }
+
+        .lane-count.brand {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
     .kanban-lane {
         min-height: 450px;
-        background-color: rgba(248, 249, 250, 0.75);
-        border: 1px dashed #e3e6f0;
+        background-color: var(--paper);
+        border: 1px dashed var(--border-c);
         border-radius: 14px;
         padding: 12px;
         transition: background-color 0.2s ease;
     }
+
+        .kanban-lane.rust-tone {
+            background-color: rgba(168, 80, 31, 0.03);
+            border-color: rgba(168, 80, 31, 0.18);
+        }
+
+        .kanban-lane.slate-tone {
+            background-color: rgba(62, 88, 120, 0.03);
+            border-color: rgba(62, 88, 120, 0.18);
+        }
+
+        .kanban-lane.brand-tone {
+            background-color: rgba(31, 77, 66, 0.03);
+            border-color: rgba(31, 77, 66, 0.18);
+        }
 
     .sortable-ghost {
         opacity: 0.35;
@@ -28,256 +372,497 @@
 
         .project-task-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.06) !important;
+            box-shadow: 0 0.5rem 1rem rgba(23, 27, 33, 0.08) !important;
+        }
+
+    /* Sidebar */
+    .sidebar-card {
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        border-radius: 18px;
+    }
+
+        .sidebar-card .card-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border-c);
+        }
+
+        .sidebar-card h5 {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--ink-soft);
+        }
+
+    .member-add-panel {
+        background: var(--paper);
+        border-bottom: 1px solid var(--border-c);
+    }
+
+    .form-control-brand, .form-select-brand-sm {
+        border-radius: 999px;
+        border: 1px solid var(--border-c);
+        font-size: 0.82rem;
+    }
+
+        .form-control-brand:focus, .form-select-brand-sm:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px var(--brand-soft);
+        }
+
+    .add-member-btn {
+        border-radius: 999px;
+        background: var(--brand-soft);
+        color: var(--brand);
+        border: 1px solid var(--brand-soft);
+        font-weight: 600;
+        font-size: 0.82rem;
+        padding: 6px 16px;
+        transition: background 0.15s ease;
+    }
+
+        .add-member-btn:hover {
+            background: var(--brand);
+            color: #fff;
         }
 
     .avatar-circle {
         width: 36px;
         height: 36px;
         font-size: 0.85rem;
+        font-weight: 700;
+        background: var(--brand-soft);
+        color: var(--brand);
+    }
+
+    .member-role-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 3px 10px;
+    }
+
+        .member-role-badge.admin {
+            background: var(--rust-soft);
+            color: var(--rust);
+        }
+
+        .member-role-badge.coordinator {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+        .member-role-badge.contributor {
+            background: var(--slate-soft);
+            color: var(--slate);
+        }
+
+    /* Delete modal */
+    .modal-icon-wrap {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: var(--danger-soft);
+        color: var(--danger);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-btn-cancel {
+        border-radius: 999px;
+        background: var(--paper);
+        color: var(--ink-soft);
+        border: 1px solid var(--border-c);
         font-weight: 600;
+        padding: 9px 16px;
+        font-size: 0.85rem;
     }
 
-    .transition-all {
-        transition: all 0.2s ease-in-out;
+    .modal-btn-danger {
+        border-radius: 999px;
+        background: var(--danger);
+        color: #fff;
+        border: 1px solid var(--danger);
+        font-weight: 600;
+        padding: 9px 16px;
+        font-size: 0.85rem;
+        width: 100%;
     }
 
-    .action-banner-card {
-        border: 1px solid rgba(13, 110, 253, 0.08) !important;
-        background: linear-gradient(135deg, #fff 70%, rgba(13, 110, 253, 0.01)) !important;
-    }
+        .modal-btn-danger:hover {
+            background: #99332F;
+        }
 
-    
     @@media (max-width: 576px) {
-        .btn-sm {
-            padding-top: 0.5rem !important;
-            padding-bottom: 0.5rem !important;
+        .btn-pill {
+            padding-top: 0.55rem !important;
+            padding-bottom: 0.55rem !important;
             font-size: 0.78rem !important;
         }
     }
 </style>
 
-<div class="container-fluid px-0 mt-2">
+<div class="project-page">
+    <div class="container-fluid px-0 mt-2">
 
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill px-2.5 small">Project Workspace</span>
-                <span class="text-muted small">&bull; Role: <strong>@ViewBag.ViewerRole</strong></span>
+        <!-- HEADER: PLATFORM TITLES & RUNTIME STATUS METRICS -->
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3" style="border-bottom: 1px solid var(--border-c);">
+            <div>
+                <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                    <span class="ws-status-tag neutral">Project workspace</span>
+
+                    <!-- Dynamic Visual Status Indication Badge -->
+                    @switch (Model.Status.ToString())
+                    {
+                        case "Running":
+                            <span class="ws-status-tag brand">
+                                <span class="ws-status-dot brand"></span> Active running
+                            </span>
+                            break;
+                        case "Postponed":
+                            <span class="ws-status-tag gold">
+                                <span class="ws-status-dot gold"></span> Postponed
+                            </span>
+                            break;
+                        case "Completed":
+                            <span class="ws-status-tag muted">
+                                <span class="ws-status-dot muted"></span> Completed
+                            </span>
+                            break;
+                    }
+
+                    <span class="text-muted small">&bull; Role: <strong>@ViewBag.ViewerRole</strong></span>
+                </div>
+                <h2 class="ws-title mb-0"><i class="bi bi-folder2-open"></i>@Model.Name</h2>
             </div>
-            <h2 class="mb-0 fw-bold text-dark tracking-tight"><i class="bi bi-folder2-open text-primary me-2"></i>@Model.Name</h2>
+
+            <div class="d-flex flex-row flex-nowrap align-items-center gap-2 mt-1 mt-sm-0">
+                <!-- Analytics Reporting Badge Action -->
+                <a asp-action="Analytics"
+                   asp-route-id="@Model.Id"
+                   class="header-action-btn"
+                   title="View Workspace Analytics Intelligence">
+                    <i class="bi bi-bar-chart-line"></i> Analytics report
+                </a>
+
+                <!-- Back loop return shortcut badge -->
+                <a asp-action="Index"
+                   asp-route-id="@Model.Id"
+                   class="header-action-btn"
+                   title="Return to Projects Dashboard">
+                    <i class="bi bi-arrow-left-short fs-5 lh-1"></i> Back to dashboard
+                </a>
+            </div>
         </div>
 
-        <div class="d-flex flex-row flex-nowrap align-items-center gap-2 mt-1 mt-sm-0">
-            <a asp-action="Analytics"
-               asp-route-id="@Model.Id"
-               class="btn btn-light border rounded-pill px-3 text-secondary d-inline-flex align-items-center gap-2 btn-sm py-2 shadow-sm transition-all text-nowrap"
-               title="View Workspace Analytics Intelligence">
-                <i class="bi bi-bar-chart-line text-success"></i> Analytics Report
-            </a>
+        <div class="row g-4">
 
-            <a asp-action="Index"
-               class="btn btn-light border rounded-pill px-3 text-secondary d-inline-flex align-items-center gap-2 btn-sm py-2 shadow-sm transition-all text-nowrap"
-               title="Return to Projects Dashboard">
-                <i class="bi bi-arrow-left-short fs-5 'lh-1'"></i> Back to Dashboard
-            </a>
-        </div>
-    </div>
-
-    <div class="row g-4">
-
-        <div class="col-xl-9 col-lg-8">
-            <div id="kanban-live-alert" class="position-fixed top-0 start-50 translate-middle-x mt-4 d-none" style="z-index: 1080; min-width: 320px; max-width: 450px;">
-            </div>
-            @if (TempData["TodoError"] != null)
-            {
-                <div class="alert alert-danger rounded-3 p-3 mb-3 d-flex align-items-center gap-2 small border-0 shadow-sm">
-                    <i class="bi bi-exclamation-triangle-fill fs-6 text-danger"></i> @TempData["TodoError"]
-                </div>
-            }
-            @if (TempData["TodoSuccess"] != null)
-            {
-                <div class="alert alert-success rounded-3 p-3 mb-3 d-flex align-items-center gap-2 small border-0 shadow-sm">
-                    <i class="bi bi-check-circle-fill fs-6 text-success"></i> @TempData["TodoSuccess"]
-                </div>
-            }
-
-            @if (ViewBag.ViewerRole == "Admin")
-            {
-                <div class="card border border-light-subtle rounded-4 shadow-sm bg-white action-banner-card mb-4">
-                    <div class="card-body p-3.5 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; min-width: 42px;">
-                                <i class="bi bi-layers-half fs-5"></i>
-                            </div>
-                            <div>
-                                <h6 class="fw-bold text-dark mb-0.5 small text-uppercase tracking-wider">Workspace Management</h6>
-                                <p class="text-muted small mb-0">Initialize full matrix tasks complete with scope profiles and attachments.</p>
-                            </div>
-                        </div>
-
-                        <a asp-controller="Todo"
-                           asp-action="Create"
-                           asp-route-projectId="@Model.Id"
-                           class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm text-nowrap py-2 btn-sm d-inline-flex align-items-center gap-2 transition-all">
-                            <i class="bi bi-plus-circle-fill fs-6"></i> Create New Task
-                        </a>
-                    </div>
-                </div>
-            }
-
-            <div class="card border border-light-subtle rounded-4 shadow-sm bg-white mb-4">
-                <div class="card-body p-3 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="bg-light text-secondary rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 36px; height: 36px;">
-                            <i class="bi bi-funnel text-secondary"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold text-dark mb-0 small text-uppercase tracking-wider">Filter Board</h6>
-                            <small class="text-muted">Isolate assignments selectively using team profile metrics.</small>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-2" style="min-width: 250px;">
-                        <span class="text-muted small text-nowrap"><i class="bi bi-filter-left me-1"></i>Assignee:</span>
-                        <select id="member-board-filter" class="form-select form-select-sm rounded-pill border-secondary-subtle shadow-none ps-3 pe-5 py-1.5" style="font-size: 0.8rem; font-weight: 500;">
-                            <option value="all">⚡ All Team Members</option>
-                            <option value="0">⚠️ Unassigned Tasks</option>
-                            @foreach (var member in Model.ProjectMembers)
-                            {
-                                <option value="@member.userId">👤 @member.userName</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <div class="p-1 d-flex align-items-center justify-content-between mb-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="d-inline-block bg-danger rounded-circle" style="width: 8px; height: 8px;"></span>
-                            <span class="fw-bold text-dark small text-uppercase tracking-wider">Todo</span>
-                        </div>
-                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">
-                            @Model.TodoList.Count(t => t.Status.ToString() == "Pending")
-                        </span>
-                    </div>
-
-                    <div class="kanban-lane" id="lane-Pending" data-status="Pending">
-                        @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Pending"))
-                        {
-                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) {
-                                { "ProjectMemberList", Model.ProjectMembers },
-                                { "DetailsViewerRole", ViewBag.ViewerRole },
-                                { "ProjectId", Model.Id }
-                            })
-                        }
-                    </div>
+            <div class="col-xl-9 col-lg-8">
+                <div id="kanban-live-alert" class="position-fixed top-0 start-50 translate-middle-x mt-4 d-none" style="z-index: 1080; min-width: 320px; max-width: 450px;">
                 </div>
 
-                <div class="col-md-4">
-                    <div class="p-1 d-flex align-items-center justify-content-between mb-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="d-inline-block bg-primary rounded-circle" style="width: 8px; height: 8px;"></span>
-                            <span class="fw-bold text-dark small text-uppercase tracking-wider">In Progress</span>
-                        </div>
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">
-                            @Model.TodoList.Count(t => t.Status.ToString() == "Processing")
-                        </span>
-                    </div>
-
-                    <div class="kanban-lane" id="lane-Processing" data-status="Processing" style="background-color: rgba(13, 110, 253, 0.02); border-color: rgba(13, 110, 253, 0.12)">
-                        @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Processing"))
-                        {
-                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMembers }, { "DetailsViewerRole", ViewBag.ViewerRole }, { "ProjectId", Model.Id } })
-                        }
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="p-1 d-flex align-items-center justify-content-between mb-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="d-inline-block bg-success rounded-circle" style="width: 8px; height: 8px;"></span>
-                            <span class="fw-bold text-dark small text-uppercase tracking-wider">Completed</span>
-                        </div>
-                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
-                            @Model.TodoList.Count(t => t.Status.ToString() == "Completed")
-                        </span>
-                    </div>
-
-                    <div class="kanban-lane" id="lane-Completed" data-status="Completed">
-                        @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Completed"))
-                        {
-                            @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMembers }, { "DetailsViewerRole", ViewBag.ViewerRole }, { "ProjectId", Model.Id } })
-                        }
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="col-xl-3 col-lg-4">
-            @if (TempData["MemberError"] != null || TempData["AssignMemberError"] != null)
-            {
-                <div class="alert alert-danger rounded-3 p-3 mb-3 small border-0 shadow-sm">
-                    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i> @(TempData["MemberError"] ?? TempData["AssignMemberError"])
-                </div>
-            }
-            @if (TempData["MemberSuccess"] != null || TempData["AssignMemberSuccess"] != null)
-            {
-                <div class="alert alert-success rounded-3 p-3 mb-3 small border-0 shadow-sm">
-                    <i class="bi bi-check-circle-fill text-success me-1"></i> @(TempData["MemberSuccess"] ?? TempData["AssignMemberSuccess"])
-                </div>
-            }
-
-            <div class="card border border-light-subtle rounded-4 shadow-sm bg-white">
-                <div class="card-header bg-white border-bottom border-light py-3 px-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-bold text-dark small text-uppercase tracking-wider"><i class="bi bi-people me-2 text-secondary"></i>Team Roster</h5>
-                        <span class="badge bg-light text-secondary border rounded-pill px-2">@Model.ProjectMembers.Count</span>
-                    </div>
-                </div>
-
-                @if (ViewBag.ViewerRole == "Admin")
+                <!-- SYSTEM ALERT BROADCAST PIPELINES -->
+                @if (TempData["TodoError"] != null || TempData["DeleteError"] != null || TempData["UpdateError"] != null)
                 {
-                    <div class="p-3 bg-light bg-opacity-50 border-bottom border-light">
-                        <form asp-controller="Project" asp-action="QuickAddMember" method="post" class="d-flex flex-column gap-2 m-0">
-                            <input type="hidden" name="projectId" value="@Model.Id" />
-                            <input type="email" name="email" class="form-control form-control-sm rounded-pill border-secondary-subtle shadow-none px-3" placeholder="Invitee email address..." required />
-                            <div class="d-flex gap-2">
-                                <select name="role" class="form-select form-select-sm rounded-pill border-secondary-subtle shadow-none">
-                                    <option value="Contributor">Contributor</option>
-                                </select>
-                                <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill text-nowrap px-3 fw-semibold">
-                                    Add
-                                </button>
-                            </div>
-                        </form>
+                    <div class="ws-alert danger mb-3">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span>@(TempData["TodoError"] ?? TempData["DeleteError"] ?? TempData["UpdateError"])</span>
+                    </div>
+                }
+                @if (TempData["TodoSuccess"] != null || TempData["DeleteSuccess"] != null || TempData["UpdateSuccess"] != null)
+                {
+                    <div class="ws-alert success mb-3">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>@(TempData["TodoSuccess"] ?? TempData["DeleteSuccess"] ?? TempData["UpdateSuccess"])</span>
                     </div>
                 }
 
-                <div class="card-body p-0 max-vh-50 overflow-auto">
-                    <div class="list-group list-group-flush">
-                        @foreach (var member in Model.ProjectMembers)
-                        {
-                            <div class="list-group-item px-3 py-2.5 d-flex align-items-center justify-content-between border-bottom-0">
-                                <div class="d-flex align-items-center text-truncate">
-                                    <div class="avatar-circle bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center shadow-none me-2.5 border border-white shrink-0">
-                                        @(string.IsNullOrEmpty(member.userName) ? "?" : member.userName.Substring(0, 1).ToUpper())
-                                    </div>
-                                    <div class="text-truncate">
-                                        <div class="fw-semibold text-dark text-truncate small" title="@member.userName">@member.userName</div>
+
+                @if (ViewBag.ViewerRole == "Admin")
+                {
+                    <div class="controls-card mb-4">
+                        <div class="p-4">
+                            <div class="row align-items-center g-3">
+
+                                <!-- Section Title Info Column -->
+                                <div class="col-md-5 d-flex align-items-center gap-3">
+                                    <div class="controls-icon"><i class="bi bi-sliders2"></i></div>
+                                    <div>
+                                        <h6 class="mb-0">Workspace deck controls</h6>
+                                        <p>Direct workflow state configuration updates and task generation settings.</p>
                                     </div>
                                 </div>
-                                <span class="badge @(member.role.ToString() == "Admin" ? "bg-dark text-white" : "bg-light text-secondary border") rounded-pill px-2 py-1 font-xs" style="font-size:0.7rem;">
-                                    @member.role
-                                </span>
+
+                                <!-- Interactive Live Actions Form Column -->
+                                <div class="col-md-7 d-flex flex-wrap align-items-center justify-content-md-end gap-3">
+
+                                    <!-- 1. DEACTIVATED / ACTIVE: New Task Button -->
+                                    @if (isDeactivated)
+                                    {
+                                        <button type="button" class="btn-pill brand disabled" disabled title="New Task creation is disabled for @Model.Status projects">
+                                            <i class="bi bi-plus-circle-fill"></i> New task
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="Todo"
+                                           asp-action="Create"
+                                           asp-route-projectId="@Model.Id"
+                                           class="btn-pill brand">
+                                            <i class="bi bi-plus-circle-fill"></i> New task
+                                        </a>
+                                    }
+
+                                    <a asp-controller="Project"
+                                       asp-action="Edit"
+                                       asp-route-projectId="@Model.Id"
+                                       class="btn-pill gold">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </a>
+
+                                    <button type="button"
+                                            class="btn-pill danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteProjectModal"
+                                            title="Open destructive deletion confirmation window">
+                                        <i class="bi bi-trash3-fill"></i> Delete project
+                                    </button>
+
+                                    <!-- DELETE CONFIRMATION MODAL -->
+                                    <div class="modal fade" id="deleteProjectModal" tabindex="-1" aria-labelledby="deleteProjectModalLabel" aria-hidden="true" style="z-index: 1060;">
+                                        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+                                            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+                                                <div class="modal-body p-4 text-center">
+                                                    <div class="modal-icon-wrap mb-3">
+                                                        <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+                                                    </div>
+                                                    <h5 class="fw-bold mb-2" id="deleteProjectModalLabel" style="letter-spacing: -0.2px;">
+                                                        Systemic destructive action
+                                                    </h5>
+                                                    <p class="text-secondary small mb-4 lh-base px-1">
+                                                        Are you absolutely positive you want to completely erase the workspace pipeline database matrix for <strong class="text-dark">@Model.Name</strong>? This systemic action cannot be reverted.
+                                                    </p>
+                                                    <div class="d-flex justify-content-center gap-2">
+                                                        <button type="button" class="modal-btn-cancel flex-grow-1" data-bs-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <form asp-controller="Project" asp-action="Delete" method="post" class="m-0 flex-grow-1">
+                                                            <input type="hidden" name="id" value="@Model.Id" />
+                                                            <button type="submit" class="modal-btn-danger">
+                                                                Yes, delete project
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
-                        }
+                        </div>
+                    </div>
+                }
+                @if (ViewBag.ViewerRole == "Coordinator")
+                {
+                    <div class="controls-card mb-4">
+                        <div class="p-4">
+                            <div class="row align-items-center g-3">
+
+                                <!-- Section Title Info Column -->
+                                <div class="col-md-5 d-flex align-items-center gap-3">
+                                    <div class="controls-icon"><i class="bi bi-sliders2"></i></div>
+                                    <div>
+                                        <h6 class="mb-0">Workspace deck controls</h6>
+                                        <p>Direct task generation settings.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Interactive Live Actions Form Column -->
+                                <div class="col-md-7 d-flex flex-wrap align-items-center justify-content-md-end gap-3">
+
+                                    <!-- 1. DEACTIVATED / ACTIVE: New Task Button -->
+                                    @if (isDeactivated)
+                                    {
+                                        <button type="button" class="btn-pill brand disabled" disabled title="New Task creation is disabled for @Model.Status projects">
+                                            <i class="bi bi-plus-circle-fill"></i> New task
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="Todo"
+                                           asp-action="Create"
+                                           asp-route-projectId="@Model.Id"
+                                           class="btn-pill brand">
+                                            <i class="bi bi-plus-circle-fill"></i> New task
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- 2. DEACTIVATED / ACTIVE: FILTER BOARD MODULE CARD -->
+                <div class="filter-card mb-4 @(isDeactivated ? "pe-none opacity-50" : "")">
+                    <div class="p-3 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="filter-icon"><i class="bi bi-funnel"></i></div>
+                            <div>
+                                <h6 class="mb-0">Filter board</h6>
+                                <small>Isolate assignments selectively using team profile metrics.</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2" style="min-width: 250px;">
+                            <span class="text-muted small text-nowrap"><i class="bi bi-filter-left me-1"></i>Assignee:</span>
+                            <select id="member-board-filter" class="form-select form-select-sm form-select-brand ps-3 pe-5 py-1.5" @(isDeactivated ? "disabled" : "")>
+                                <option value="all">All team members</option>
+                                <option value="0">Unassigned tasks</option>
+                                @foreach (var member in Model.ProjectMembers)
+                                {
+                                    <option value="@member.userId">@member.userName</option>
+                                }
+                            </select>
+                        </div>
                     </div>
                 </div>
+
+                <!-- 3. DEACTIVATED / ACTIVE: KANBAN BOARD FLOW GRID LAYOUT -->
+                <div class="row g-3 @(isDeactivated ? "pe-none opacity-50" : "")">
+                    <!-- LANE 1: TODO -->
+                    <div class="col-md-4">
+                        <div class="lane-head">
+                            <div class="lane-head-left">
+                                <span class="lane-dot rust"></span>
+                                <span class="lane-title">Todo</span>
+                            </div>
+                            <span class="lane-count rust">
+                                @Model.TodoList.Count(t => t.Status.ToString() == "Pending")
+                            </span>
+                        </div>
+
+                        <div class="kanban-lane rust-tone" id="lane-Pending" data-status="Pending">
+                            @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Pending"))
+                            {
+                                @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) {
+                                    { "ProjectMemberList", Model.ProjectMembers },
+                                    { "DetailsViewerRole", ViewBag.ViewerRole },
+                                    { "ProjectId", Model.Id }
+                                })
+                            }
+                        </div>
+                    </div>
+
+                    <!-- LANE 2: IN PROGRESS -->
+                    <div class="col-md-4">
+                        <div class="lane-head">
+                            <div class="lane-head-left">
+                                <span class="lane-dot slate"></span>
+                                <span class="lane-title">In progress</span>
+                            </div>
+                            <span class="lane-count slate">
+                                @Model.TodoList.Count(t => t.Status.ToString() == "Processing")
+                            </span>
+                        </div>
+
+                        <div class="kanban-lane slate-tone" id="lane-Processing" data-status="Processing">
+                            @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Processing"))
+                            {
+                                @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMembers }, { "DetailsViewerRole", ViewBag.ViewerRole }, { "ProjectId", Model.Id } })
+                            }
+                        </div>
+                    </div>
+
+                    <!-- LANE 3: COMPLETED -->
+                    <div class="col-md-4">
+                        <div class="lane-head">
+                            <div class="lane-head-left">
+                                <span class="lane-dot brand"></span>
+                                <span class="lane-title">Completed</span>
+                            </div>
+                            <span class="lane-count brand">
+                                @Model.TodoList.Count(t => t.Status.ToString() == "Completed")
+                            </span>
+                        </div>
+
+                        <div class="kanban-lane brand-tone" id="lane-Completed" data-status="Completed">
+                            @foreach (var todo in Model.TodoList.Where(t => t.Status.ToString() == "Completed"))
+                            {
+                                @Html.Partial("_ProjectTaskCard", todo, new ViewDataDictionary(ViewData) { { "ProjectMemberList", Model.ProjectMembers }, { "DetailsViewerRole", ViewBag.ViewerRole }, { "ProjectId", Model.Id } })
+                            }
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
+            <!-- 4. DEACTIVATED / ACTIVE: TEAM MEMBERS SIDEBAR PANEL -->
+            <div class="col-xl-3 col-lg-4">
+                <div class="sidebar-card @(isDeactivated ? "pe-none opacity-50" : "")">
+                    <div class="card-header py-3 px-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-people me-2"></i>Team members</h5>
+                            <span class="badge bg-light text-secondary border rounded-pill px-2">@Model.ProjectMembers.Count</span>
+                        </div>
+                    </div>
+
+                    @if (ViewBag.ViewerRole == "Admin")
+                    {
+                        <div class="p-3 member-add-panel">
+                            <form asp-controller="Project" asp-action="QuickAddMember" method="post" class="d-flex flex-column gap-2 m-0">
+                                <input type="hidden" name="projectId" value="@Model.Id" />
+                                <input type="email" name="email" class="form-control form-control-sm form-control-brand px-3" placeholder="Invitee email address..." required @(isDeactivated ? "disabled" : "") />
+                                <div class="d-flex gap-2">
+                                    <select name="role" class="form-select form-select-sm form-select-brand-sm" @(isDeactivated ? "disabled" : "")>
+                                        <option value="Contributor">Contributor</option>
+                                        <option value="Coordinator">Co-Ordinator</option>
+                                    </select>
+                                    <button type="submit" class="add-member-btn text-nowrap" @(isDeactivated ? "disabled" : "")>
+                                        Add
+                                    </button>
+                                </div>
+                            </form>
+                            @if (TempData["MemberError"] != null)
+                            {
+                                <div class="ws-alert danger mt-3 mb-0">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    <span>@(TempData["MemberError"])</span>
+                                </div>
+                            }
+                            @if (TempData["MemberSuccess"] != null)
+                            {
+                                <div class="ws-alert success mt-3 mb-0">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    <span>@(TempData["MemberSuccess"])</span>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <div class="card-body p-0 max-vh-50 overflow-auto">
+                        <div class="list-group list-group-flush">
+                            @foreach (var member in Model.ProjectMembers)
+                            {
+                                <div class="list-group-item px-3 py-2.5 d-flex align-items-center justify-content-between border-bottom-0">
+                                    <div class="d-flex align-items-center text-truncate">
+                                        <div class="avatar-circle rounded-circle d-flex align-items-center justify-content-center shadow-none me-2.5 border border-white shrink-0">
+                                            @(string.IsNullOrEmpty(member.userName) ? "?" : member.userName.Substring(0, 1).ToUpper())
+                                        </div>
+                                        <div class="text-truncate">
+                                            <div class="fw-semibold text-dark text-truncate small" title="@member.userName">@member.userName</div>
+                                        </div>
+                                    </div>
+                                    <span class="member-role-badge @(member.role.ToString() == "Admin" ? "admin" : member.role.ToString() == "Coordinator" ? "coordinator" : "contributor")">
+                                        @member.role
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>

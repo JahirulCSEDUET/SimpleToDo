@@ -10,5 +10,6 @@ namespace SimpleToDo.Domain.Entities
         public bool IsDeleted { get; set; } = false;
         public ICollection<ProjectMember> ProjectMembers { get; set; } = new List<ProjectMember>();
         public ICollection<Todo> Todos { get; set; } = new List<Todo>();
+        public Chat Chat { get; set; }
     }
 }

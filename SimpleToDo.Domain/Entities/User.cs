@@ -14,5 +14,6 @@ namespace SimpleToDo.Domain.Entities
         public ICollection<Todo> Todos { get; set; } = new List<Todo>();
         public ICollection<Query> Queries { get; set; } = new List<Query>();
         public ICollection<Notification> Notifications { get; set; }= new List<Notification>();
+        public ICollection<Message> Messages { get; set; }= new List<Message>();
     }
 }

@@ -5,118 +5,393 @@
     ViewData["Title"] = "My To-Do List";
 }
 
+@Html.AntiForgeryToken()
+
 <style>
-    .kanban-column {
-        min-height: 550px;
-        background-color: rgba(248, 249, 250, 0.7);
-        border: 1px dashed #dee2e6;
-        border-radius: 16px;
-        padding: 16px;
-        transition: background-color 0.2s ease;
+    .board-page {
+        --ink: #171B21;
+        --ink-soft: #565F6B;
+        --paper: #F7F7F4;
+        --surface: #FFFFFF;
+        --border-c: #E3E4DE;
+        --brand: #1F4D42;
+        --brand-dark: #143229;
+        --brand-soft: #E7EEEA;
+        --rust: #A8501F;
+        --rust-soft: #F3E4D8;
+        --slate: #3E5878;
+        --slate-soft: #E5EAF1;
     }
 
-    .sortable-ghost {
-        opacity: 0.3;
-        transform: scale(0.98);
-        filter: grayscale(1);
+        .board-page * {
+            box-sizing: border-box;
+        }
+
+        .board-page h2, .board-page h5 {
+            color: var(--ink);
+        }
+
+    /* Header Bar */
+    .kanban-header-bar {
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        border-radius: 18px;
+        padding: 14px 22px;
+        transition: border-color 0.2s ease;
     }
+
+        .kanban-header-bar:hover {
+            border-color: #CBCDC5;
+        }
+
+    .kanban-header-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--brand-soft);
+        color: var(--brand);
+    }
+
+    .kanban-header-bar h2 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+    }
+
+    /* Archive Badge */
+    .archive-badge-smooth {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        color: var(--ink-soft);
+        background: var(--paper);
+        border: 1px solid var(--border-c);
+        border-radius: 9999px;
+        text-decoration: none;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        user-select: none;
+    }
+
+        .archive-badge-smooth i {
+            font-size: 0.85rem;
+            transition: transform 0.2s ease;
+        }
+
+        .archive-badge-smooth:hover {
+            background: var(--brand-dark);
+            color: #ffffff !important;
+            border-color: var(--brand-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px -2px rgba(20, 50, 41, 0.25);
+        }
+
+            .archive-badge-smooth:hover i {
+                transform: scale(1.1);
+            }
+
+        .archive-badge-smooth:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(20, 50, 41, 0.2);
+        }
+
+    /* Column heading */
+    .col-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 2px;
+        margin-bottom: 12px;
+    }
+
+    .col-heading-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .col-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+    }
+
+        .col-dot.rust {
+            background: var(--rust);
+        }
+
+        .col-dot.slate {
+            background: var(--slate);
+        }
+
+        .col-dot.brand {
+            background: var(--brand);
+        }
+
+    .col-title {
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: 0.02em;
+        margin: 0;
+    }
+
+    .col-count {
+        font-size: 0.76rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 3px 11px;
+    }
+
+        .col-count.rust {
+            background: var(--rust-soft);
+            color: var(--rust);
+        }
+
+        .col-count.slate {
+            background: var(--slate-soft);
+            color: var(--slate);
+        }
+
+        .col-count.brand {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+    /* Kanban Columns Container */
+    .kanban-column {
+        min-height: 580px;
+        max-height: calc(100vh - 260px);
+        overflow-y: auto;
+        background: var(--paper);
+        border: 2px dashed var(--border-c);
+        border-radius: 18px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+        .kanban-column::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .kanban-column::-webkit-scrollbar-thumb {
+            background-color: #CBCDC5;
+            border-radius: 10px;
+        }
+
+        .kanban-column.drag-over {
+            background-color: var(--brand-soft);
+            border-color: var(--brand);
+            border-style: solid;
+        }
+
+        .kanban-column.rust-tone {
+            background-color: rgba(168, 80, 31, 0.03);
+            border-color: rgba(168, 80, 31, 0.18);
+        }
+
+        .kanban-column.slate-tone {
+            background-color: rgba(62, 88, 120, 0.03);
+            border-color: rgba(62, 88, 120, 0.18);
+        }
+
+        .kanban-column.brand-tone {
+            background-color: rgba(31, 77, 66, 0.03);
+            border-color: rgba(31, 77, 66, 0.18);
+        }
+
+    /* Dragging States */
+    .sortable-ghost {
+        opacity: 0.35 !important;
+        transform: scale(0.97);
+        filter: grayscale(1);
+        box-shadow: none !important;
+        border: 2px dashed var(--brand) !important;
+    }
+
+    .sortable-chosen {
+        cursor: grabbing !important;
+        transform: rotate(1.5deg);
+    }
+
+    .sortable-drag {
+        opacity: 0.95 !important;
+        box-shadow: 0 16px 32px rgba(23, 27, 33, 0.16) !important;
+        cursor: grabbing !important;
+    }
+
+    /* Empty State Placeholder */
+    .kanban-empty-placeholder {
+        margin: auto 0;
+        padding: 30px 15px;
+        text-align: center;
+        color: #9AA097;
+        font-size: 0.82rem;
+        pointer-events: none;
+    }
+
+    /* Board-level empty state */
+    .board-empty {
+        background: var(--surface);
+        border: 1.5px dashed var(--border-c);
+        border-radius: 18px;
+        padding: 48px 24px;
+        text-align: center;
+    }
+
+    .board-empty-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--paper);
+        border: 1px solid var(--border-c);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: var(--brand);
+        margin-bottom: 14px;
+    }
+
+    .board-empty h5 {
+        font-size: 1.02rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .board-empty p {
+        font-size: 0.85rem;
+        color: var(--ink-soft);
+        max-width: 340px;
+        margin: 0 auto 20px;
+    }
+
+    .board-empty-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--brand);
+        color: #fff;
+        border: 1px solid var(--brand);
+        border-radius: 999px;
+        padding: 9px 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.15s ease;
+    }
+
+        .board-empty-btn:hover {
+            background: var(--brand-dark);
+            color: #fff;
+        }
 </style>
 
-<div class="container mt-4">
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-5 pb-3 border-bottom">
-        <div>
-            <h2 class="mb-1 fw-bold text-dark tracking-tight">My Tasks Board</h2>
-            <p class="text-muted mb-0 small">Drag and drop cards to update status phases seamlessly.</p>
-        </div>
-        <div class="d-flex gap-2 w-100 w-sm-auto">
-            <a asp-action="Create" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm d-flex align-items-center gap-2 btn-sm py-2">
-                <i class="bi bi-plus-lg fs-6"></i> New Task
+<div class="board-page">
+    <div class="container mt-4">
+        <!-- Header Bar -->
+        <div class="kanban-header-bar d-flex align-items-center justify-content-between gap-3 mb-4">
+            <div class="d-flex align-items-center gap-2">
+                <div class="kanban-header-icon"><i class="bi bi-kanban fs-5"></i></div>
+                <h2 class="mb-0">My Tasks Board</h2>
+            </div>
+
+            <a asp-action="ArchivedList" class="archive-badge-smooth" title="View Archived Tasks">
+                <i class="bi bi-archive"></i>
+                <span>Archived</span>
             </a>
-            <a asp-action="ArchivedList" class="btn btn-light border rounded-pill px-3 text-secondary d-flex align-items-center gap-2 btn-sm py-2" title="Archived List">
-                <i class="bi bi-archive"></i> Archived
-            </a>
         </div>
+
+        @if (!Model.Any())
+        {
+            <div class="board-empty">
+                <div class="board-empty-icon"><i class="bi bi-clipboard-check"></i></div>
+                <h5>Your board is empty</h5>
+                
+                <a asp-action="Create" class="board-empty-btn">Add new task</a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                <!-- Column 1: Todo -->
+                <div class="col-xl-4 col-lg-4">
+                    <div class="card border-0 bg-transparent mb-4">
+                        <div class="card-body p-0 mb-0">
+                            <div class="col-heading">
+                                <div class="col-heading-left">
+                                    <span class="col-dot rust"></span>
+                                    <h5 class="col-title">Todo</h5>
+                                </div>
+                                <span class="col-count rust">
+                                    @Model.Count(m => m.Status.ToString() == "Pending")
+                                </span>
+                            </div>
+                            <div class="kanban-column rust-tone" id="Pending" data-status="Pending">
+                                @foreach (var item in Model.Where(m => m.Status.ToString() == "Pending"))
+                                {
+                                    <partial name="_TaskCardPartial" model="item" />
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: In Progress -->
+                <div class="col-xl-4 col-lg-4">
+                    <div class="card border-0 bg-transparent mb-4">
+                        <div class="card-body p-0 mb-0">
+                            <div class="col-heading">
+                                <div class="col-heading-left">
+                                    <span class="col-dot slate"></span>
+                                    <h5 class="col-title">In Progress</h5>
+                                </div>
+                                <span class="col-count slate">
+                                    @Model.Count(m => m.Status.ToString() == "Processing")
+                                </span>
+                            </div>
+                            <div class="kanban-column slate-tone" id="Processing" data-status="Processing">
+                                @foreach (var item in Model.Where(m => m.Status.ToString() == "Processing"))
+                                {
+                                    <partial name="_TaskCardPartial" model="item" />
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3: Done -->
+                <div class="col-xl-4 col-lg-4">
+                    <div class="card border-0 bg-transparent mb-4">
+                        <div class="card-body p-0 mb-0">
+                            <div class="col-heading">
+                                <div class="col-heading-left">
+                                    <span class="col-dot brand"></span>
+                                    <h5 class="col-title">Done</h5>
+                                </div>
+                                <span class="col-count brand">
+                                    @Model.Count(m => m.Status.ToString() == "Completed")
+                                </span>
+                            </div>
+                            <div class="kanban-column brand-tone" id="Completed" data-status="Completed">
+                                @foreach (var item in Model.Where(m => m.Status.ToString() == "Completed"))
+                                {
+                                    <partial name="_TaskCardPartial" model="item" />
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
-
-    @if (!Model.Any())
-    {
-        <div class="card border border-dashed rounded-4 p-5 text-center bg-light bg-opacity-20">
-            <div class="bg-light text-secondary rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 64px; height: 64px;">
-                <i class="bi bi-clipboard-check fs-3 text-primary"></i>
-            </div>
-            <h5 class="fw-bold text-dark">Your board is empty</h5>
-            <p class="text-muted small mb-4 mx-auto" style="max-width: 340px;">No task assignments found. Start mapping out your workflow objectives.</p>
-            <a asp-action="Create" class="btn btn-sm btn-primary rounded-pill px-4 shadow-sm">Add New Task</a>
-        </div>
-    }
-    else
-    {
-        <div class="row g-4">
-            <div class="col-xl-4 col-lg-4">
-                <div class="card border-0 bg-transparent mb-4">
-                    <div class="card-body p-0 d-flex align-items-center justify-content-between mb-3 px-1">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="d-inline-block bg-secondary bg-opacity-20 rounded-circle" style="width: 10px; height: 10px;"></span>
-                            <h5 class="fw-bold text-dark mb-0 fs-6 text-uppercase tracking-wider" style="letter-spacing: 0.3px;">Todo</h5>
-                        </div>
-                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2.5">
-                            @Model.Count(m => m.Status.ToString() == "Pending")
-                        </span>
-                    </div>
-                    <div class="kanban-column" id="Pending" data-status="Pending">
-                        @foreach (var item in Model.Where(m => m.Status.ToString() == "Pending"))
-                        {
-                            <partial name="_TaskCardPartial" model="item" />
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-4 col-lg-4">
-                <div class="card border-0 bg-transparent mb-4">
-                    <div class="card-body p-0 d-flex align-items-center justify-content-between mb-3 px-1">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="d-inline-block bg-primary rounded-circle" style="width: 10px; height: 10px;"></span>
-                            <h5 class="fw-bold text-dark mb-0 fs-6 text-uppercase tracking-wider" style="letter-spacing: 0.3px;">In Progress</h5>
-                        </div>
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5">
-                            @Model.Count(m => m.Status.ToString() == "Processing")
-                        </span>
-                    </div>
-                    <div class="kanban-column shadow-sm" id="Processing" data-status="Processing" style="background-color: rgba(13, 110, 253, 0.02); border-color: rgba(13, 110, 253, 0.15);">
-                        @foreach (var item in Model.Where(m => m.Status.ToString() == "Processing"))
-                        {
-                            <partial name="_TaskCardPartial" model="item" />
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-4 col-lg-4">
-                <div class="card border-0 bg-transparent mb-4">
-                    <div class="card-body p-0 d-flex align-items-center justify-content-between mb-3 px-1">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="d-inline-block bg-success rounded-circle" style="width: 10px; height: 10px;"></span>
-                            <h5 class="fw-bold text-dark mb-0 fs-6 text-uppercase tracking-wider" style="letter-spacing: 0.3px;">Done</h5>
-                        </div>
-                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5">
-                            @Model.Count(m => m.Status.ToString() == "Completed")
-                        </span>
-                    </div>
-                    <div class="kanban-column" id="Completed" data-status="Completed">
-                        @foreach (var item in Model.Where(m => m.Status.ToString() == "Completed"))
-                        {
-                            <partial name="_TaskCardPartial" model="item" />
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-
-@section Scripts {
-    <script src="~/js/todo-board.js" asp-append-version="true"></script>
-}

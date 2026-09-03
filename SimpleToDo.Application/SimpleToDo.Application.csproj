@@ -17,4 +17,8 @@
     <ProjectReference Include="..\SimpleToDo.Domain\SimpleToDo.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Chats\Commands\" />
+  </ItemGroup>
+
 </Project>

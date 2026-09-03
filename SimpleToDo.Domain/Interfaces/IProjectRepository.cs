@@ -8,6 +8,7 @@ namespace SimpleToDo.Domain.Interfaces
     public interface IProjectRepository:IRepository<Project>
     {
         Task<IReadOnlyList<Project>> GetByUserIdAsync(int userId);
+        Task<Project> GetByIdForUpdateAsync(int id);
         Task<Project> GetByIdAsync(int id);
     }
 }

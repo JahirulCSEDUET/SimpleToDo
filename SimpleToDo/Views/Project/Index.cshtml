@@ -5,188 +5,512 @@
 @{
     ViewData["Title"] = "Workspace";
     int CurrentUserId = ViewBag.CurrentUserId;
-    
-    var ownProjects = Model.Where(p => p.ProjectMembers
-        .Any(m => m.userId == CurrentUserId && m.role.ToString() == "Admin"))
-        .ToList();
 
+    var ownProjects = Model.Where(p => p.ProjectMembers
+            .Any(m => m.userId == CurrentUserId && m.role.ToString() == "Admin"))
+            .ToList();
+    var coordinatorProjects = Model.Where(p => p.ProjectMembers
+        .Any(m => m.userId == CurrentUserId && m.role.ToString() == "Coordinator"))
+        .ToList();
     var contributions = Model.Where(p => p.ProjectMembers
         .Any(m => m.userId == CurrentUserId && m.role.ToString() == "Contributor"))
         .ToList();
 }
 
-<div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom">
-    <div>
-        <h2 class="mb-1 fw-bold text-dark tracking-tight">Your workspaces</h2>
-        <p class="text-muted mb-0 small">Manage your personal workspaces and team collaborations</p>
-    </div>
-    <a asp-action="Create" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm d-flex align-items-center gap-2 transition-all">
-        <span class="fs-5 lh-1">+</span> New workspace
-    </a>
-</div>
-
-<div class="d-flex flex-column gap-5">
-
-    <section>
-        <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                <span>👑</span>
-            </div>
-            <h4 class="mb-0 fw-bold text-dark">My Projects</h4>
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 ms-2">@ownProjects.Count</span>
-        </div>
-
-        @if (ownProjects.Any())
-        {
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                @foreach (var project in ownProjects)
-                {
-                    <div class="col">
-                        <div class="card h-100 border border-light-subtle shadow-sm rounded-4 hover-shadow transition-all position-relative overflow-hidden">
-                            <div class="position-absolute top-0 start-0 end-0 bg-primary" style="height: 4px;"></div>
-
-                            <div class="card-body p-4 d-flex flex-column justify-content-between">
-                                <div>
-                                    <div class="d-flex align-items-center gap-3 mb-3">
-                                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-flex justify-content-center align-items-center fw-bold text-uppercase fs-5 shadow-sm" style="width: 48px; height: 48px; min-width: 48px;">
-                                            @project.Name.Substring(0, 1)
-                                        </div>
-                                        <div class="text-truncate">
-                                            <h5 class="card-title mb-1 fw-bold text-dark text-truncate" title="@project.Name">@project.Name</h5>
-                                            <span class="badge bg-light text-primary border border-primary-subtle rounded-pill px-2 py-1 fs-xs fw-semibold">Admin</span>
-                                        </div>
-                                    </div>
-                                    <p class="text-muted small card-text text-secondary mb-4 line-clamp-2">
-                                        Manage workspace parameters, tasks, and team configurations.
-                                    </p>
-                                </div>
-
-                                <div class="pt-3 border-top border-light d-flex justify-content-between align-items-center">
-                                    <span class="text-muted small d-flex align-items-center gap-1">
-                                        👥 @project.ProjectMembers.Count Members
-                                    </span>
-                                    
-                                    <div class="d-flex gap-3">
-                                        <a asp-action="Analytics" asp-route-id="@project.Id" class="btn btn-sm btn-link text-secondary fw-semibold p-0 text-decoration-none position-relative z-3" title="View Analytics Data">
-                                            <i class="bi bi-bar-chart-line me-1"></i>Analytics
-                                        </a>
-                                        
-                                        
-                                        <a asp-action="Details" asp-route-id="@project.Id" class="btn btn-sm btn-link text-primary fw-semibold p-0 text-decoration-none stretched-link">
-                                            Open Workspace &rarr;
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="card border border-dashed rounded-4 p-5 text-center bg-light bg-opacity-20">
-                <div class="bg-light text-secondary rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 64px; height: 64px;">
-                    <span class="fs-3">📁</span>
-                </div>
-                <h5 class="fw-bold text-dark">No projects created yet</h5>
-                <p class="text-muted small mb-4 mx-auto" style="max-width: 320px;">Get started by building your first managed project workspace right now.</p>
-                <a asp-action="Create" class="btn btn-sm btn-primary rounded-pill px-4 shadow-sm">Create a Project</a>
-            </div>
-        }
-    </section>
-
-    <section>
-        <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="bg-info bg-opacity-10 text-info rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                <span>🤝</span>
-            </div>
-            <h4 class="mb-0 fw-bold text-dark">Team Projects</h4>
-            <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 ms-2">@contributions.Count</span>
-        </div>
-
-        @if (contributions.Any())
-        {
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                @foreach (var project in contributions)
-                {
-                    <div class="col">
-                        <div class="card h-100 border border-light-subtle shadow-sm rounded-4 hover-shadow transition-all position-relative overflow-hidden">
-                            <div class="position-absolute top-0 start-0 end-0 bg-primary" style="height: 4px;"></div>
-
-                            <div class="card-body p-4 d-flex flex-column justify-content-between">
-                                <div>
-                                    <div class="d-flex align-items-center gap-3 mb-3">
-                                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-flex justify-content-center align-items-center fw-bold text-uppercase fs-5 shadow-sm" style="width: 48px; height: 48px; min-width: 48px;">
-                                            @project.Name.Substring(0, 1)
-                                        </div>
-                                        <div class="text-truncate">
-                                            <h5 class="card-title mb-1 fw-bold text-dark text-truncate" title="@project.Name">@project.Name</h5>
-                                            <span class="badge bg-light text-primary border border-primary-subtle rounded-pill px-2 py-1 fs-xs fw-semibold">Admin</span>
-                                        </div>
-                                    </div>
-                                    <p class="text-muted small card-text text-secondary mb-4 line-clamp-2">
-                                        Manage workspace parameters, tasks, and team configurations.
-                                    </p>
-                                </div>
-
-                                <div class="pt-3 border-top border-light d-flex justify-content-between align-items-center">
-                                    <span class="text-muted small d-flex align-items-center gap-1">
-                                        👥 @project.ProjectMembers.Count Members
-                                    </span>
-
-                                    <div class="d-flex gap-3">
-                                        <a asp-action="Analytics" asp-route-id="@project.Id" class="btn btn-sm btn-link text-secondary fw-semibold p-0 text-decoration-none position-relative z-3" title="View Analytics Data">
-                                            <i class="bi bi-bar-chart-line me-1"></i>Analytics
-                                        </a>
-
-                                        
-                                        <a asp-action="Details" asp-route-id="@project.Id" class="btn btn-sm btn-link text-primary fw-semibold p-0 text-decoration-none stretched-link">
-                                            Open Workspace &rarr;
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="card border border-dashed rounded-4 p-5 text-center bg-light bg-opacity-20">
-                <div class="bg-light text-secondary rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 64px; height: 64px;">
-                    <span class="fs-3">🌱</span>
-                </div>
-                <h5 class="fw-bold text-dark">No shared workspaces</h5>
-                <p class="text-muted small mb-0 mx-auto" style="max-width: 320px;">When other team administrators add you to their projects, they'll show up here.</p>
-            </div>
-        }
-    </section>
-</div>
-
 <style>
-    .hover-shadow {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    .workspace-page {
+        --ink: #171B21;
+        --ink-soft: #565F6B;
+        --paper: #F7F7F4;
+        --surface: #FFFFFF;
+        --border: #E3E4DE;
+        --brand: #1F4D42;
+        --brand-dark: #143229;
+        --brand-soft: #E7EEEA;
+        --rust: #A8501F;
+        --rust-soft: #F3E4D8;
+        --slate: #3E5878;
+        --slate-soft: #E5EAF1;
     }
-    .hover-shadow:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.08) !important;
+
+        .workspace-page * {
+            box-sizing: border-box;
+        }
+
+        .workspace-page h2, .workspace-page h4, .workspace-page h5 {
+            color: var(--ink);
+        }
+
+        .workspace-page p, .workspace-page span {
+            color: var(--ink-soft);
+        }
+
+    .ws-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        padding-bottom: 22px;
+        border-bottom: 1px solid var(--border);
     }
-    .transition-all {
-        transition: all 0.2s ease-in-out;
+
+        .ws-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 4px;
+        }
+
+        .ws-header p {
+            font-size: 0.87rem;
+            margin: 0;
+        }
+
+    .ws-new-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--brand);
+        color: #fff;
+        border: 1px solid var(--brand);
+        border-radius: 999px;
+        padding: 10px 22px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.15s ease, transform 0.15s ease;
     }
-    .border-dashed {
-        border-style: dashed !important;
-        border-width: 2px !important;
+
+        .ws-new-btn:hover {
+            background: var(--brand-dark);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    .ws-section-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
     }
-    .fs-xs {
-        font-size: 0.75rem;
+
+    .ws-section-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
     }
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+
+        .ws-section-icon.brand {
+            background: var(--brand-soft);
+        }
+
+        .ws-section-icon.rust {
+            background: var(--rust-soft);
+        }
+
+        .ws-section-icon.slate {
+            background: var(--slate-soft);
+        }
+
+    .ws-section-head h4 {
+        font-size: 1.08rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .ws-count {
+        font-size: 0.74rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 3px 10px;
+        margin-left: 4px;
+    }
+
+        .ws-count.brand {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+        .ws-count.rust {
+            background: var(--rust-soft);
+            color: var(--rust);
+        }
+
+        .ws-count.slate {
+            background: var(--slate-soft);
+            color: var(--slate);
+        }
+
+    .ws-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        height: 100%;
+        position: relative;
         overflow: hidden;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+        .ws-card:hover {
+            transform: translateY(-3px);
+            border-color: #CBCDC5;
+            box-shadow: 0 12px 26px rgba(23, 27, 33, 0.07);
+        }
+
+    .ws-card-stripe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+    }
+
+        .ws-card-stripe.brand {
+            background: var(--brand);
+        }
+
+        .ws-card-stripe.rust {
+            background: var(--rust);
+        }
+
+        .ws-card-stripe.slate {
+            background: var(--slate);
+        }
+
+    .ws-card-body {
+        padding: 26px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    .ws-avatar {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.05rem;
+        text-transform: uppercase;
+    }
+
+        .ws-avatar.brand {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+        .ws-avatar.rust {
+            background: var(--rust-soft);
+            color: var(--rust);
+        }
+
+        .ws-avatar.slate {
+            background: var(--slate-soft);
+            color: var(--slate);
+        }
+
+    .ws-card-title {
+        font-size: 1.02rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 4px;
+    }
+
+    .ws-role-badge {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 3px 10px;
+    }
+
+        .ws-role-badge.brand {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+        .ws-role-badge.rust {
+            background: var(--rust-soft);
+            color: var(--rust);
+        }
+
+        .ws-role-badge.slate {
+            background: var(--slate-soft);
+            color: var(--slate);
+        }
+
+    .ws-card-desc {
+        font-size: 0.84rem;
+        line-height: 1.55;
+        margin: 14px 0 20px;
+    }
+
+    .ws-card-footer {
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ws-members {
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .ws-links {
+        display: flex;
+        gap: 16px;
+    }
+
+    .ws-link {
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .ws-link.muted {
+            color: var(--ink-soft);
+            position: relative;
+            z-index: 2;
+        }
+
+            .ws-link.muted:hover {
+                color: var(--ink);
+            }
+
+        .ws-link.open.brand {
+            color: var(--brand);
+        }
+
+        .ws-link.open.rust {
+            color: var(--rust);
+        }
+
+        .ws-link.open.slate {
+            color: var(--slate);
+        }
+
+    /* Empty state */
+    .ws-empty {
+        background: var(--surface);
+        border: 1.5px dashed var(--border);
+        border-radius: 18px;
+        padding: 48px 24px;
+        text-align: center;
+    }
+
+    .ws-empty-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--paper);
+        border: 1px solid var(--border);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 14px;
+    }
+
+    .ws-empty h5 {
+        font-size: 1.02rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .ws-empty p {
+        font-size: 0.85rem;
+        max-width: 320px;
+        margin: 0 auto 20px;
+    }
+
+    .ws-empty .ws-new-btn {
+        padding: 9px 20px;
+        font-size: 0.85rem;
     }
 </style>
+
+<div class="workspace-page">
+
+    <div class="ws-header">
+        <div>
+            <h2>Your workspaces</h2>
+            <p>Manage your personal workspaces and team collaborations</p>
+        </div>
+        <a asp-action="Create" class="ws-new-btn">
+            <span style="font-size:1.1rem; line-height:1;">+</span> New workspace
+        </a>
+    </div>
+
+    <div class="d-flex flex-column gap-5">
+
+        <!-- 1. Admin Workspaces -->
+        <section>
+            <div class="ws-section-head">
+                <div class="ws-section-icon brand"><span>👑</span></div>
+                <h4>My workspaces</h4>
+                <span class="ws-count brand">@ownProjects.Count</span>
+            </div>
+
+            @if (ownProjects.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    @foreach (var project in ownProjects)
+                    {
+                        <div class="col">
+                            <div class="ws-card">
+                                <div class="ws-card-stripe brand"></div>
+                                <div class="ws-card-body">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-3 mb-1">
+                                            <div class="ws-avatar brand">@project.Name.Substring(0, 1)</div>
+                                            <div class="text-truncate">
+                                                <div class="ws-card-title text-truncate" title="@project.Name">@project.Name</div>
+                                                <span class="ws-role-badge brand">Admin</span>
+                                            </div>
+                                        </div>
+                                        <p class="ws-card-desc">Manage workspace parameters, tasks, and team configurations.</p>
+                                    </div>
+                                    <div class="ws-card-footer">
+                                        <span class="ws-members">👥 @project.ProjectMembers.Count members</span>
+                                        <div class="ws-links">
+                                            <a asp-action="Analytics" asp-route-id="@project.Id" class="ws-link muted" title="View Analytics Data">
+                                                <i class="bi bi-bar-chart-line"></i>Analytics
+                                            </a>
+                                            <a asp-action="Details" asp-route-id="@project.Id" class="ws-link open brand stretched-link">
+                                                Open workspace &rarr;
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="ws-empty">
+                    <div class="ws-empty-icon"><span>📁</span></div>
+                    <h5>No projects created yet</h5>
+                   
+                    <a asp-action="Create" class="ws-new-btn my-2">Create a project</a>
+                </div>
+            }
+        </section>
+
+        <!-- 2. Coordinator Workspaces (Middle Section) -->
+        @if (coordinatorProjects.Any())
+        {
+            <section>
+                <div class="ws-section-head">
+                    <div class="ws-section-icon rust"><span>🎯</span></div>
+                    <h4>Coordinated workspaces</h4>
+                    <span class="ws-count rust">@coordinatorProjects.Count</span>
+                </div>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    @foreach (var project in coordinatorProjects)
+                    {
+                        <div class="col">
+                            <div class="ws-card">
+                                <div class="ws-card-stripe rust"></div>
+                                <div class="ws-card-body">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-3 mb-1">
+                                            <div class="ws-avatar rust">@project.Name.Substring(0, 1)</div>
+                                            <div class="text-truncate">
+                                                <div class="ws-card-title text-truncate" title="@project.Name">@project.Name</div>
+                                                <span class="ws-role-badge rust">Coordinator</span>
+                                            </div>
+                                        </div>
+                                        <p class="ws-card-desc">Coordinate workspace tasks, timelines, and team activities.</p>
+                                    </div>
+                                    <div class="ws-card-footer">
+                                        <span class="ws-members">👥 @project.ProjectMembers.Count members</span>
+                                        <div class="ws-links">
+                                            <a asp-action="Analytics" asp-route-id="@project.Id" class="ws-link muted" title="View Analytics Data">
+                                                <i class="bi bi-bar-chart-line"></i>Analytics
+                                            </a>
+                                            <a asp-action="Details" asp-route-id="@project.Id" class="ws-link open rust stretched-link">
+                                                Open workspace &rarr;
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+
+        <!-- 3. Contributor Workspaces -->
+        <section>
+            <div class="ws-section-head">
+                <div class="ws-section-icon slate"><span>🤝</span></div>
+                <h4>Team workspaces</h4>
+                <span class="ws-count slate">@contributions.Count</span>
+            </div>
+
+            @if (contributions.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    @foreach (var project in contributions)
+                    {
+                        <div class="col">
+                            <div class="ws-card">
+                                <div class="ws-card-stripe slate"></div>
+                                <div class="ws-card-body">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-3 mb-1">
+                                            <div class="ws-avatar slate">@project.Name.Substring(0, 1)</div>
+                                            <div class="text-truncate">
+                                                <div class="ws-card-title text-truncate" title="@project.Name">@project.Name</div>
+                                                <span class="ws-role-badge slate">Contributor</span>
+                                            </div>
+                                        </div>
+                                        <p class="ws-card-desc">Contribute to tasks and collaborate with team members.</p>
+                                    </div>
+                                    <div class="ws-card-footer">
+                                        <span class="ws-members">👥 @project.ProjectMembers.Count members</span>
+                                        <div class="ws-links">
+                                            <a asp-action="Analytics" asp-route-id="@project.Id" class="ws-link muted" title="View Analytics Data">
+                                                <i class="bi bi-bar-chart-line"></i>Analytics
+                                            </a>
+                                            <a asp-action="Details" asp-route-id="@project.Id" class="ws-link open slate stretched-link">
+                                                Open workspace &rarr;
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="ws-empty">
+                    <div class="ws-empty-icon"><span>🌱</span></div>
+                    <h5>No shared workspaces</h5>
+                    
+                </div>
+            }
+        </section>
+    </div>
+</div>

@@ -4,131 +4,339 @@
     ViewData["Title"] = "Archived Tasks";
 }
 
-<div class="container mt-4">
-    <!-- View Header -->
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-5 pb-3 border-bottom">
-        <div>
-            <h2 class="mb-1 fw-bold text-dark tracking-tight">
-                <i class="bi bi-archive text-secondary me-2"></i>Archived Tasks
-            </h2>
-            <p class="text-muted mb-0 small">Review, restore, or permanently delete tasks removed from active pipelines.</p>
-        </div>
-        <div class="w-100 w-sm-auto">
-            <a asp-action="Index" class="btn btn-light border rounded-pill px-4 text-secondary d-flex align-items-center gap-2 btn-sm py-2 transition-all shadow-sm" title="Go back to the main task board">
-                <i class="bi bi-arrow-left"></i> Back to Board
-            </a>
-        </div>
-    </div>
-
-    @if (!Model.Any())
-    {
-        <!-- Premium Empty State -->
-        <div class="card border border-dashed rounded-4 p-5 text-center bg-light bg-opacity-20">
-            <div class="bg-light text-secondary rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 64px; height: 64px;">
-                <i class="bi bi-inbox-fill fs-3 text-secondary text-opacity-50"></i>
-            </div>
-            <h5 class="fw-bold text-dark">Archive is clean</h5>
-            <p class="text-muted small mb-0 mx-auto" style="max-width: 340px;">You don't have any archived tasks sitting in storage right now.</p>
-        </div>
-    }
-    else
-    {
-        <!-- Modern Data Container -->
-        <div class="card shadow-sm border border-light-subtle rounded-4 overflow-hidden bg-white">
-            <div class="card-header bg-light bg-opacity-50 py-3 px-4 border-bottom border-light-subtle">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-secondary small fw-bold text-uppercase tracking-wider">Task Profile Details</span>
-                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2.5">Total: @Model.Count</span>
-                </div>
-            </div>
-
-            <div class="list-group list-group-flush">
-                @foreach (var item in Model)
-                {
-                    <div class="list-group-item p-4 transition-all hover-bg-light">
-                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-
-                            <!-- Left Content Area -->
-                            <div class="text-truncate">
-                                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                                    <h6 class="mb-0 fw-semibold text-secondary text-decoration-line-through text-truncate d-inline-block" style="max-width: 500px;" title="@item.Title">
-                                        @item.Title
-                                    </h6>
-                                    <span class="badge bg-light text-secondary border rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">Archived</span>
-                                </div>
-
-                                <!-- Metadata Row -->
-                                @if (item.ProjectId.HasValue && item.ProjectId != 0)
-                                {
-                                    <div class="d-flex align-items-center gap-3 flex-wrap">
-                                        <small class="text-muted d-flex align-items-center gap-1">
-                                            <i class="bi bi-folder2 text-primary text-opacity-70"></i>
-                                            Project: <span class="fw-medium text-dark-subtle">@item.ProjectName</span>
-                                        </small>
-                                        <small class="text-muted d-none d-sm-inline opacity-50">|</small>
-                                        <small class="text-muted d-flex align-items-center gap-1">
-                                            <i class="bi bi-person text-secondary text-opacity-70"></i>
-                                            By: <span class="text-secondary">@item.CreatorName</span>
-                                        </small>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <small class="text-muted-opacity italic style-italic" style="font-size: 0.8rem;">Personal Task</small>
-                                }
-                            </div>
-
-                            <!-- Right Actions Area -->
-                            <div class="shrink-0">
-                                <div class="d-flex align-items-center gap-2">
-
-                                    <!-- 1. Restore Action Button -->
-                                    <form asp-action="ArchivedUnArchived" asp-controller="ToDo" method="post" class="m-0">
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3 d-flex align-items-center gap-1.5 fw-medium" title="Restore this task back to the board">
-                                            <i class="bi bi-arrow-counterclockwise"></i> Restore
-                                        </button>
-                                    </form>
-
-                                    <!-- 2. Permanent Delete Action Button -->
-                                    <form asp-action="Delete" asp-controller="ToDo" method="post" class="m-0" onsubmit="return confirm('Are you sure you want to permanently delete this task? This cannot be undone.');">
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit" class="btn btn-sm btn-link text-danger text-decoration-none px-2 d-flex align-items-center gap-1 opacity-75 hover-opacity-100 fw-medium" title="Permanently delete this task">
-                                            <i class="bi bi-trash3"></i> Delete
-                                        </button>
-                                    </form>
-
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
-    }
-</div>
-
-<!-- Extra CSS utilities supporting the interactive layouts -->
 <style>
-    .hover-bg-light:hover {
-        background-color: rgba(248, 249, 250, 0.6) !important;
+    .archive-page {
+        --ink: #171B21;
+        --ink-soft: #565F6B;
+        --paper: #F7F7F4;
+        --surface: #FFFFFF;
+        --border-c: #E3E4DE;
+        --brand: #1F4D42;
+        --brand-dark: #143229;
+        --brand-soft: #E7EEEA;
+        --rust: #A8501F;
+        --rust-soft: #F3E4D8;
     }
 
-    .border-dashed {
-        border-style: dashed !important;
-        border-width: 2px !important;
+        .archive-page * {
+            box-sizing: border-box;
+        }
+
+        .archive-page h2, .archive-page h5, .archive-page h6 {
+            color: var(--ink);
+        }
+
+    .archive-header {
+        border-bottom: 1px solid var(--border-c);
     }
 
-    .tracking-wider {
-        letter-spacing: 0.05em;
+        .archive-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+    .archive-header-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--brand-soft);
+        color: var(--brand);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
     }
 
-    .transition-all {
-        transition: all 0.2s ease-in-out;
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        color: var(--ink-soft);
+        border-radius: 999px;
+        padding: 9px 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
     }
 
-    .hover-opacity-100:hover {
-        opacity: 1 !important;
+        .back-btn:hover {
+            background: var(--brand-soft);
+            border-color: var(--brand-soft);
+            color: var(--brand);
+        }
+
+    /* Empty state */
+    .archive-empty {
+        background: var(--surface);
+        border: 1.5px dashed var(--border-c);
+        border-radius: 18px;
+        padding: 48px 24px;
+        text-align: center;
+    }
+
+    .archive-empty-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--paper);
+        border: 1px solid var(--border-c);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: var(--ink-soft);
+        margin-bottom: 14px;
+    }
+
+    .archive-empty h5 {
+        font-size: 1.02rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .archive-empty p {
+        color: var(--ink-soft);
+        font-size: 0.85rem;
+        max-width: 340px;
+        margin: 0 auto;
+    }
+
+    /* Data container */
+    .archive-table-card {
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .archive-table-header {
+        background: var(--paper);
+        border-bottom: 1px solid var(--border-c);
+        padding: 14px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .archive-table-header span.label {
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--ink-soft);
+        }
+
+    .archive-total-badge {
+        font-size: 0.76rem;
+        font-weight: 700;
+        background: var(--brand-soft);
+        color: var(--brand);
+        border-radius: 999px;
+        padding: 4px 12px;
+    }
+
+    .archive-row {
+        padding: 22px 24px;
+        border-bottom: 1px solid var(--border-c);
+        transition: background 0.15s ease;
+    }
+
+        .archive-row:last-child {
+            border-bottom: none;
+        }
+
+        .archive-row:hover {
+            background: var(--paper);
+        }
+
+    .archive-item-title {
+        font-weight: 600;
+        color: var(--ink-soft);
+        text-decoration: line-through;
+        max-width: 500px;
+    }
+
+    .archived-chip {
+        font-size: 0.7rem;
+        font-weight: 700;
+        background: var(--rust-soft);
+        color: var(--rust);
+        border-radius: 999px;
+        padding: 2px 10px;
+    }
+
+    .archive-meta {
+        font-size: 0.8rem;
+        color: var(--ink-soft);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .archive-meta i {
+            color: var(--brand);
+        }
+
+        .archive-meta strong {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+    .archive-meta-sep {
+        color: var(--border-c);
+    }
+
+    .personal-task-label {
+        font-size: 0.8rem;
+        color: var(--ink-soft);
+        font-style: italic;
+    }
+
+    .restore-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--brand-soft);
+        color: var(--brand);
+        border: 1px solid var(--brand-soft);
+        border-radius: 999px;
+        padding: 6px 16px;
+        font-size: 0.83rem;
+        font-weight: 600;
+        transition: background 0.15s ease;
+    }
+
+        .restore-btn:hover {
+            background: var(--brand);
+            color: #fff;
+        }
+
+    .delete-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: transparent;
+        color: var(--rust);
+        border: none;
+        padding: 6px 10px;
+        font-size: 0.83rem;
+        font-weight: 600;
+        opacity: 0.8;
+        transition: opacity 0.15s ease;
+    }
+
+        .delete-btn:hover {
+            opacity: 1;
+        }
+
+    @@media (max-width: 767px) {
+        .archive-row {
+            padding: 18px;
+        }
     }
 </style>
+
+<div class="archive-page">
+    <div class="container mt-4">
+        <!-- View Header -->
+        <div class="archive-header d-flex justify-content-between align-items-center gap-3 mb-5 pb-3">
+            <h2>
+                <span class="archive-header-icon"><i class="bi bi-archive"></i></span>Archived tasks
+            </h2>
+            <a asp-action="Index" class="back-btn" title="Go back to the main task board">
+                <i class="bi bi-arrow-left"></i> Back to board
+            </a>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <!-- Empty State -->
+            <div class="archive-empty">
+                <div class="archive-empty-icon"><i class="bi bi-inbox-fill"></i></div>
+                <h5>Archive is clean</h5>
+                
+            </div>
+        }
+        else
+        {
+            <!-- Data Container -->
+            <div class="archive-table-card">
+                <div class="archive-table-header">
+                    <span class="label">Task profile details</span>
+                    <span class="archive-total-badge">Total: @Model.Count</span>
+                </div>
+
+                <div>
+                    @foreach (var item in Model)
+                    {
+                        <div class="archive-row">
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+
+                                <!-- Left Content Area -->
+                                <div class="text-truncate">
+                                    <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                        <h6 class="archive-item-title mb-0 text-truncate d-inline-block" title="@item.Title">
+                                            @item.Title
+                                        </h6>
+                                        <span class="archived-chip">Archived</span>
+                                    </div>
+
+                                    <!-- Metadata Row -->
+                                    @if (item.ProjectId.HasValue && item.ProjectId != 0)
+                                    {
+                                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                                            <span class="archive-meta">
+                                                <i class="bi bi-folder2"></i>
+                                                Project: <strong>@item.ProjectName</strong>
+                                            </span>
+                                            <span class="archive-meta-sep d-none d-sm-inline">|</span>
+                                            <span class="archive-meta">
+                                                <i class="bi bi-person"></i>
+                                                By: <strong>@item.CreatorName</strong>
+                                            </span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="personal-task-label">Personal task</span>
+                                    }
+                                </div>
+
+                                <!-- Right Actions Area -->
+                                <div class="shrink-0">
+                                    <div class="d-flex align-items-center gap-2">
+
+                                        <!-- 1. Restore Action Button -->
+                                        <form asp-action="ArchivedUnArchived" asp-controller="ToDo" method="post" class="m-0">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="restore-btn" title="Restore this task back to the board">
+                                                <i class="bi bi-arrow-counterclockwise"></i> Restore
+                                            </button>
+                                        </form>
+
+                                        <!-- 2. Permanent Delete Action Button -->
+                                        <form asp-action="Delete" asp-controller="ToDo" method="post" class="m-0" onsubmit="return confirm('Are you sure you want to permanently delete this task? This cannot be undone.');">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="delete-btn" title="Permanently delete this task">
+                                                <i class="bi bi-trash3"></i> Delete
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
