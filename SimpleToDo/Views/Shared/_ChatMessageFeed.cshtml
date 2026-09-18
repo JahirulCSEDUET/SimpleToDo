@@ -3,51 +3,74 @@
 
 <style>
     .fb-chat-feed {
+        --brand: #1F4D42;
+        --brand-dark: #143229;
+        --ink: #171B21;
+        --ink-soft: #565F6B;
+        --paper: #F7F7F4;
+        --border-c: #E3E4DE;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
     }
 
     .fb-bubble {
         max-width: 80%;
-        padding: 8px 12px;
-        font-size: 0.82rem;
-        line-height: 1.4;
+        padding: 9px 13px;
+        font-size: 0.83rem;
+        line-height: 1.45;
         word-break: break-word;
+        border-radius: 14px;
     }
 
     .fb-bubble-me {
-        background-color: #0d6efd;
+        background-color: var(--brand);
         color: #ffffff;
         align-self: flex-end;
-        border-radius: 14px 14px 2px 14px;
+        border-radius: 14px 14px 3px 14px;
     }
 
     .fb-bubble-other {
-        background-color: #e4e6eb;
-        color: #050505;
+        background-color: var(--paper);
+        border: 1px solid var(--border-c);
+        color: var(--ink);
         align-self: flex-start;
-        border-radius: 14px 14px 14px 2px;
+        border-radius: 14px 14px 14px 3px;
     }
 
     .sender-tag {
         font-size: 0.68rem;
         font-weight: 700;
-        color: #65676b;
-        margin-bottom: 2px;
+        color: var(--brand);
+        margin-bottom: 3px;
     }
 
     .msg-timestamp {
-        font-size: 0.65rem;
+        font-size: 0.64rem;
         opacity: 0.75;
-        margin-top: 2px;
+        margin-top: 3px;
     }
+
+    .fb-chat-empty {
+        text-align: center;
+        padding: 40px 12px;
+        color: var(--ink-soft);
+        font-size: 0.86rem;
+    }
+
+        .fb-chat-empty i {
+            font-size: 1.6rem;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--brand);
+            opacity: 0.6;
+        }
 </style>
 
 @if (Model == null || !Model.Any())
 {
-    <div class="text-center py-5 text-muted small">
-        <i class="bi bi-chat-heart fs-3 d-block opacity-50 mb-1"></i>
+    <div class="fb-chat-empty">
+        <i class="bi bi-chat-heart"></i>
         No messages yet. Send a greeting to start the conversation!
     </div>
 }

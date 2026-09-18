@@ -5,119 +5,302 @@
 }
 
 <style>
-    .task-create-card {
-        border: 1px solid rgba(0, 0, 0, 0.08) !important;
-        border-radius: 16px !important;
+    .task-create-page {
+        --ink: #171B21;
+        --ink-soft: #565F6B;
+        --paper: #F7F7F4;
+        --surface: #FFFFFF;
+        --border-c: #E3E4DE;
+        --brand: #1F4D42;
+        --brand-dark: #143229;
+        --brand-soft: #E7EEEA;
+        --rust: #A8501F;
+        --rust-soft: #F3E4D8;
+        --gold: #B9862B;
+        --gold-soft: #F3E9D3;
+        --slate: #3E5878;
+        --slate-soft: #E5EAF1;
     }
 
-    .form-control-premium {
-        border: 1px solid #dee2e6;
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
-        font-size: 0.9rem;
-        transition: all 0.2s ease-in-out;
-    }
-
-        .form-control-premium:focus {
-            border-color: #86b7fe;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        .task-create-page * {
+            box-sizing: border-box;
         }
 
-    
+        .task-create-page h3, .task-create-page h6 {
+            color: var(--ink);
+        }
+
+        .task-create-page .text-muted {
+            color: var(--ink-soft) !important;
+        }
+
+    .task-create-header {
+        border-bottom: 1px solid var(--border-c);
+    }
+
+    .back-circle {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        color: var(--ink-soft);
+        transition: all 0.15s ease;
+    }
+
+        .back-circle:hover {
+            background: var(--brand-soft);
+            border-color: var(--brand-soft);
+            color: var(--brand);
+        }
+
+    .eyebrow-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--ink-soft);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .eyebrow-label i {
+            color: var(--brand);
+        }
+
+    .task-create-header h3 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        margin: 0;
+    }
+
+    .task-create-card {
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        border-radius: 20px;
+    }
+
+    .section-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--ink-soft);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .section-label i {
+            color: var(--brand);
+        }
+
+    .field-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control-brand {
+        border: 1px solid var(--border-c);
+        border-radius: 10px;
+        padding: 0.72rem 1rem;
+        font-size: 0.9rem;
+        color: var(--ink);
+        background: var(--surface);
+        transition: all 0.15s ease;
+    }
+
+        .form-control-brand:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px var(--brand-soft);
+        }
+
     .upload-zone-wrapper {
-        border: 2px dashed #dee2e6;
-        border-radius: 12px;
-        background-color: #f8f9fa;
-        transition: all 0.2s ease-in-out;
-        position: relative;
+        border: 2px dashed var(--border-c);
+        border-radius: 14px;
+        background-color: var(--paper);
+        transition: all 0.2s ease;
     }
 
         .upload-zone-wrapper:hover {
-            border-color: #0d6efd;
-            background-color: rgba(13, 110, 253, 0.02);
+            border-color: var(--brand);
+            background-color: var(--brand-soft);
         }
+
+    .upload-zone-icon {
+        color: var(--brand);
+    }
+
+    .upload-zone-wrapper h6 {
+        font-size: 0.88rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .upload-zone-wrapper p {
+        font-size: 0.8rem;
+        color: var(--ink-soft);
+        margin-bottom: 14px;
+    }
 
     .ext-badge {
         font-size: 0.72rem;
-        font-weight: 600;
-        padding: 0.25rem 0.6rem;
-        letter-spacing: 0.3px;
+        font-weight: 700;
+        padding: 0.28rem 0.7rem;
+        border-radius: 999px;
+        letter-spacing: 0.02em;
     }
+
+        .ext-badge.rust {
+            background: var(--rust-soft);
+            color: var(--rust);
+        }
+
+        .ext-badge.slate {
+            background: var(--slate-soft);
+            color: var(--slate);
+        }
+
+        .ext-badge.gold {
+            background: var(--gold-soft);
+            color: var(--gold);
+        }
+
+        .ext-badge.brand {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+    .form-footer {
+        border-top: 1px solid var(--border-c);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 22px;
+    }
+
+    .btn-cancel-outline {
+        display: inline-flex;
+        align-items: center;
+        background: var(--surface);
+        color: var(--ink-soft);
+        border: 1px solid var(--border-c);
+        border-radius: 999px;
+        padding: 9px 22px;
+        font-size: 0.86rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+
+        .btn-cancel-outline:hover {
+            background: var(--paper);
+            color: var(--ink);
+        }
+
+    .btn-save {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--brand);
+        color: #fff;
+        border: 1px solid var(--brand);
+        border-radius: 999px;
+        padding: 9px 22px;
+        font-size: 0.86rem;
+        font-weight: 600;
+        transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+        .btn-save:hover {
+            background: var(--brand-dark);
+            transform: translateY(-1px);
+        }
 </style>
 
-<div class="container mt-4">
-    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
-        <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="btn btn-sm btn-outline-secondary rounded-circle d-inline-flex align-items-center justify-content-center p-0 shadow-sm" style="width: 34px; height: 34px; min-width: 34px;" title="Back to Project Workspace">
-            <i class="bi bi-arrow-left fs-5"></i>
-        </a>
-        <div>
-            <span class="text-muted small text-uppercase tracking-wider fw-semibold" style="font-size: 0.72rem;">
-                <i class="bi bi-folder2-open text-primary me-1"></i> Target Project Workspace
-            </span>
-            <h3 class="mb-0 fw-bold text-dark tracking-tight">@Model.ProjectName</h3>
+<div class="task-create-page">
+    <div class="container mt-4">
+        <div class="task-create-header d-flex align-items-center gap-3 mb-4 pb-3">
+            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="back-circle" title="Back to Project Workspace">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <span class="eyebrow-label">
+                    <i class="bi bi-folder2-open"></i> Target project workspace
+                </span>
+                <h3 class="mt-1">@Model.ProjectName</h3>
+            </div>
         </div>
-    </div>
 
-    <div class="row justify-content-center">
-        <div class="col-xl-7 col-lg-9">
-            <div class="card shadow-sm bg-white task-create-card border-0">
-                <div class="card-body p-4 p-md-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-9">
+                <div class="task-create-card">
+                    <div class="p-4 p-md-5">
 
-                    <form asp-action="Create" method="post" enctype="multipart/form-data" class="m-0">
-                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 fw-medium"></div>
+                        <form asp-action="Create" method="post" enctype="multipart/form-data" class="m-0">
+                            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 fw-medium"></div>
 
-                        <input type="hidden" asp-for="ProjectId" value="@Model.ProjectId" />
-                        <input type="hidden" asp-for="ProjectName" value="@Model.ProjectName" />
+                            <input type="hidden" asp-for="ProjectId" value="@Model.ProjectId" />
+                            <input type="hidden" asp-for="ProjectName" value="@Model.ProjectName" />
 
-                        <div class="mb-2 text-muted-xs text-uppercase fw-bold tracking-wider mb-3" style="font-size: 0.75rem; color: #8c98a5;">
-                            <i class="bi bi-layers-half me-1"></i> Task Definition Entry
-                        </div>
-
-                        <div class="mb-4">
-                            <label asp-for="Title" class="form-label text-dark fw-bold small text-uppercase tracking-wider" style="font-size: 0.78rem;">Task Title</label>
-                            <input asp-for="Title" class="form-control form-control-premium" placeholder="What core objective needs to be done?" autofocus autocomplete="off" />
-                            <span asp-validation-for="Title" class="text-danger small d-block mt-1 fw-medium"></span>
-                        </div>
-
-                        <div class="mb-4">
-                            <label asp-for="Description" class="form-label text-dark fw-bold small text-uppercase tracking-wider" style="font-size: 0.78rem;">Scope Description</label>
-                            <textarea asp-for="Description" class="form-control form-control-premium" rows="4" placeholder="Detail the operational steps, execution dependencies, or technical block parameters..."></textarea>
-                            <span asp-validation-for="Description" class="text-danger small d-block mt-1 fw-medium"></span>
-                        </div>
-
-                        <div class="mb-5">
-                            <label for="fileUpload" class="form-label text-dark fw-bold small text-uppercase tracking-wider" style="font-size: 0.78rem;">
-                                Supported Attachments <span class="text-muted fw-normal text-lowercase">(Optional)</span>
-                            </label>
-
-                            <div class="upload-zone-wrapper p-4 text-center">
-                                <i class="bi bi-file-earmark-arrow-up text-primary fs-1 mb-2 d-inline-block"></i>
-                                <h6 class="text-dark fw-bold mb-1 small">Select dynamic tracking assets to upload</h6>
-                                <p class="text-muted small mb-3" style="font-size: 0.78rem;">Files are securely attached to the data pipeline context logs.</p>
-
-                                <div class="col-sm-8 mx-auto mb-3">
-                                    <input id="fileUpload" name="File" class="form-control form-control-sm shadow-none" type="file" accept=".jpg,.jpeg,.png,.pdf,.zip" />
-                                </div>
-
-                                <div class="d-flex justify-content-center flex-wrap gap-2">
-                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill ext-badge">.JPG / .JPEG</span>
-                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill ext-badge">.PNG</span>
-                                    <span class="badge bg-warning bg-opacity-10 text-warning-emphasis border border-warning-subtle rounded-pill ext-badge">.PDF</span>
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary-subtle rounded-pill ext-badge">.ZIP</span>
-                                </div>
+                            <div class="section-label">
+                                <i class="bi bi-layers-half"></i> Task definition entry
                             </div>
 
-                            @Html.ValidationMessage("File", "", new { @class = "text-danger small d-block mt-1 fw-medium" })
-                        </div>
+                            <div class="mb-4">
+                                <label asp-for="Title" class="field-label">Task title</label>
+                                <input asp-for="Title" class="form-control form-control-brand" placeholder="What core objective needs to be done?" autofocus autocomplete="off" />
+                                <span asp-validation-for="Title" class="text-danger small d-block mt-1 fw-medium"></span>
+                            </div>
 
-                        <div class="d-flex justify-content-between align-items-center pt-3 border-top border-light-subtle">
-                            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="btn btn-outline-secondary rounded-pill px-4 btn-sm py-2 fw-semibold text-decoration-none transition-all">Cancel</a>
-                            <button type="submit" class="btn btn-primary rounded-pill px-4 btn-sm py-2 fw-semibold shadow-sm transition-all">
-                                Save Task <i class="bi bi-plus-circle ms-1.5 small"></i>
-                            </button>
-                        </div>
-                    </form>
+                            <div class="mb-4">
+                                <label asp-for="Description" class="field-label">Scope description</label>
+                                <textarea asp-for="Description" class="form-control form-control-brand" rows="4" placeholder="Detail the operational steps, execution dependencies, or technical block parameters..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger small d-block mt-1 fw-medium"></span>
+                            </div>
 
+                            <div class="mb-5">
+                                <label for="fileUpload" class="field-label">
+                                    Supported attachments <span class="text-muted fw-normal text-lowercase">(optional)</span>
+                                </label>
+
+                                <div class="upload-zone-wrapper p-4 text-center">
+                                    <i class="bi bi-file-earmark-arrow-up upload-zone-icon fs-1 mb-2 d-inline-block"></i>
+                                    <h6>Select dynamic tracking assets to upload</h6>
+                                    <p>Files are securely attached to the data pipeline context logs.</p>
+
+                                    <div class="col-sm-8 mx-auto mb-3">
+                                        <input id="fileUpload" name="File" class="form-control form-control-sm shadow-none" type="file" accept=".jpg,.jpeg,.png,.pdf,.zip" />
+                                    </div>
+
+                                    <div class="d-flex justify-content-center flex-wrap gap-2">
+                                        <span class="ext-badge rust">.JPG / .JPEG</span>
+                                        <span class="ext-badge brand">.PNG</span>
+                                        <span class="ext-badge gold">.PDF</span>
+                                        <span class="ext-badge slate">.ZIP</span>
+                                    </div>
+                                </div>
+
+                                @Html.ValidationMessage("File", "", new { @class = "text-danger small d-block mt-1 fw-medium" })
+                            </div>
+
+                            <div class="form-footer">
+                                <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="btn-cancel-outline">Cancel</a>
+                                <button type="submit" class="btn-save">
+                                    Save task <i class="bi bi-plus-circle"></i>
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
                 </div>
             </div>
         </div>

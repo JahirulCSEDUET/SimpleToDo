@@ -1,0 +1,493 @@
+﻿@using SimpleToDo.Application.DTOs.SimpleToDo.Application.DTOs
+@model UserProfileDto
+@{
+    ViewData["Title"] = "Account & Profile Settings";
+    var initials = !string.IsNullOrWhiteSpace(Model.FullName)
+        ? string.Concat(Model.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0])).ToUpper()
+        : "U";
+}
+
+<style>
+    .profile-page {
+        --ink: #171B21;
+        --ink-soft: #565F6B;
+        --paper: #F7F7F4;
+        --surface: #FFFFFF;
+        --border-c: #E3E4DE;
+        --brand: #1F4D42;
+        --brand-soft: #E7EEEA;
+        --gold: #B9862B;
+        --gold-soft: #F3E9D3;
+        --slate: #3E5878;
+        --slate-soft: #E5EAF1;
+        --rust: #A8501F;
+        --rust-soft: #F3E4D8;
+    }
+
+        .profile-page * {
+            box-sizing: border-box;
+        }
+
+        .profile-page h2, .profile-page h5, .profile-page h6 {
+            color: var(--ink);
+        }
+
+        .profile-page .text-secondary, .profile-page .text-muted {
+            color: var(--ink-soft) !important;
+        }
+
+    .profile-card {
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        border-radius: 18px;
+        transition: border-color 0.2s ease;
+    }
+
+        .profile-card:hover {
+            border-color: #CBCDC5;
+        }
+
+    .profile-avatar-box {
+        width: 82px;
+        height: 82px;
+        border-radius: 50%;
+        background: var(--brand-soft);
+        color: var(--brand);
+        font-size: 1.75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--brand-soft);
+        color: var(--brand);
+        border-radius: 999px;
+        padding: 6px 16px;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .badge-soft-id {
+        font-family: monospace;
+        background: var(--paper);
+        color: var(--ink-soft);
+        border: 1px solid var(--border-c);
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 0.72rem;
+    }
+
+    .stat-box {
+        background: var(--paper);
+        border: 1px solid var(--border-c);
+        border-radius: 14px;
+        padding: 16px;
+        text-align: center;
+        transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+        .stat-box:hover {
+            transform: translateY(-2px);
+            border-color: #CBCDC5;
+        }
+
+    .stat-number {
+        font-size: 1.45rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+        .stat-number.brand {
+            color: var(--brand);
+        }
+
+        .stat-number.gold {
+            color: var(--gold);
+        }
+
+        .stat-number.rust {
+            color: var(--rust);
+        }
+
+        .stat-number.slate {
+            color: var(--slate);
+        }
+
+    .stat-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .section-title {
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--ink-soft);
+    }
+
+    /* Read-only info rows */
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        background: var(--paper);
+        border: 1px solid var(--border-c);
+        border-radius: 14px;
+    }
+
+        .info-row + .info-row {
+            margin-top: 12px;
+        }
+
+    .info-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        color: var(--brand);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .info-label {
+        font-size: 0.72rem;
+        color: var(--ink-soft);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .info-value {
+        font-size: 0.94rem;
+        color: var(--ink);
+        font-weight: 600;
+    }
+
+    .info-note {
+        font-size: 0.74rem;
+        color: var(--ink-soft);
+        margin-top: 2px;
+    }
+
+    /* Large action badges */
+    .action-badge {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        border-radius: 18px;
+        padding: 22px;
+        text-decoration: none;
+        transition: all 0.18s ease;
+        height: 100%;
+    }
+
+        .action-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(23, 27, 33, 0.06);
+        }
+
+        .action-badge.brand:hover {
+            border-color: var(--brand);
+        }
+
+        .action-badge.gold:hover {
+            border-color: var(--gold);
+        }
+
+        .action-badge.slate:hover {
+            border-color: var(--slate);
+        }
+
+    .action-badge-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .action-badge.brand .action-badge-icon {
+        background: var(--brand-soft);
+        color: var(--brand);
+    }
+
+    .action-badge.gold .action-badge-icon {
+        background: var(--gold-soft);
+        color: var(--gold);
+    }
+
+    .action-badge.slate .action-badge-icon {
+        background: var(--slate-soft);
+        color: var(--slate);
+    }
+
+    .action-badge-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 3px;
+    }
+
+    .action-badge-desc {
+        font-size: 0.82rem;
+        color: var(--ink-soft);
+    }
+
+    .action-badge-arrow {
+        margin-left: auto;
+        color: var(--ink-soft);
+        flex-shrink: 0;
+        transition: transform 0.15s ease, color 0.15s ease;
+    }
+
+    .action-badge:hover .action-badge-arrow {
+        transform: translateX(3px);
+    }
+
+    .action-badge.brand:hover .action-badge-arrow {
+        color: var(--brand);
+    }
+
+    .action-badge.gold:hover .action-badge-arrow {
+        color: var(--gold);
+    }
+
+    .action-badge.slate:hover .action-badge-arrow {
+        color: var(--slate);
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface);
+        border: 1px solid var(--border-c);
+        color: var(--ink-soft);
+        border-radius: 999px;
+        padding: 8px 18px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+
+        .back-btn:hover {
+            background: var(--brand-soft);
+            border-color: var(--brand-soft);
+            color: var(--brand);
+        }
+
+    .alert-brand {
+        background: var(--brand-soft);
+        color: var(--brand);
+        border-radius: 14px;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .alert-rust {
+        background: var(--rust-soft);
+        color: var(--rust);
+        border-radius: 14px;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    @@media (max-width: 767px) {
+        .action-badge {
+            padding: 18px;
+        }
+    }
+</style>
+
+<div class="profile-page">
+    <div class="container py-4">
+
+        <!-- Alert Notifications -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-brand alert-dismissible fade show shadow-sm mb-4" role="alert">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <div>@TempData["SuccessMessage"]</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-rust alert-dismissible fade show shadow-sm mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                <div>@TempData["ErrorMessage"]</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Profile Page Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4 pb-3" style="border-bottom: 1px solid var(--border-c);">
+            <div>
+                <h2 class="mb-0 fw-bold">Account profile</h2>
+                <p class="mb-0 small">Manage personal identification details and view workspace telemetry.</p>
+            </div>
+            <a asp-controller="ToDo" asp-action="Index" class="back-btn">
+                <i class="bi bi-arrow-left"></i> Board
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left: Profile Badge & Platform Stats -->
+            <div class="col-lg-4">
+                <div class="profile-card p-4 text-center mb-4">
+                    <div class="profile-avatar-box mx-auto mb-3">
+                        @initials
+                    </div>
+                    <h5 class="fw-bold mb-1">@Model.FullName</h5>
+                    <p class="small mb-2">@Model.Email</p>
+
+                    <div class="mb-3">
+                        <span class="badge-soft-id" title="System Identifier">ID: @Model.UserId.Substring(0, Math.Min(8, Model.UserId.Length))...</span>
+                    </div>
+
+                    <div class="pt-3" style="border-top: 1px solid var(--border-c);">
+                        <span class="status-pill">
+                            <i class="bi bi-shield-check"></i> Account active
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Productivity Metric Summary -->
+                <div class="profile-card p-3">
+                    <h6 class="fw-bold mb-3 px-2 section-title">Productivity overview</h6>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <div class="stat-number brand">@Model.TotalWorkspaces</div>
+                                <div class="stat-label mt-1">Workspaces</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <div class="stat-number slate">@Model.TotalAssignedTasks</div>
+                                <div class="stat-label mt-1">Total tasks</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <div class="stat-number gold">@Model.PendingTasksCount</div>
+                                <div class="stat-label mt-1">Incomplete</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <div class="stat-number brand">@Model.CompletedTasksCount</div>
+                                <div class="stat-label mt-1">Completed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Info & Quick Actions -->
+            <div class="col-lg-8">
+
+                <!-- Personal Identification (read-only, no save) -->
+                <div class="profile-card p-4 mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom: 1px solid var(--border-c);">
+                        <div class="info-icon" style="width:36px; height:36px;">
+                            <i class="bi bi-person-lines-fill"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0 fs-6">Personal identification</h5>
+                            <span class="small">Your public display identity across projects</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-icon"><i class="bi bi-person"></i></div>
+                        <div>
+                            <div class="info-label">Full name</div>
+                            <div class="info-value">@Model.FullName</div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-icon"><i class="bi bi-envelope"></i></div>
+                        <div>
+                            <div class="info-label">Registered email</div>
+                            <div class="info-value">@Model.Email</div>
+                            <div class="info-note">Email changes must be requested through identity administration.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick action badges -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a asp-controller="Profile" asp-action="Edit" class="action-badge brand">
+                            <div class="action-badge-icon"><i class="bi bi-pencil-square"></i></div>
+                            <div>
+                                <div class="action-badge-title">Edit profile</div>
+                                <div class="action-badge-desc">Update your name and display details</div>
+                            </div>
+                            <i class="bi bi-chevron-right action-badge-arrow"></i>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6">
+                        <a asp-controller="Account" asp-action="ChangePassword" class="action-badge gold">
+                            <div class="action-badge-icon"><i class="bi bi-key-fill"></i></div>
+                            <div>
+                                <div class="action-badge-title">Change password</div>
+                                <div class="action-badge-desc">Update your sign-in credentials</div>
+                            </div>
+                            <i class="bi bi-chevron-right action-badge-arrow"></i>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6">
+                        <a asp-controller="Project" asp-action="Index" class="action-badge slate">
+                            <div class="action-badge-icon"><i class="bi bi-kanban"></i></div>
+                            <div>
+                                <div class="action-badge-title">My workspaces</div>
+                                <div class="action-badge-desc">View and manage your project workspaces</div>
+                            </div>
+                            <i class="bi bi-chevron-right action-badge-arrow"></i>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6">
+                        <a asp-controller="ToDo" asp-action="ArchivedList" class="action-badge brand">
+                            <div class="action-badge-icon"><i class="bi bi-archive"></i></div>
+                            <div>
+                                <div class="action-badge-title">Archived tasks</div>
+                                <div class="action-badge-desc">Review or restore archived items</div>
+                            </div>
+                            <i class="bi bi-chevron-right action-badge-arrow"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

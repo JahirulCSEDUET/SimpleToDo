@@ -21,12 +21,15 @@ namespace SimpleToDo.Infrastructure.Repositories
         {
             return await _context.Members
                 .AsNoTracking()
+                
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
         public async Task<User> GetByUserIdAsync(string userId)
         {
             return await _context.Members
                 .AsNoTracking()
+                .Include(i => i.ProjectMembers)
+                .Include(u => u.Todos)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
         }
 

@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+<!DOCTYPE html>
 <html lang="en" class="h-100">
 <head>
     <meta charset="utf-8" />
@@ -31,7 +32,6 @@
                 color: var(--ink);
             }
 
-            /* Reskin core Bootstrap primary utilities site-wide to match brand palette */
             .bg-primary {
                 background-color: var(--brand) !important;
             }
@@ -70,41 +70,6 @@
                 .btn-outline-primary:hover {
                     background-color: var(--brand);
                     border-color: var(--brand);
-                }
-
-            .nav-link-custom {
-                font-weight: 500;
-                color: var(--ink-soft);
-                transition: color 0.15s ease-in-out;
-                position: relative;
-            }
-
-                .nav-link-custom:hover, .nav-link-custom.active {
-                    color: var(--brand) !important;
-                }
-
-            .navbar-brand-custom {
-                font-weight: 700;
-                letter-spacing: -0.5px;
-                background: linear-gradient(45deg, var(--brand), var(--slate));
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-
-            .btn-logout:hover {
-                color: #B23A3A !important;
-            }
-
-            /* Nav utility buttons (messages / notifications) */
-            .fb-nav-btn {
-                background-color: var(--paper) !important;
-                border: 1px solid var(--border-c) !important;
-                transition: background-color 0.2s ease, border-color 0.2s ease;
-            }
-
-                .fb-nav-btn:hover {
-                    background-color: var(--brand-soft) !important;
-                    border-color: var(--brand-soft) !important;
                 }
 
             .fb-dropdown-item {
@@ -147,7 +112,25 @@
                 overflow: hidden;
             }
 
-            /* Floating chat dock */
+            .dropdown-title-group {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .dropdown-title-icon {
+                width: 30px;
+                height: 30px;
+                border-radius: 9px;
+                background: var(--brand-soft);
+                color: var(--brand);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.9rem;
+                flex-shrink: 0;
+            }
+
             .fb-chat-dock {
                 position: fixed;
                 bottom: 0;
@@ -229,15 +212,180 @@
                 border-top: 1px solid var(--border-c);
                 padding: 8px 10px;
             }
+
+            /* ---------- Navbar ---------- */
+            .app-navbar {
+                background: var(--surface);
+                border-bottom: 1px solid var(--border-c);
+                padding: 14px 0;
+            }
+
+            .navbar-brand-custom {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-weight: 700;
+                font-size: 1.28rem;
+                letter-spacing: -0.02em;
+                color: var(--ink) !important;
+                text-decoration: none;
+            }
+
+            .brand-mark {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                background: var(--brand);
+                color: #fff;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.05rem;
+                flex-shrink: 0;
+            }
+
+            .nav-links {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                background: var(--paper);
+                border: 1px solid var(--border-c);
+                border-radius: 999px;
+                padding: 4px;
+            }
+
+            .nav-link-custom {
+                font-weight: 600;
+                font-size: 0.86rem;
+                color: var(--ink-soft);
+                padding: 8px 16px;
+                border-radius: 999px;
+                text-decoration: none;
+                transition: background 0.15s ease, color 0.15s ease;
+                white-space: nowrap;
+            }
+
+                .nav-link-custom:hover {
+                    color: var(--brand);
+                }
+
+                .nav-link-custom.active {
+                    background: var(--surface);
+                    color: var(--brand);
+                    box-shadow: 0 1px 4px rgba(23, 27, 33, 0.08);
+                }
+
+            .user-chip {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: var(--paper);
+                border: 1px solid var(--border-c);
+                border-radius: 999px;
+                padding: 6px 14px 6px 8px;
+                text-decoration: none;
+                transition: border-color 0.15s ease, background 0.15s ease;
+            }
+            .user-chip:hover { background: var(--brand-soft); border-color: var(--brand-soft); }
+
+            .user-chip-avatar {
+                width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                background: var(--brand);
+                color: #fff;
+                font-size: 0.68rem;
+                font-weight: 700;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+            .user-chip-name {
+                font-size: 0.83rem;
+                font-weight: 600;
+                color: var(--ink);
+            }
+            .user-chip-greeting { font-size: 0.78rem; color: var(--ink-soft); }
+
+            .fb-nav-btn {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                background: var(--paper) !important;
+                border: 1px solid var(--border-c) !important;
+                color: var(--ink-soft);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+            }
+
+                .fb-nav-btn i { color: var(--ink-soft) !important; font-size: 1.05rem; }
+
+                .fb-nav-btn:hover {
+                    background-color: var(--brand-soft) !important;
+                    border-color: var(--brand-soft) !important;
+                }
+                .fb-nav-btn:hover i { color: var(--brand) !important; }
+
+            .btn-logout-nav {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                border: none;
+                background: transparent;
+                color: var(--ink-soft);
+                font-size: 0.86rem;
+                font-weight: 600;
+                padding: 8px 12px;
+                border-radius: 999px;
+                transition: color 0.15s ease, background 0.15s ease;
+            }
+            .btn-logout-nav:hover { color: #B23A3A; background: #F6DEDE; }
+
+            .btn-register-nav {
+                background: var(--brand);
+                border: 1px solid var(--brand);
+                color: #fff;
+                font-weight: 600;
+                font-size: 0.86rem;
+                border-radius: 999px;
+                padding: 8px 20px;
+                text-decoration: none;
+                transition: background 0.15s ease, transform 0.15s ease;
+            }
+            .btn-register-nav:hover { background: var(--brand-dark); color: #fff; transform: translateY(-1px); }
+
+            .btn-login-nav {
+                color: var(--ink-soft);
+                font-weight: 600;
+                font-size: 0.86rem;
+                padding: 8px 14px;
+                text-decoration: none;
+            }
+            .btn-login-nav:hover { color: var(--brand); }
+
+            @@media (max-width: 991px) {
+                .nav-links {
+                    flex-direction: column;
+                    align-items: stretch;
+                    border-radius: 14px;
+                    gap: 2px;
+                }
+                .nav-link-custom { text-align: left; }
+                .nav-link-custom.active { box-shadow: none; }
+            }
     </style>
 </head>
 <body class="d-flex flex-column h-100">
 
     <header>
-        <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom border-light-subtle py-3 shadow-sm">
+        <nav class="navbar navbar-expand-lg app-navbar">
             <div class="container">
-                <a class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2 fs-4" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-cloud-haze2 text-primary"></i> AuraSpace
+                <a class="navbar-brand navbar-brand-custom" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="brand-mark"><i class="bi bi-cloud-haze2"></i></span> AuraSpace
                 </a>
 
                 <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent"
@@ -246,38 +394,42 @@
                 </button>
 
                 <div class="navbar-collapse collapse" id="navbarContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-md-0 gap-1 gap-md-3 mt-2 mt-md-0">
+                    <ul class="navbar-nav mx-auto mb-3 mb-lg-0 mt-3 mt-lg-0 list-unstyled nav-links">
                         <li class="nav-item">
-                            <a class="nav-link nav-link-custom d-flex align-items-center gap-1.5" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link-custom" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link nav-link-custom d-flex align-items-center gap-1.5" asp-area="" asp-controller="Project" asp-action="Index">Dashboard</a>
+                                <a class="nav-link-custom" asp-area="" asp-controller="Project" asp-action="Index">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link nav-link-custom d-flex align-items-center gap-1.5" asp-area="" asp-controller="ToDo" asp-action="Index">My Tasks</a>
+                                <a class="nav-link-custom" asp-area="" asp-controller="ToDo" asp-action="Index">My Tasks</a>
                             </li>
                         }
                         <li class="nav-item">
-                            <a class="nav-link nav-link-custom d-flex align-items-center gap-1.5" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link-custom" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
 
-                    <ul class="navbar-nav align-items-md-center gap-2">
+                    <ul class="navbar-nav align-items-lg-center gap-2 list-unstyled d-flex flex-column flex-lg-row">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item me-md-1">
-                                <span class="nav-link bg-light border rounded-pill px-3 py-1.5 text-dark small d-inline-flex align-items-center gap-2">
-                                    <span class="d-inline-block bg-success rounded-circle" style="width: 8px; height: 8px;"></span>
-                                    <span class="text-muted">User:</span> <strong class="fw-semibold">@User.Identity.Name</strong>
-                                </span>
+                            
+                            var navFullName = User.FindFirst("FullName")?.Value ?? "User";
+                            var navInitial = !string.IsNullOrWhiteSpace(navFullName) ? navFullName.Trim()[0].ToString().ToUpper() : "U";
+                            
+                            <li class="nav-item me-lg-1 mb-2 mb-lg-0">
+                                <a class="user-chip" asp-action="Index" asp-controller="User">
+                                    <span class="user-chip-avatar">@navInitial</span>
+                                    <span class="user-chip-greeting">Hello,</span>
+                                    <span class="user-chip-name">@navFullName</span>
+                                </a>
                             </li>
 
-                            <!-- MESSAGES DROPDOWN HUB -->
                             <li class="nav-item dropdown">
-                                <button type="button" class="btn fb-nav-btn border-0 position-relative rounded-circle p-0 d-flex align-items-center justify-content-center" id="fbMessageDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 38px;" title="Messages">
-                                    <i class="bi bi-chat-dots-fill text-dark fs-5"></i>
+                                <button type="button" class="btn fb-nav-btn position-relative p-0" id="fbMessageDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Messages">
+                                    <i class="bi bi-chat-dots-fill"></i>
                                     <span id="message-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary d-none" style="font-size: 0.65rem; padding: 0.25em 0.5em; transform: translate(-35%, -5%) !important;">
                                         0
                                     </span>
@@ -285,7 +437,10 @@
 
                                 <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 py-0 overflow-hidden mt-2" aria-labelledby="fbMessageDropdown" style="width: 360px; max-width: 90vw; z-index: 1050;">
                                     <div class="p-3 bg-white border-bottom d-flex align-items-center justify-content-between">
-                                        <h5 class="mb-0 fw-bold text-dark fs-5" style="letter-spacing: -0.3px;">Messages</h5>
+                                        <div class="dropdown-title-group">
+                                            <span class="dropdown-title-icon"><i class="bi bi-chat-dots-fill"></i></span>
+                                            <h5 class="mb-0 fw-bold text-dark fs-5" style="letter-spacing: -0.3px;">Messages</h5>
+                                        </div>
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="badge bg-primary-subtle text-primary rounded-pill font-xs px-2 py-1" id="message-header-count">0 Unread</span>
                                         </div>
@@ -297,10 +452,9 @@
                                 </div>
                             </li>
 
-                            <!-- NOTIFICATION DROPDOWN HUB -->
-                            <li class="nav-item dropdown me-md-2">
-                                <button type="button" class="btn fb-nav-btn border-0 position-relative rounded-circle p-0 d-flex align-items-center justify-content-center" id="fbNotificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 38px;" title="Notifications">
-                                    <i class="bi bi-bell-fill text-dark fs-5"></i>
+                            <li class="nav-item dropdown me-lg-2">
+                                <button type="button" class="btn fb-nav-btn position-relative p-0" id="fbNotificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+                                    <i class="bi bi-bell-fill"></i>
                                     <span id="notification-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.65rem; padding: 0.25em 0.5em; transform: translate(-35%, -5%) !important;">
                                         0
                                     </span>
@@ -308,7 +462,10 @@
 
                                 <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 py-0 overflow-hidden mt-2" aria-labelledby="fbNotificationDropdown" style="width: 360px; max-width: 90vw; z-index: 1050;">
                                     <div class="p-3 bg-white border-bottom d-flex align-items-center justify-content-between">
-                                        <h5 class="mb-0 fw-bold text-dark fs-5" style="letter-spacing: -0.3px;">Notifications</h5>
+                                        <div class="dropdown-title-group">
+                                            <span class="dropdown-title-icon"><i class="bi bi-bell-fill"></i></span>
+                                            <h5 class="mb-0 fw-bold text-dark fs-5" style="letter-spacing: -0.3px;">Notifications</h5>
+                                        </div>
                                         <div class="d-flex align-items-center gap-2">
                                             <button type="button" id="mark-all-read-btn" class="btn btn-link btn-sm text-primary text-decoration-none p-0 small fw-medium" style="font-size: 0.82rem;">
                                                 Mark all as read
@@ -324,7 +481,7 @@
 
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline m-0">
-                                    <button type="submit" class="nav-link btn btn-link btn-logout text-secondary border-0 d-flex align-items-center gap-1.5 py-1.5 transition-all">
+                                    <button type="submit" class="btn-logout-nav">
                                         <i class="bi bi-box-arrow-right"></i> Logout
                                     </button>
                                 </form>
@@ -333,10 +490,10 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-secondary fw-medium px-3" asp-controller="Account" asp-action="Login">Login</a>
+                                <a class="btn-login-nav" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="btn btn-primary rounded-pill px-4 fw-medium shadow-sm btn-sm" asp-controller="Account" asp-action="Register">Register</a>
+                                <a class="btn-register-nav" asp-controller="Account" asp-action="Register">Register</a>
                             </li>
                         }
                     </ul>
@@ -351,7 +508,6 @@
         </main>
     </div>
 
-    <!-- FLOATING CHAT DOCK (Docks bottom-right chat windows) -->
     <div id="fb-chat-dock" class="fb-chat-dock"></div>
 
     <footer class="footer mt-auto py-4 bg-white border-top border-light-subtle text-muted">
@@ -372,7 +528,6 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
-    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script> *@
     @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
         <script src="~/js/notifications.js" asp-append-version="true"></script>
